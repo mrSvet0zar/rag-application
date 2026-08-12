@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+
+# Env & secrets
+.env
+.env.local
+*.env
+!.env.example
+!*.env.example
+
+# Models cache (sentence-transformers downloads here)
+.cache/
+backend/.hf_cache/
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Data
+*.db
+uploads/

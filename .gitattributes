@@ -1,0 +1,9 @@
+# Normalize line endings to LF in the repo (prevents CRLF issues in Docker,
+# shell scripts, and cross-platform checkouts).
+* text=auto eol=lf
+
+# Binary / generated files: leave untouched.
+*.png binary
+*.jpg binary
+*.pdf binary
+package-lock.json -diff

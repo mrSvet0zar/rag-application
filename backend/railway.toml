@@ -1,0 +1,13 @@
+# Railway service config for the backend.
+# In the Railway dashboard, set this service's *Root Directory* to `backend`
+# so this file and the Dockerfile are picked up.
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Simple markdown-ish rendering for assistant messages */
+.prose-msg p {
+  margin: 0.4rem 0;
+}
+.prose-msg blockquote {
+  border-left: 3px solid #c7d2fe;
+  padding-left: 0.75rem;
+  color: #475569;
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+.prose-msg code {
+  background: #eef2ff;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+}
