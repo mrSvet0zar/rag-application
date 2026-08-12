@@ -34,8 +34,17 @@ simple est de déployer **l'image officielle pgvector** comme service :
    POSTGRES_USER=rag_user
    POSTGRES_PASSWORD=<mot-de-passe-fort>
    POSTGRES_DB=rag_db
+   # OBLIGATOIRE sur Railway : voir l'encart ci-dessous
+   PGDATA=/var/lib/postgresql/data/pgdata
    ```
 4. Ajoutez un **volume** monté sur `/var/lib/postgresql/data` (persistance).
+
+> ⚠️ **Erreur `initdb: directory ... exists but is not empty` (lost+found)**
+> Un volume monté contient toujours un dossier `lost+found`, donc Postgres
+> refuse d'initialiser directement dans le point de montage. La variable
+> `PGDATA=/var/lib/postgresql/data/pgdata` ci-dessus place les données dans un
+> **sous-dossier** et règle le problème. (En local ça ne se produit pas : le
+> *named volume* de docker-compose démarre réellement vide.)
 
 > ✅ **Pas de SQL à exécuter à la main** : au premier démarrage, le backend
 > applique automatiquement `init_db.sql` (extension pgvector + tables + index
