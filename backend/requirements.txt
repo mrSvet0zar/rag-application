@@ -21,8 +21,10 @@ sentence-transformers==3.3.1
 
 # --- Document parsing ---
 pypdf==5.1.0
+python-docx==1.1.2
+beautifulsoup4==4.12.3
+httpx==0.28.1  # also used to fetch pages for URL import
 
 # --- Tests ---
 pytest==8.3.4
 pytest-asyncio==0.25.0
-httpx==0.28.1

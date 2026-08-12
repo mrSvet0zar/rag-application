@@ -28,6 +28,11 @@ export const api = {
     return data;
   },
 
+  async importUrl(url) {
+    const { data } = await client.post('/api/documents/import-url', { url });
+    return data;
+  },
+
   async deleteDocument(id) {
     const { data } = await client.delete(`/api/documents/${id}`);
     return data;

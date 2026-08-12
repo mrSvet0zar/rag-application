@@ -120,8 +120,8 @@ class Database:
                 """INSERT INTO documents (filename, content_type, file_size_bytes, status)
                    VALUES ($1, $2, $3, 'processing')
                    RETURNING id""",
-                filename,
-                content_type,
+                filename[:255],
+                (content_type or "")[:50],  # column is VARCHAR(50); MIME types can be longer
                 file_size_bytes,
             )
 

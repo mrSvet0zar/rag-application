@@ -8,14 +8,17 @@ import json
 import logging
 import time
 from contextlib import asynccontextmanager
+from urllib.parse import urlparse
 from uuid import UUID
 
+import httpx
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from app.config import get_settings
 from app.embeddings import embedding_service
+from app.ingestion import docx_to_text, html_to_text, validate_public_url
 from app.rag_pipeline import RAGPipeline
 from app.reranker import rerank_service
 from app.schemas import (
@@ -25,8 +28,12 @@ from app.schemas import (
     DocumentResponse,
     RetrievedChunk,
     StatsResponse,
+    UrlImportRequest,
 )
 from app.vector_db import database
+
+# Cap on how much of a fetched web page we'll read (bytes).
+MAX_URL_BYTES = 5 * 1024 * 1024
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("rag")
@@ -62,18 +69,50 @@ SUPPORTED_TEXT_TYPES = {".txt", ".md", ".markdown", ".csv", ".json"}
 
 
 def _extract_text(filename: str, content: bytes) -> str:
-    """Extract plain text from an uploaded file (txt/md/pdf)."""
+    """Extract plain text from an uploaded file (txt/md/pdf/docx/html)."""
     lower = filename.lower()
     if lower.endswith(".pdf"):
         from pypdf import PdfReader
 
         reader = PdfReader(io.BytesIO(content))
         return "\n\n".join(page.extract_text() or "" for page in reader.pages)
+    if lower.endswith(".docx"):
+        return docx_to_text(content)
+    if lower.endswith((".html", ".htm")):
+        return html_to_text(content.decode("utf-8", errors="replace"))[1]
     # Default: treat as text.
     try:
         return content.decode("utf-8")
     except UnicodeDecodeError:
         return content.decode("latin-1")
+
+
+async def _ingest(
+    filename: str, content_type: str, size_bytes: int, text: str
+) -> DocumentResponse:
+    """Shared pipeline: chunk -> embed -> store -> finalize a document record.
+
+    Used by both file upload and URL import.
+    """
+    chunks = rag_pipeline.split_text(text)
+    if not chunks:
+        raise HTTPException(status_code=400, detail="Document produced no chunks.")
+
+    document_id = await database.create_document(filename, content_type, size_bytes)
+    try:
+        embeddings = await asyncio.to_thread(embedding_service.embed_documents, chunks)
+        chunk_data = [
+            (chunk, embedding, {"filename": filename})
+            for chunk, embedding in zip(chunks, embeddings)
+        ]
+        stored = await database.store_chunks(document_id, chunk_data)
+        await database.finalize_document(document_id, stored, status="completed")
+    except Exception as exc:  # noqa: BLE001
+        await database.finalize_document(document_id, 0, status="failed")
+        logger.exception("Failed to process document %s", document_id)
+        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
+
+    return DocumentResponse(**await database.get_document(document_id))
 
 
 async def _retrieve_chunks(question: str, k: int) -> list[dict]:
@@ -107,7 +146,7 @@ async def health():
 # ============ Documents ============
 @app.post("/api/documents/upload", response_model=DocumentResponse)
 async def upload_document(file: UploadFile = File(...)):
-    """Upload a document: extract text, chunk, embed, and store."""
+    """Upload a document (txt/md/pdf/docx/html): extract, chunk, embed, store."""
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="Empty file.")
@@ -120,32 +159,49 @@ async def upload_document(file: UploadFile = File(...)):
     if not text.strip():
         raise HTTPException(status_code=400, detail="No extractable text in file.")
 
-    chunks = rag_pipeline.split_text(text)
-    if not chunks:
-        raise HTTPException(status_code=400, detail="Document produced no chunks.")
-
-    document_id = await database.create_document(
+    return await _ingest(
         filename=file.filename,
         content_type=file.content_type or "text/plain",
-        file_size_bytes=len(content),
+        size_bytes=len(content),
+        text=text,
     )
 
-    try:
-        # Embedding is CPU-bound -> run off the event loop.
-        embeddings = await asyncio.to_thread(embedding_service.embed_documents, chunks)
-        chunk_data = [
-            (chunk, embedding, {"filename": file.filename})
-            for chunk, embedding in zip(chunks, embeddings)
-        ]
-        stored = await database.store_chunks(document_id, chunk_data)
-        await database.finalize_document(document_id, stored, status="completed")
-    except Exception as exc:  # noqa: BLE001
-        await database.finalize_document(document_id, 0, status="failed")
-        logger.exception("Failed to process document %s", document_id)
-        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
 
-    doc = await database.get_document(document_id)
-    return DocumentResponse(**doc)
+@app.post("/api/documents/import-url", response_model=DocumentResponse)
+async def import_url(req: UrlImportRequest):
+    """Fetch a web page, extract its readable text, and index it."""
+    url = str(req.url)
+
+    # SSRF guard (blocks localhost / private / metadata addresses).
+    try:
+        await asyncio.to_thread(validate_public_url, url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"URL refusée : {exc}")
+
+    try:
+        async with httpx.AsyncClient(
+            timeout=20.0, follow_redirects=True, max_redirects=5
+        ) as client:
+            resp = await client.get(url, headers={"User-Agent": "RAG-App/1.0"})
+            resp.raise_for_status()
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=400, detail=f"Récupération impossible : {exc}")
+
+    if len(resp.content) > MAX_URL_BYTES:
+        raise HTTPException(status_code=400, detail="Page trop volumineuse (> 5 Mo).")
+
+    title, text = html_to_text(resp.text)
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Aucun texte extractible de cette page.")
+
+    parsed = urlparse(url)
+    filename = (title or f"{parsed.netloc}{parsed.path}").strip()[:255] or parsed.netloc
+    return await _ingest(
+        filename=filename,
+        content_type="text/html",
+        size_bytes=len(resp.content),
+        text=text,
+    )
 
 
 @app.get("/api/documents", response_model=list[DocumentResponse])

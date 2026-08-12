@@ -7,29 +7,40 @@ export default function DocumentPanel() {
   const fileInputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState(null);
+  const [url, setUrl] = useState('');
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ['documents'],
     queryFn: api.listDocuments,
   });
 
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['documents'] });
+    queryClient.invalidateQueries({ queryKey: ['stats'] });
+  };
+
   const uploadMutation = useMutation({
     mutationFn: api.uploadDocument,
     onMutate: () => setError(null),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    },
+    onSuccess: invalidate,
     onError: (err) =>
       setError(err.response?.data?.detail || err.message || 'Échec de l’upload'),
   });
 
+  const importUrlMutation = useMutation({
+    mutationFn: api.importUrl,
+    onMutate: () => setError(null),
+    onSuccess: () => {
+      setUrl('');
+      invalidate();
+    },
+    onError: (err) =>
+      setError(err.response?.data?.detail || err.message || 'Échec de l’import'),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: api.deleteDocument,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    },
+    onSuccess: invalidate,
   });
 
   const handleFiles = (files) => {
@@ -67,18 +78,45 @@ export default function DocumentPanel() {
           <p className="mt-1 text-sm font-medium text-slate-700">
             Glissez un fichier ici
           </p>
-          <p className="text-xs text-slate-400">ou cliquez — .txt, .md, .pdf</p>
+          <p className="text-xs text-slate-400">
+            ou cliquez — .txt, .md, .pdf, .docx, .html
+          </p>
           <input
             ref={fileInputRef}
             type="file"
-            accept=".txt,.md,.markdown,.pdf,.csv,.json"
+            accept=".txt,.md,.markdown,.pdf,.docx,.html,.htm,.csv,.json"
             multiple
             className="hidden"
             onChange={(e) => handleFiles(e.target.files)}
           />
         </div>
 
-        {uploadMutation.isPending && (
+        {/* URL import */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (url.trim()) importUrlMutation.mutate(url.trim());
+          }}
+          className="mt-3 flex gap-2"
+        >
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="🔗 Importer depuis une URL…"
+            disabled={importUrlMutation.isPending}
+            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={importUrlMutation.isPending || !url.trim()}
+            className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Importer
+          </button>
+        </form>
+
+        {(uploadMutation.isPending || importUrlMutation.isPending) && (
           <p className="mt-2 text-xs text-brand-600">⏳ Traitement en cours…</p>
         )}
         {error && <p className="mt-2 text-xs text-red-600">{error}</p>}

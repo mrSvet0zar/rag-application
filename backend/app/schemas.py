@@ -4,10 +4,14 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 # ---------- Documents ----------
+class UrlImportRequest(BaseModel):
+    url: HttpUrl
+
+
 class DocumentResponse(BaseModel):
     id: int
     filename: str

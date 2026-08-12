@@ -114,7 +114,8 @@ python -m scripts.seed_documents
 | Méthode  | Route                              | Description                          |
 | -------- | ---------------------------------- | ------------------------------------ |
 | `GET`    | `/api/health`                      | Statut + mode démo                   |
-| `POST`   | `/api/documents/upload`            | Upload + chunk + embed + index       |
+| `POST`   | `/api/documents/upload`            | Upload (txt/md/pdf/docx/html) + index |
+| `POST`   | `/api/documents/import-url`        | Importe une page web (SSRF-guarded)  |
 | `GET`    | `/api/documents`                   | Liste des documents                  |
 | `DELETE` | `/api/documents/{id}`              | Supprime un document et ses chunks   |
 | `POST`   | `/api/chat`                        | Pose une question (RAG, réponse complète) |
@@ -203,6 +204,7 @@ Guide complet Railway (backend + DB) + Vercel (frontend) :
 
 - ✅ ~~Réponses en streaming (SSE)~~ — fait
 - ✅ ~~Reranking avec un cross-encoder~~ — fait (`RERANK_ENABLED`)
+- ✅ ~~Support de plus de formats (docx, html, import d'URL)~~ — fait
 - Authentification utilisateur
 - Support de plus de formats (docx, html, crawling web)
 - Déploiement (Railway + Vercel)
