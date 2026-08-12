@@ -1,13 +1,80 @@
-# 🤖 RAG Application — Chatbot sur documents personnalisés
+<div align="center">
 
-Chatbot de **Retrieval-Augmented Generation** : uploadez vos documents, posez
-des questions, obtenez des réponses **ancrées dans vos sources** (avec citation
-des passages utilisés et scores de similarité).
+# 🤖 RAG Chatbot — Questions-réponses sur vos documents
 
-Ce projet fait partie d'un portfolio démontrant des compétences autour de l'IA,
-des LLMs et de la recherche sémantique.
+**Uploadez vos documents, posez des questions, obtenez des réponses ancrées dans vos sources** — avec citations, streaming en temps réel et reranking par cross-encoder.
+
+[![CI](https://github.com/mrSvet0zar/rag-application/actions/workflows/ci.yml/badge.svg)](https://github.com/mrSvet0zar/rag-application/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-4169E1?logo=postgresql&logoColor=white)
+![Claude](https://img.shields.io/badge/LLM-Claude-D97757)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+### [🚀 Démo live](https://rag-application-flax.vercel.app) &nbsp;·&nbsp; [Fonctionnalités](#-fonctionnalités) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Démarrage](#-démarrage-rapide)
+
+</div>
 
 ---
+
+Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonctionnel. Il démontre la maîtrise d'une chaîne RAG complète : chunking, embeddings vectoriels, recherche sémantique, **reranking**, et génération par LLM avec citation des sources.
+
+> 💡 **Sans clé API ?** L'app tourne quand même : la recherche vectorielle fonctionne et une réponse est construite localement (*mode démo*). Ajoutez une clé Anthropic pour activer les réponses de Claude.
+
+## 🖼️ Démo
+
+<!-- Ajoutez vos captures dans docs/screenshots/ (voir la note en bas du README) -->
+<div align="center">
+
+| Chat avec sources & reranking | Panneau documents |
+| :---: | :---: |
+| ![Chat](docs/screenshots/chat.png) | ![Documents](docs/screenshots/documents.png) |
+
+</div>
+
+## ✨ Fonctionnalités
+
+- 🔍 **RAG à deux étages** — recherche vectorielle (pgvector, index HNSW) puis **reranking par cross-encoder** multilingue : remonte les passages pertinents que la similarité seule enterre.
+- 🧠 **Génération Claude** avec **citation des sources** (`[source: fichier]`) et **streaming SSE** token par token.
+- 🌍 **Embeddings 100 % locaux** (`sentence-transformers`, multilingue FR/EN, 384 dims) — gratuits, sans clé, sans coût.
+- 📥 **Ingestion multi-formats** — `.txt`, `.md`, `.pdf`, `.docx`, `.html`, et **import depuis une URL** (avec garde **anti-SSRF**).
+- 💬 **Conversations persistées** (documents, chunks, conversations, messages en base).
+- 🛡️ **Robustesse** — schéma auto-appliqué au démarrage, retry de connexion, dégradation gracieuse si le LLM est indisponible, mode démo.
+- ⚙️ **Prêt pour la prod** — Docker, CI GitHub Actions, déployé sur Railway + Vercel.
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+    U(["👤 Utilisateur"]) -->|HTTPS| FE["⚛️ Frontend<br/>React + Vite + Tailwind<br/>— Vercel —"]
+    FE <-->|"REST + SSE"| BE["⚡ Backend<br/>FastAPI async<br/>— Railway —"]
+
+    subgraph Traitement
+        EMB["🔡 Embeddings locaux<br/>sentence-transformers"]
+        RR["🎯 Reranking<br/>cross-encoder"]
+        LLM["🧠 Claude API"]
+    end
+
+    BE --> EMB
+    BE --> RR
+    BE --> LLM
+    BE <--> DB[("🐘 PostgreSQL + pgvector<br/>documents · chunks · conversations")]
+```
+
+### Le flux d'une question
+
+```mermaid
+flowchart TD
+    Q["❓ Question"] --> E["Embedding local<br/>384d multilingue"]
+    E --> VS["Recherche vectorielle<br/>pgvector · HNSW · cosinus"]
+    VS -->|"pool de ~20 candidats"| RR["🎯 Reranking cross-encoder<br/>re-note chaque paire (question, passage)"]
+    RR -->|"top-k pertinents"| P["📝 Prompt + contexte"]
+    P --> C["🧠 Claude — streaming SSE"]
+    C --> A["💬 Réponse + sources citées"]
+```
+
+**Pourquoi le reranking ?** Un bi-encodeur (embeddings) encode la question et les passages *séparément* — rapide mais grossier. Le cross-encoder lit la paire *ensemble* → bien plus précis. En pratique, un passage à **0.19** de similarité cosinus (sous le seuil !) peut être **re-classé n°1** par le cross-encoder.
 
 ## 🧱 Stack
 
@@ -15,196 +82,98 @@ des LLMs et de la recherche sémantique.
 | ------------ | ---------------------------------------------------------------------- |
 | Frontend     | React 18 + Vite + Tailwind CSS + React Query                           |
 | Backend      | FastAPI (async) + asyncpg                                              |
-| Embeddings   | `sentence-transformers` (local, multilingue, **384 dims**, sans clé)   |
-| LLM          | Anthropic **Claude** (`claude-sonnet-5` par défaut)                    |
-| Chunking     | LangChain `RecursiveCharacterTextSplitter`                             |
-| Reranking    | Cross-encoder multilingue (`mmarco-mMiniLMv2`) — re-note les candidats |
+| Embeddings   | `sentence-transformers` (local, multilingue, 384 dims)                 |
+| Reranking    | Cross-encoder `mmarco-mMiniLMv2` (multilingue)                         |
+| LLM          | Anthropic **Claude** (`claude-sonnet-5`)                               |
 | Vector store | PostgreSQL 16 + **pgvector** (index HNSW, similarité cosinus)          |
-
-> **Note embeddings** : Anthropic ne propose pas d'API d'embeddings. On utilise
-> donc un modèle local (gratuit, aucune clé). Claude n'intervient que pour la
-> **génération** de la réponse finale.
-
-> **Mode démo** : sans clé Anthropic, l'app reste 100 % fonctionnelle — la
-> recherche vectorielle marche et la réponse est construite localement à partir
-> des passages récupérés. Ajoutez `ANTHROPIC_API_KEY` pour activer Claude.
-
----
-
-## 🏗️ Architecture
-
-```
-Frontend (React)  ──HTTP──►  Backend (FastAPI)
-                                 │
-                 ┌───────────────┼────────────────┐
-                 ▼               ▼                ▼
-         Embeddings local   RAG pipeline     PostgreSQL + pgvector
-        (sentence-transf.)  (chunk + Claude)  (documents, chunks,
-                                               conversations, messages)
-```
-
-**Flux d'une question :** embedding de la question → recherche d'un pool de
-candidats (cosinus) → **reranking cross-encoder** (re-note finement puis garde
-les meilleurs) → injection dans le prompt → génération Claude → persistance de
-la conversation → réponse + sources (avec score de reranking).
-
----
+| Déploiement  | Railway (backend + DB) · Vercel (frontend) · Docker · GitHub Actions   |
 
 ## 🚀 Démarrage rapide
 
-### Prérequis
-- Docker (pour PostgreSQL + pgvector)
-- Python 3.10+
-- Node.js 18+
-
-### 1. Base de données
+**Prérequis :** Docker, Python 3.10+, Node.js 18+.
 
 ```bash
+# 1. Base de données (PostgreSQL + pgvector)
 docker compose up -d
-```
 
-Cela démarre PostgreSQL sur le port `5432` et applique automatiquement
-`backend/init_db.sql` (extension pgvector + tables + index).
-
-### 2. Backend
-
-```bash
+# 2. Backend
 cd backend
-python -m venv venv
-# Windows PowerShell:  venv\Scripts\Activate.ps1
-# macOS/Linux:         source venv/bin/activate
+python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-cp .env.example .env      # puis, optionnel : renseignez ANTHROPIC_API_KEY
+cp .env.example .env        # optionnel : renseignez ANTHROPIC_API_KEY
 uvicorn app.main:app --reload --port 8000
-```
 
-- API : http://localhost:8000
-- Docs interactives (Swagger) : http://localhost:8000/docs
-
-> Au premier appel nécessitant un embedding, le modèle (~120 Mo) est téléchargé
-> puis mis en cache.
-
-### 3. Frontend
-
-```bash
+# 3. Frontend (autre terminal)
 cd frontend
-npm install
-npm run dev
+npm install && npm run dev
 ```
 
-Interface : http://localhost:5173
-
-### 4. (Optionnel) Charger les documents d'exemple
-
-Trois documents markdown sont fournis dans `backend/sample_docs/`.
-Serveur démarré, dans un autre terminal :
-
-```bash
-cd backend
-python -m scripts.seed_documents
-```
-
-…ou glissez-les simplement dans l'interface.
-
----
+- Interface : http://localhost:5173
+- API + Swagger : http://localhost:8000/docs
+- Charger les documents d'exemple : `cd backend && python -m scripts.seed_documents`
 
 ## 📡 API
 
-| Méthode  | Route                              | Description                          |
-| -------- | ---------------------------------- | ------------------------------------ |
-| `GET`    | `/api/health`                      | Statut + mode démo                   |
-| `POST`   | `/api/documents/upload`            | Upload (txt/md/pdf/docx/html) + index |
-| `POST`   | `/api/documents/import-url`        | Importe une page web (SSRF-guarded)  |
-| `GET`    | `/api/documents`                   | Liste des documents                  |
-| `DELETE` | `/api/documents/{id}`              | Supprime un document et ses chunks   |
-| `POST`   | `/api/chat`                        | Pose une question (RAG, réponse complète) |
-| `POST`   | `/api/chat/stream`                 | Idem en **streaming** (SSE, token par token) |
-| `GET`    | `/api/conversations/{id}`          | Historique d'une conversation        |
-| `GET`    | `/api/stats`                       | Statistiques globales                |
-
-Exemple de requête chat :
-
-```bash
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"question": "Qu'\''est-ce que le RAG ?", "k": 5}'
-```
-
----
+| Méthode  | Route                        | Description                              |
+| -------- | ---------------------------- | ---------------------------------------- |
+| `POST`   | `/api/documents/upload`      | Upload (txt/md/pdf/docx/html) + index    |
+| `POST`   | `/api/documents/import-url`  | Importe une page web (SSRF-guarded)      |
+| `GET`    | `/api/documents`             | Liste des documents                      |
+| `DELETE` | `/api/documents/{id}`        | Supprime un document et ses chunks       |
+| `POST`   | `/api/chat`                  | Question (RAG, réponse complète)         |
+| `POST`   | `/api/chat/stream`           | Question en **streaming** (SSE)          |
+| `GET`    | `/api/conversations/{id}`    | Historique d'une conversation            |
+| `GET`    | `/api/stats`                 | Statistiques globales                    |
 
 ## 🧪 Tests
 
 ```bash
-cd backend
-pytest          # tests unitaires (chunking, prompt, mode démo — sans DB ni modèle)
+cd backend && pytest      # 21 tests (chunking, prompt, reranking, ingestion, SSRF)
 ```
 
----
+## ⚙️ Configuration
 
-## ⚙️ Configuration (backend/.env)
+Variables principales (`backend/.env`, voir [`.env.example`](backend/.env.example)) :
 
-| Variable              | Défaut                          | Rôle                                        |
-| --------------------- | ------------------------------- | ------------------------------------------- |
-| `ANTHROPIC_API_KEY`   | *(vide)*                        | Clé Claude. Vide = mode démo.               |
-| `CHAT_MODEL`          | `claude-sonnet-5`               | Modèle de génération                        |
-| `EMBEDDING_MODEL`     | `…paraphrase-multilingual-MiniLM-L12-v2` | Modèle d'embeddings local          |
-| `PGVECTOR_DIMENSION`  | `384`                           | Dimension des vecteurs (⇔ modèle)           |
-| `CHUNK_SIZE`          | `1024`                          | Taille des chunks (caractères)              |
-| `CHUNK_OVERLAP`       | `200`                           | Chevauchement entre chunks                  |
-| `MIN_RELEVANCE_SCORE` | `0.25`                          | Seuil de similarité minimal (sans rerank)   |
-| `TOP_K_RETRIEVAL`     | `5`                             | Nombre de chunks récupérés                  |
-| `RERANK_ENABLED`      | `true`                          | Active le reranking cross-encoder (2ᵉ modèle, ~500 Mo RAM) |
-| `RERANK_MODEL`        | `…mmarco-mMiniLMv2-L12-H384-v1` | Modèle cross-encoder multilingue            |
-| `RERANK_CANDIDATES`   | `20`                            | Taille du pool re-noté par le cross-encoder |
-| `RERANK_MIN_SCORE`    | `0.05`                          | Seuil du score de rerank (garde ≥ 1 source) |
+| Variable              | Défaut              | Rôle                                        |
+| --------------------- | ------------------- | ------------------------------------------- |
+| `ANTHROPIC_API_KEY`   | *(vide)*            | Clé Claude. Vide = mode démo.               |
+| `CHAT_MODEL`          | `claude-sonnet-5`   | Modèle de génération                        |
+| `RERANK_ENABLED`      | `true`              | Reranking cross-encoder (2ᵉ modèle, ~500 Mo RAM) |
+| `MIN_RELEVANCE_SCORE` | `0.25`              | Seuil de similarité (sans rerank)           |
+| `TOP_K_RETRIEVAL`     | `5`                 | Nombre de chunks fournis au LLM             |
 
-> ⚠️ Si vous changez `EMBEDDING_MODEL`, mettez à jour `PGVECTOR_DIMENSION` **et**
-> la dimension `vector(...)` dans `init_db.sql`, puis recréez la base.
+## ☁️ Déploiement
 
----
+Guide complet Railway + Vercel : **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+Fichiers fournis : `backend/Dockerfile`, `backend/railway.toml`, `frontend/vercel.json`, `.github/workflows/ci.yml`.
 
 ## 📁 Structure
 
 ```
 rag-application/
-├── docker-compose.yml         # PostgreSQL + pgvector
+├── docker-compose.yml          # PostgreSQL + pgvector
 ├── backend/
-│   ├── init_db.sql            # schéma + extension + index
-│   ├── requirements.txt
-│   ├── .env.example
 │   ├── app/
-│   │   ├── config.py          # settings (pydantic-settings)
-│   │   ├── schemas.py         # modèles Pydantic (API)
-│   │   ├── embeddings.py      # embeddings locaux (sentence-transformers)
-│   │   ├── rag_pipeline.py    # chunking + génération Claude / démo
-│   │   ├── vector_db.py       # accès DB async + recherche vectorielle
-│   │   └── main.py            # app FastAPI + routes
-│   ├── scripts/seed_documents.py
-│   ├── sample_docs/           # documents d'exemple
+│   │   ├── main.py             # FastAPI + routes
+│   │   ├── rag_pipeline.py     # chunking + génération Claude / démo
+│   │   ├── reranker.py         # reranking cross-encoder
+│   │   ├── embeddings.py       # embeddings locaux
+│   │   ├── ingestion.py        # extraction docx/html + garde anti-SSRF
+│   │   └── vector_db.py        # accès DB async + recherche vectorielle
 │   └── tests/
 └── frontend/
     └── src/
-        ├── App.jsx
         ├── services/api.js
         └── components/{Navbar,DocumentPanel,ChatInterface}.jsx
 ```
 
----
+## 📄 Licence
 
-## ☁️ Déploiement
-
-Guide complet Railway (backend + DB) + Vercel (frontend) :
-**[DEPLOYMENT.md](DEPLOYMENT.md)**. Fichiers fournis : `backend/Dockerfile`,
-`backend/railway.toml`, `frontend/vercel.json`, `.github/workflows/ci.yml`.
+[MIT](LICENSE) © Milan Ganivet
 
 ---
 
-## 🗺️ Améliorations possibles (post-MVP)
-
-- ✅ ~~Réponses en streaming (SSE)~~ — fait
-- ✅ ~~Reranking avec un cross-encoder~~ — fait (`RERANK_ENABLED`)
-- ✅ ~~Support de plus de formats (docx, html, import d'URL)~~ — fait
-- Authentification utilisateur
-- Support de plus de formats (docx, html, crawling web)
-- Déploiement (Railway + Vercel)
+<div align="center">
+<sub>Projet 1 d'un portfolio autour de l'IA, des LLMs et de la recherche sémantique.</sub>
+</div>
