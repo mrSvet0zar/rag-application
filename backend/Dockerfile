@@ -21,11 +21,14 @@ RUN pip install --upgrade pip \
 # 2) Copy the application code.
 COPY . .
 
-# 3) Pre-download the embedding model into the image so the first request
-#    doesn't pay the download cost (and works on read-only/offline hosts).
+# 3) Pre-download the embedding + reranker models into the image so the first
+#    request doesn't pay the download cost (and works on read-only/offline hosts).
 RUN python -c "from sentence_transformers import SentenceTransformer; \
 import os; SentenceTransformer(os.getenv('EMBEDDING_MODEL', \
 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'))"
+RUN python -c "from sentence_transformers import CrossEncoder; \
+import os; CrossEncoder(os.getenv('RERANK_MODEL', \
+'cross-encoder/mmarco-mMiniLMv2-L12-H384-v1'))"
 
 # Railway/most PaaS inject $PORT. Default to 8000 locally.
 ENV PORT=8000

@@ -17,6 +17,7 @@ from fastapi.responses import StreamingResponse
 from app.config import get_settings
 from app.embeddings import embedding_service
 from app.rag_pipeline import RAGPipeline
+from app.reranker import rerank_service
 from app.schemas import (
     ChatRequest,
     ChatResponse,
@@ -73,6 +74,28 @@ def _extract_text(filename: str, content: bytes) -> str:
         return content.decode("utf-8")
     except UnicodeDecodeError:
         return content.decode("latin-1")
+
+
+async def _retrieve_chunks(question: str, k: int) -> list[dict]:
+    """Embed the query, vector-search a candidate pool, then (optionally)
+    rerank it down to the top `k` with a cross-encoder.
+
+    When reranking is on we fetch a broad pool (`rerank_candidates`) with **no**
+    cosine floor, because the cross-encoder — not the bi-encoder — should decide
+    relevance; applying the 0.25 floor here would hide good chunks from it.
+    When reranking is off we fetch exactly `k` above `min_relevance_score`.
+    """
+    query_embedding = await asyncio.to_thread(embedding_service.embed_query, question)
+    if settings.rerank_enabled:
+        candidates = await database.search(
+            query_embedding, top_k=settings.rerank_candidates, min_score=0.0
+        )
+        if not candidates:
+            return []
+        return await asyncio.to_thread(rerank_service.rerank, question, candidates, k)
+    return await database.search(
+        query_embedding, top_k=k, min_score=settings.min_relevance_score
+    )
 
 
 # ============ Health ============
@@ -145,15 +168,8 @@ async def chat(request: ChatRequest):
     """Answer a question using retrieval-augmented generation."""
     start = time.time()
 
-    # 1. Embed the query and retrieve relevant chunks.
-    query_embedding = await asyncio.to_thread(
-        embedding_service.embed_query, request.question
-    )
-    chunks = await database.search(
-        query_embedding,
-        top_k=request.k,
-        min_score=settings.min_relevance_score,
-    )
+    # 1. Retrieve relevant chunks (vector search + optional cross-encoder rerank).
+    chunks = await _retrieve_chunks(request.question, request.k)
 
     # 2. Generate the answer (Claude, or demo fallback).
     answer, tokens = await rag_pipeline.generate_response(request.question, chunks)
@@ -181,6 +197,11 @@ async def chat(request: ChatRequest):
                 document_id=c["document_id"],
                 filename=c.get("filename"),
                 similarity_score=round(float(c["similarity"]), 4),
+                rerank_score=(
+                    round(float(c["rerank_score"]), 4)
+                    if c.get("rerank_score") is not None
+                    else None
+                ),
             )
             for c in chunks
         ],
@@ -208,14 +229,7 @@ async def chat_stream(request: ChatRequest):
     async def event_generator():
         start = time.time()
         try:
-            query_embedding = await asyncio.to_thread(
-                embedding_service.embed_query, request.question
-            )
-            chunks = await database.search(
-                query_embedding,
-                top_k=request.k,
-                min_score=settings.min_relevance_score,
-            )
+            chunks = await _retrieve_chunks(request.question, request.k)
 
             sources = [
                 {
@@ -224,6 +238,11 @@ async def chat_stream(request: ChatRequest):
                     "document_id": c["document_id"],
                     "filename": c.get("filename"),
                     "similarity_score": round(float(c["similarity"]), 4),
+                    "rerank_score": (
+                        round(float(c["rerank_score"]), 4)
+                        if c.get("rerank_score") is not None
+                        else None
+                    ),
                 }
                 for c in chunks
             ]
@@ -297,6 +316,7 @@ async def get_stats():
         demo_mode=settings.demo_mode,
         chat_model=settings.chat_model,
         embedding_model=settings.embedding_model,
+        rerank_enabled=settings.rerank_enabled,
     )
 
 

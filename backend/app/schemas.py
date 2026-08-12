@@ -33,7 +33,8 @@ class RetrievedChunk(BaseModel):
     text: str
     document_id: int
     filename: Optional[str] = None
-    similarity_score: float
+    similarity_score: float  # cosine similarity from vector search
+    rerank_score: Optional[float] = None  # cross-encoder relevance, if reranked
 
 
 class ChatResponse(BaseModel):
@@ -71,3 +72,4 @@ class StatsResponse(BaseModel):
     demo_mode: bool
     chat_model: str
     embedding_model: str
+    rerank_enabled: bool = False

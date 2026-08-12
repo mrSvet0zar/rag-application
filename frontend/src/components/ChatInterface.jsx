@@ -178,13 +178,25 @@ function Sources({ sources }) {
         <ul className="mt-2 space-y-2">
           {sources.map((s) => (
             <li key={s.id} className="rounded-lg bg-white p-2 text-xs">
-              <div className="mb-1 flex items-center justify-between">
+              <div className="mb-1 flex items-center justify-between gap-2">
                 <span className="font-medium text-slate-700">
                   📎 {s.filename || `doc #${s.document_id}`}
                 </span>
-                <span className="rounded bg-brand-50 px-1.5 py-0.5 text-brand-700">
-                  {(s.similarity_score * 100).toFixed(0)}%
-                </span>
+                {s.rerank_score != null ? (
+                  <span
+                    className="whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700"
+                    title={`Reranking ${(s.rerank_score * 100).toFixed(0)}% · cosinus ${(s.similarity_score * 100).toFixed(0)}%`}
+                  >
+                    ⭐ {(s.rerank_score * 100).toFixed(0)}%
+                  </span>
+                ) : (
+                  <span
+                    className="whitespace-nowrap rounded bg-brand-50 px-1.5 py-0.5 text-brand-700"
+                    title="Similarité cosinus"
+                  >
+                    {(s.similarity_score * 100).toFixed(0)}%
+                  </span>
+                )}
               </div>
               <p className="text-slate-500">
                 {s.text.length > 220 ? s.text.slice(0, 220) + '…' : s.text}

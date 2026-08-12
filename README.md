@@ -18,7 +18,8 @@ des LLMs et de la recherche sémantique.
 | Embeddings   | `sentence-transformers` (local, multilingue, **384 dims**, sans clé)   |
 | LLM          | Anthropic **Claude** (`claude-sonnet-5` par défaut)                    |
 | Chunking     | LangChain `RecursiveCharacterTextSplitter`                             |
-| Vector store | PostgreSQL 16 + **pgvector** (index IVFFlat, similarité cosinus)       |
+| Reranking    | Cross-encoder multilingue (`mmarco-mMiniLMv2`) — re-note les candidats |
+| Vector store | PostgreSQL 16 + **pgvector** (index HNSW, similarité cosinus)          |
 
 > **Note embeddings** : Anthropic ne propose pas d'API d'embeddings. On utilise
 > donc un modèle local (gratuit, aucune clé). Claude n'intervient que pour la
@@ -42,9 +43,10 @@ Frontend (React)  ──HTTP──►  Backend (FastAPI)
                                                conversations, messages)
 ```
 
-**Flux d'une question :** embedding de la question → recherche des chunks les
-plus proches (cosinus) → injection dans le prompt → génération Claude →
-persistance de la conversation → réponse + sources.
+**Flux d'une question :** embedding de la question → recherche d'un pool de
+candidats (cosinus) → **reranking cross-encoder** (re-note finement puis garde
+les meilleurs) → injection dans le prompt → génération Claude → persistance de
+la conversation → réponse + sources (avec score de reranking).
 
 ---
 
@@ -149,8 +151,12 @@ pytest          # tests unitaires (chunking, prompt, mode démo — sans DB ni m
 | `PGVECTOR_DIMENSION`  | `384`                           | Dimension des vecteurs (⇔ modèle)           |
 | `CHUNK_SIZE`          | `1024`                          | Taille des chunks (caractères)              |
 | `CHUNK_OVERLAP`       | `200`                           | Chevauchement entre chunks                  |
-| `MIN_RELEVANCE_SCORE` | `0.25`                          | Seuil de similarité minimal                 |
+| `MIN_RELEVANCE_SCORE` | `0.25`                          | Seuil de similarité minimal (sans rerank)   |
 | `TOP_K_RETRIEVAL`     | `5`                             | Nombre de chunks récupérés                  |
+| `RERANK_ENABLED`      | `true`                          | Active le reranking cross-encoder (2ᵉ modèle, ~500 Mo RAM) |
+| `RERANK_MODEL`        | `…mmarco-mMiniLMv2-L12-H384-v1` | Modèle cross-encoder multilingue            |
+| `RERANK_CANDIDATES`   | `20`                            | Taille du pool re-noté par le cross-encoder |
+| `RERANK_MIN_SCORE`    | `0.05`                          | Seuil du score de rerank (garde ≥ 1 source) |
 
 > ⚠️ Si vous changez `EMBEDDING_MODEL`, mettez à jour `PGVECTOR_DIMENSION` **et**
 > la dimension `vector(...)` dans `init_db.sql`, puis recréez la base.
@@ -196,7 +202,7 @@ Guide complet Railway (backend + DB) + Vercel (frontend) :
 ## 🗺️ Améliorations possibles (post-MVP)
 
 - ✅ ~~Réponses en streaming (SSE)~~ — fait
-- Reranking avec un cross-encoder
+- ✅ ~~Reranking avec un cross-encoder~~ — fait (`RERANK_ENABLED`)
 - Authentification utilisateur
 - Support de plus de formats (docx, html, crawling web)
 - Déploiement (Railway + Vercel)

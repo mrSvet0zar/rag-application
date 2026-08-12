@@ -59,6 +59,44 @@ def test_demo_answer_mentions_sources(pipeline):
     assert "doc.md" in answer
 
 
+def test_reranker_assemble_sorts_and_truncates():
+    """_assemble adds sigmoid scores, sorts by relevance, keeps top_n."""
+    from app.reranker import RerankService
+
+    chunks = [
+        {"id": 1, "text": "peu pertinent"},
+        {"id": 2, "text": "très pertinent"},
+        {"id": 3, "text": "moyen"},
+    ]
+    raw_scores = [-2.0, 5.0, 0.0]  # cross-encoder logits
+    out = RerankService._assemble(chunks, raw_scores, top_n=2)
+
+    assert [c["id"] for c in out] == [2, 3]  # highest logits first
+    assert 0.0 <= out[0]["rerank_score"] <= 1.0
+    assert out[0]["rerank_score"] > out[1]["rerank_score"]
+    # original chunks are not mutated (dicts are copied)
+    assert "rerank_score" not in chunks[0]
+
+
+def test_reranker_assemble_empty():
+    from app.reranker import RerankService
+
+    assert RerankService._assemble([], [], top_n=5) == []
+
+
+def test_reranker_assemble_threshold_filters_but_keeps_best():
+    from app.reranker import RerankService
+
+    chunks = [{"id": 1, "text": "a"}, {"id": 2, "text": "b"}, {"id": 3, "text": "c"}]
+    scores = [5.0, -6.0, -7.0]  # only #1 is clearly relevant
+    out = RerankService._assemble(chunks, scores, top_n=5, min_score=0.05)
+    assert [c["id"] for c in out] == [1]  # low-score chunks dropped
+
+    # If everything is below threshold, still keep the single best.
+    out2 = RerankService._assemble(chunks, [-6.0, -7.0, -8.0], top_n=5, min_score=0.05)
+    assert len(out2) == 1 and out2[0]["id"] == 1
+
+
 def test_llm_error_answer_credit_message():
     """The credit-balance error produces a clear, user-facing fallback."""
     import anthropic

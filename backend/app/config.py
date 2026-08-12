@@ -42,6 +42,17 @@ class Settings(BaseSettings):
     min_relevance_score: float = 0.25
     top_k_retrieval: int = 5
 
+    # --- Reranking (cross-encoder) ---
+    # Retrieve `rerank_candidates` chunks by vector similarity, then re-score
+    # them with a cross-encoder and keep the best `k`. Set rerank_enabled=False
+    # to skip it (e.g. on a memory-constrained host: it loads a 2nd model).
+    rerank_enabled: bool = True
+    rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
+    rerank_candidates: int = 20
+    # Drop chunks the cross-encoder scores below this (keeps at least the top 1),
+    # so obviously irrelevant passages aren't fed to the LLM or shown as sources.
+    rerank_min_score: float = 0.05
+
     @property
     def cors_origins_list(self) -> list[str]:
         """CORS origins as a list (env stores a comma-separated string)."""
