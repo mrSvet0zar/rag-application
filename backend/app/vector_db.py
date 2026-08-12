@@ -7,6 +7,7 @@ retrieval over pgvector.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from pathlib import Path
@@ -32,15 +33,53 @@ class Database:
         self.pool: Optional[asyncpg.Pool] = None
 
     # ---------- Lifecycle ----------
-    async def connect(self) -> None:
-        """Ensure the schema exists, then create the pgvector-aware pool."""
-        # Bootstrap the schema first: register_vector (run on every pooled
-        # connection) needs the `vector` type to already exist, so the
-        # extension must be created before the pool is built. init_db.sql is
-        # fully idempotent (CREATE ... IF NOT EXISTS), so this is safe to run
-        # on every startup and removes the need to apply it manually in prod.
-        await self._ensure_schema()
+    async def connect(self, max_wait_seconds: float = 90.0) -> None:
+        """Connect to the DB, retrying while the network/DB comes up.
 
+        Railway's private network (`*.railway.internal`) takes a few seconds to
+        be established after a service starts, so an immediate connection at
+        boot can fail DNS resolution. We retry with exponential backoff until
+        the DB is reachable (or the budget is exhausted), which also covers the
+        DB simply not being ready yet.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + max_wait_seconds
+        attempt = 0
+        delay = 1.0
+        while True:
+            attempt += 1
+            try:
+                await self._bootstrap()
+                logger.info("Database ready (after %d attempt(s)).", attempt)
+                return
+            except (OSError, asyncpg.PostgresError) as exc:
+                if loop.time() >= deadline:
+                    logger.error(
+                        "Could not connect to the database after %d attempts / "
+                        "%.0fs. Last error: %s",
+                        attempt,
+                        max_wait_seconds,
+                        exc,
+                    )
+                    raise
+                logger.warning(
+                    "DB not reachable yet (attempt %d): %s. Retrying in %.0fs...",
+                    attempt,
+                    exc,
+                    delay,
+                )
+                await asyncio.sleep(delay)
+                delay = min(delay * 2, 8.0)
+
+    async def _bootstrap(self) -> None:
+        """One connection attempt: ensure schema, then build the pool.
+
+        register_vector (run on every pooled connection) needs the `vector`
+        type to already exist, so the extension must be created before the pool
+        is built. init_db.sql is idempotent, so this is safe on every startup
+        and removes the need to apply it manually in prod.
+        """
+        await self._ensure_schema()
         self.pool = await asyncpg.create_pool(
             self.settings.database_url,
             min_size=self.settings.db_pool_min_size,
