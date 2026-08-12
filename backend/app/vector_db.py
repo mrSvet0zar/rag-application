@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+from pathlib import Path
 from typing import Optional
 from uuid import UUID
 
@@ -18,6 +19,9 @@ from pgvector.asyncpg import register_vector
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
+
+# init_db.sql lives at the backend root (one level above this app/ package).
+SCHEMA_PATH = Path(__file__).resolve().parent.parent / "init_db.sql"
 
 
 class Database:
@@ -29,7 +33,14 @@ class Database:
 
     # ---------- Lifecycle ----------
     async def connect(self) -> None:
-        """Create the connection pool and register the pgvector codec."""
+        """Ensure the schema exists, then create the pgvector-aware pool."""
+        # Bootstrap the schema first: register_vector (run on every pooled
+        # connection) needs the `vector` type to already exist, so the
+        # extension must be created before the pool is built. init_db.sql is
+        # fully idempotent (CREATE ... IF NOT EXISTS), so this is safe to run
+        # on every startup and removes the need to apply it manually in prod.
+        await self._ensure_schema()
+
         self.pool = await asyncpg.create_pool(
             self.settings.database_url,
             min_size=self.settings.db_pool_min_size,
@@ -37,6 +48,19 @@ class Database:
             init=self._init_connection,
         )
         logger.info("Database pool created.")
+
+    async def _ensure_schema(self) -> None:
+        """Apply init_db.sql once via a plain (non-pgvector) connection."""
+        if not SCHEMA_PATH.exists():
+            logger.warning("Schema file not found at %s; skipping bootstrap.", SCHEMA_PATH)
+            return
+        sql = SCHEMA_PATH.read_text(encoding="utf-8")
+        conn = await asyncpg.connect(self.settings.database_url)
+        try:
+            await conn.execute(sql)
+            logger.info("Schema ensured (init_db.sql applied).")
+        finally:
+            await conn.close()
 
     @staticmethod
     async def _init_connection(conn: asyncpg.Connection) -> None:

@@ -36,12 +36,15 @@ simple est de déployer **l'image officielle pgvector** comme service :
    POSTGRES_DB=rag_db
    ```
 4. Ajoutez un **volume** monté sur `/var/lib/postgresql/data` (persistance).
-5. Une fois démarré, ouvrez l'onglet **Data** (ou connectez-vous via `psql`) et
-   exécutez le contenu de [`backend/init_db.sql`](backend/init_db.sql) pour créer
-   l'extension, les tables et les index.
+
+> ✅ **Pas de SQL à exécuter à la main** : au premier démarrage, le backend
+> applique automatiquement `init_db.sql` (extension pgvector + tables + index
+> HNSW). C'est idempotent — il vérifie à chaque démarrage sans rien casser.
+> Il vous suffit donc de fournir la base ; le schéma se crée tout seul.
 
 > 💡 Alternatives managées avec pgvector inclus : **Neon** ou **Supabase**
-> (créez la base, exécutez `init_db.sql`, récupérez l'URL de connexion).
+> (créez la base, récupérez l'URL de connexion — le schéma s'appliquera au
+> démarrage du backend, comme ci-dessus).
 
 Notez l'URL de connexion interne, de la forme :
 `postgresql://rag_user:<pwd>@<host>:5432/rag_db`
