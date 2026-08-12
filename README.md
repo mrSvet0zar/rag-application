@@ -40,6 +40,7 @@ Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonc
 - 🌍 **Embeddings 100 % locaux** (`sentence-transformers`, multilingue FR/EN, 384 dims) — gratuits, sans clé, sans coût.
 - 📥 **Ingestion multi-formats** — `.txt`, `.md`, `.pdf`, `.docx`, `.html`, et **import depuis une URL** (avec garde **anti-SSRF**).
 - 💬 **Conversations persistées** (documents, chunks, conversations, messages en base).
+- 🌗 **Mode clair / sombre** persistant (respecte la préférence système, sans flash au chargement).
 - 🛡️ **Robustesse** — schéma auto-appliqué au démarrage, retry de connexion, dégradation gracieuse si le LLM est indisponible, mode démo.
 - ⚙️ **Prêt pour la prod** — Docker, CI GitHub Actions, déployé sur Railway + Vercel.
 

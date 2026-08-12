@@ -48,10 +48,10 @@ export default function DocumentPanel() {
   };
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white">
-      <div className="border-b border-slate-100 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-900">📄 Documents</h2>
-        <p className="text-xs text-slate-500">Base de connaissances</p>
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">📄 Documents</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Base de connaissances</p>
       </div>
 
       {/* Dropzone */}
@@ -70,15 +70,15 @@ export default function DocumentPanel() {
           }}
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition ${
             dragOver
-              ? 'border-brand-500 bg-brand-50'
-              : 'border-slate-200 hover:border-brand-400 hover:bg-slate-50'
+              ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10'
+              : 'border-slate-200 hover:border-brand-400 hover:bg-slate-50 dark:border-slate-700 dark:hover:border-brand-500 dark:hover:bg-slate-800'
           }`}
         >
           <div className="text-2xl">⬆️</div>
-          <p className="mt-1 text-sm font-medium text-slate-700">
+          <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
             Glissez un fichier ici
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
             ou cliquez — .txt, .md, .pdf, .docx, .html
           </p>
           <input
@@ -105,7 +105,7 @@ export default function DocumentPanel() {
             onChange={(e) => setUrl(e.target.value)}
             placeholder="🔗 Importer depuis une URL…"
             disabled={importUrlMutation.isPending}
-            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:opacity-60"
+            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
           />
           <button
             type="submit"
@@ -125,27 +125,27 @@ export default function DocumentPanel() {
       {/* List */}
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         {isLoading ? (
-          <p className="text-sm text-slate-400">Chargement…</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">Chargement…</p>
         ) : documents.length === 0 ? (
-          <p className="text-sm text-slate-400">Aucun document pour l’instant.</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">Aucun document pour l’instant.</p>
         ) : (
           <ul className="space-y-2">
             {documents.map((doc) => (
               <li
                 key={doc.id}
-                className="group flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+                className="group flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-800/50"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-800">
+                  <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">
                     {doc.filename}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-400 dark:text-slate-500">
                     {doc.total_chunks} chunks · {statusLabel(doc.status)}
                   </p>
                 </div>
                 <button
                   onClick={() => deleteMutation.mutate(doc.id)}
-                  className="ml-2 shrink-0 rounded p-1 text-slate-300 hover:bg-red-50 hover:text-red-500"
+                  className="ml-2 shrink-0 rounded p-1 text-slate-300 hover:bg-red-50 hover:text-red-500 dark:text-slate-600 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                   title="Supprimer"
                 >
                   ✕

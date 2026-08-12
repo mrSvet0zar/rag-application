@@ -69,7 +69,7 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
   };
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white">
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 && !loading && <EmptyState />}
@@ -78,7 +78,7 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
             <MessageBubble key={i} msg={msg} />
           ))}
           {error && (
-            <div className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
+            <div className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
               ⚠️ {error}
             </div>
           )}
@@ -87,7 +87,7 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
       </div>
 
       {/* Input */}
-      <form onSubmit={send} className="border-t border-slate-100 p-3">
+      <form onSubmit={send} className="border-t border-slate-100 p-3 dark:border-slate-800">
         <div className="mx-auto flex max-w-3xl items-end gap-2">
           <textarea
             value={input}
@@ -98,7 +98,7 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
             placeholder="Posez une question sur vos documents…"
             rows={1}
             disabled={loading}
-            className="max-h-32 flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:opacity-60"
+            className="max-h-32 flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
           />
           <button
             type="submit"
@@ -115,7 +115,7 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
 
 function EmptyState() {
   return (
-    <div className="flex h-full flex-col items-center justify-center text-center text-slate-400">
+    <div className="flex h-full flex-col items-center justify-center text-center text-slate-400 dark:text-slate-500">
       <div className="text-4xl">💬</div>
       <p className="mt-2 max-w-sm text-sm">
         Uploadez des documents puis posez une question. Les réponses citent les
@@ -139,7 +139,7 @@ function MessageBubble({ msg }) {
         className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
           isUser
             ? 'rounded-br-sm bg-brand-600 text-white'
-            : 'rounded-bl-sm border border-slate-200 bg-slate-50 text-slate-800'
+            : 'rounded-bl-sm border border-slate-200 bg-slate-50 text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
         }`}
       >
         <div
@@ -154,7 +154,7 @@ function MessageBubble({ msg }) {
         />
         {msg.sources && msg.sources.length > 0 && <Sources sources={msg.sources} />}
         {msg.meta && (
-          <div className="mt-1 text-[11px] text-slate-400">
+          <div className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
             {msg.meta.tokens > 0 && `${msg.meta.tokens} tokens · `}
             {Math.round(msg.meta.ms)} ms
           </div>
@@ -167,38 +167,38 @@ function MessageBubble({ msg }) {
 function Sources({ sources }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-2 border-t border-slate-200 pt-2">
+    <div className="mt-2 border-t border-slate-200 pt-2 dark:border-slate-700">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-xs font-medium text-brand-600 hover:underline"
+        className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
       >
         {open ? '▼' : '▶'} {sources.length} source{sources.length > 1 ? 's' : ''}
       </button>
       {open && (
         <ul className="mt-2 space-y-2">
           {sources.map((s) => (
-            <li key={s.id} className="rounded-lg bg-white p-2 text-xs">
+            <li key={s.id} className="rounded-lg bg-white p-2 text-xs dark:bg-slate-900">
               <div className="mb-1 flex items-center justify-between gap-2">
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
                   📎 {s.filename || `doc #${s.document_id}`}
                 </span>
                 {s.rerank_score != null ? (
                   <span
-                    className="whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700"
+                    className="whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
                     title={`Reranking ${(s.rerank_score * 100).toFixed(0)}% · cosinus ${(s.similarity_score * 100).toFixed(0)}%`}
                   >
                     ⭐ {(s.rerank_score * 100).toFixed(0)}%
                   </span>
                 ) : (
                   <span
-                    className="whitespace-nowrap rounded bg-brand-50 px-1.5 py-0.5 text-brand-700"
+                    className="whitespace-nowrap rounded bg-brand-50 px-1.5 py-0.5 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                     title="Similarité cosinus"
                   >
                     {(s.similarity_score * 100).toFixed(0)}%
                   </span>
                 )}
               </div>
-              <p className="text-slate-500">
+              <p className="text-slate-500 dark:text-slate-400">
                 {s.text.length > 220 ? s.text.slice(0, 220) + '…' : s.text}
               </p>
             </li>
@@ -212,12 +212,12 @@ function Sources({ sources }) {
 function TypingBubble() {
   return (
     <div className="flex justify-start">
-      <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-slate-50 px-4 py-3">
+      <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
         <div className="flex gap-1">
           {[0, 0.2, 0.4].map((d) => (
             <span
               key={d}
-              className="h-2 w-2 animate-bounce-dot rounded-full bg-slate-400"
+              className="h-2 w-2 animate-bounce-dot rounded-full bg-slate-400 dark:bg-slate-500"
               style={{ animationDelay: `${d}s` }}
             />
           ))}

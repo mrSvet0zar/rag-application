@@ -13,6 +13,11 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: #f8fafc;
   color: #0f172a;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.dark body {
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
 /* Simple markdown-ish rendering for assistant messages */
@@ -26,9 +31,17 @@ body {
   font-style: italic;
   margin: 0.5rem 0;
 }
+.dark .prose-msg blockquote {
+  border-left-color: #4f46e5;
+  color: #94a3b8;
+}
 .prose-msg code {
   background: #eef2ff;
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
   font-size: 0.85em;
+}
+.dark .prose-msg code {
+  background: #312e81;
+  color: #e0e7ff;
 }
