@@ -127,7 +127,9 @@ async def test_duplicate_chunk_index_is_rejected(db: Database):
     """The unique constraint is what stops a retried ingest double-indexing."""
     embedder = FakeEmbedder()
     doc_id = await db.create_document("a.md", "text/markdown", 1)
-    chunk = [("texte", embedder.embed_query("texte"), {})]
+    chunk: list[tuple[str, list[float], dict]] = [
+        ("texte", embedder.embed_query("texte"), {})
+    ]
     await db.store_chunks(doc_id, chunk)
     with pytest.raises(asyncpg.UniqueViolationError):
         await db.store_chunks(doc_id, chunk)

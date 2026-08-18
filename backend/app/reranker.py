@@ -29,7 +29,7 @@ class RerankService:
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
-        self._model = None
+        self._model: Any = None
         self._lock = threading.Lock()
 
     def _ensure_model(self) -> Any:
