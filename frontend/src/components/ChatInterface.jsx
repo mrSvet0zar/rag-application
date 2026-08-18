@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import api from '../services/api';
 
 export default function ChatInterface({ conversationId, onConversationCreate }) {
@@ -57,7 +57,11 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
           // Drop the empty assistant placeholder on failure.
           setMessages((prev) => {
             const next = [...prev];
-            if (next.length && next[next.length - 1].role === 'assistant' && !next[next.length - 1].content) {
+            if (
+              next.length &&
+              next[next.length - 1].role === 'assistant' &&
+              !next[next.length - 1].content
+            ) {
               next.pop();
             }
             return next;
@@ -87,7 +91,10 @@ export default function ChatInterface({ conversationId, onConversationCreate }) 
       </div>
 
       {/* Input */}
-      <form onSubmit={send} className="border-t border-slate-100 p-3 dark:border-slate-800">
+      <form
+        onSubmit={send}
+        className="border-t border-slate-100 p-3 dark:border-slate-800"
+      >
         <div className="mx-auto flex max-w-3xl items-end gap-2">
           <textarea
             value={input}
@@ -118,8 +125,8 @@ function EmptyState() {
     <div className="flex h-full flex-col items-center justify-center text-center text-slate-400 dark:text-slate-500">
       <div className="text-4xl">💬</div>
       <p className="mt-2 max-w-sm text-sm">
-        Uploadez des documents puis posez une question. Les réponses citent les
-        passages sources utilisés.
+        Uploadez des documents puis posez une question. Les réponses citent les passages
+        sources utilisés.
       </p>
     </div>
   );
@@ -229,10 +236,7 @@ function TypingBubble() {
 
 // Minimal, safe-ish markdown: escape HTML first, then apply a few patterns.
 function renderMarkdown(text) {
-  const escaped = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return escaped
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')

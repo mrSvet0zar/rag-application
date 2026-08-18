@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import logging
 import threading
+from typing import Any
 
-from app.config import get_settings
+from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -18,12 +19,12 @@ logger = logging.getLogger(__name__)
 class EmbeddingService:
     """Wraps a sentence-transformers model to produce normalized embeddings."""
 
-    def __init__(self) -> None:
-        self._settings = get_settings()
+    def __init__(self, settings: Settings) -> None:
+        self._settings = settings
         self._model = None
         self._lock = threading.Lock()
 
-    def _ensure_model(self):
+    def _ensure_model(self) -> Any:
         """Load the model on first use (thread-safe, idempotent)."""
         if self._model is None:
             with self._lock:
@@ -68,7 +69,3 @@ class EmbeddingService:
             convert_to_numpy=True,
         )
         return vector.tolist()
-
-
-# Module-level singleton reused across requests.
-embedding_service = EmbeddingService()

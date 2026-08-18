@@ -1,7 +1,6 @@
 """Pydantic request/response models for the API."""
 
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, HttpUrl
@@ -15,8 +14,8 @@ class UrlImportRequest(BaseModel):
 class DocumentResponse(BaseModel):
     id: int
     filename: str
-    content_type: Optional[str] = None
-    file_size_bytes: Optional[int] = None
+    content_type: str | None = None
+    file_size_bytes: int | None = None
     uploaded_at: datetime
     total_chunks: int
     status: str
@@ -27,7 +26,7 @@ class DocumentResponse(BaseModel):
 # ---------- Chat ----------
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=4000)
-    conversation_id: Optional[UUID] = None
+    conversation_id: UUID | None = None
     temperature: float = Field(0.7, ge=0.0, le=1.0)
     k: int = Field(5, ge=1, le=20)
 
@@ -36,9 +35,9 @@ class RetrievedChunk(BaseModel):
     id: int
     text: str
     document_id: int
-    filename: Optional[str] = None
+    filename: str | None = None
     similarity_score: float  # cosine similarity from vector search
-    rerank_score: Optional[float] = None  # cross-encoder relevance, if reranked
+    rerank_score: float | None = None  # cross-encoder relevance, if reranked
 
 
 class ChatResponse(BaseModel):
@@ -63,7 +62,7 @@ class MessageResponse(BaseModel):
 class ConversationResponse(BaseModel):
     id: UUID
     created_at: datetime
-    title: Optional[str] = None
+    title: str | None = None
     messages: list[MessageResponse]
 
 

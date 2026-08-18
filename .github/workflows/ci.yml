@@ -5,36 +5,106 @@ on:
     branches: [main, master]
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  backend-tests:
+  backend:
+    name: Backend (lint, types, tests)
     runs-on: ubuntu-latest
+
+    # Integration tests run against a real pgvector database — the bugs worth
+    # catching (index behaviour, cosine ordering, column widths) only show up
+    # against the genuine article.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: rag_user
+          POSTGRES_PASSWORD: rag_password
+          POSTGRES_DB: rag_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      TEST_DATABASE_URL: postgresql://rag_user:rag_password@localhost:5432/rag_test
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
-      # CPU-only torch to keep the CI job light and fast.
-      - name: Install deps
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
+        working-directory: backend
         run: |
           python -m pip install --upgrade pip
+          # CPU-only torch keeps the job from pulling the multi-GB CUDA build.
           pip install --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
-          pip install -r backend/requirements.txt
-      - name: Run unit tests
-        working-directory: backend
-        run: pytest -q
+          pip install -r requirements-dev.txt
 
-  frontend-build:
+      - name: Lint (ruff)
+        working-directory: backend
+        run: ruff check .
+
+      - name: Format check (ruff)
+        working-directory: backend
+        run: ruff format --check .
+
+      - name: Type check (mypy)
+        working-directory: backend
+        run: mypy
+
+      - name: Tests + coverage gate
+        working-directory: backend
+        run: pytest --cov --cov-report=term-missing
+
+  frontend:
+    name: Frontend (lint, format, build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - name: Install & build
+
+      - name: Install dependencies
         working-directory: frontend
-        run: |
-          npm ci
-          npm run build
+        run: npm ci
+
+      - name: Lint (eslint)
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Format check (prettier)
+        working-directory: frontend
+        run: npm run format:check
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+  docker:
+    name: Backend image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

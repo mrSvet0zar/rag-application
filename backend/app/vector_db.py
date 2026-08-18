@@ -11,13 +11,12 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Optional
 from uuid import UUID
 
 import asyncpg
 from pgvector.asyncpg import register_vector
 
-from app.config import get_settings
+from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,23 @@ SCHEMA_PATH = Path(__file__).resolve().parent.parent / "init_db.sql"
 class Database:
     """Owns the asyncpg connection pool and all SQL access."""
 
-    def __init__(self) -> None:
-        self.settings = get_settings()
-        self.pool: Optional[asyncpg.Pool] = None
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self._pool: asyncpg.Pool | None = None
+
+    @property
+    def pool(self) -> asyncpg.Pool:
+        """The connection pool, or a clear error if `connect()` hasn't run.
+
+        Without this, every query site would need a None check to satisfy the
+        type checker, and a misuse would surface as an opaque
+        `AttributeError: 'NoneType' object has no attribute 'acquire'`.
+        """
+        if self._pool is None:
+            raise RuntimeError(
+                "Database.connect() must be awaited before running queries."
+            )
+        return self._pool
 
     # ---------- Lifecycle ----------
     async def connect(self, max_wait_seconds: float = 90.0) -> None:
@@ -80,7 +93,7 @@ class Database:
         and removes the need to apply it manually in prod.
         """
         await self._ensure_schema()
-        self.pool = await asyncpg.create_pool(
+        self._pool = await asyncpg.create_pool(
             self.settings.database_url,
             min_size=self.settings.db_pool_min_size,
             max_size=self.settings.db_pool_max_size,
@@ -91,7 +104,9 @@ class Database:
     async def _ensure_schema(self) -> None:
         """Apply init_db.sql once via a plain (non-pgvector) connection."""
         if not SCHEMA_PATH.exists():
-            logger.warning("Schema file not found at %s; skipping bootstrap.", SCHEMA_PATH)
+            logger.warning(
+                "Schema file not found at %s; skipping bootstrap.", SCHEMA_PATH
+            )
             return
         sql = SCHEMA_PATH.read_text(encoding="utf-8")
         conn = await asyncpg.connect(self.settings.database_url)
@@ -107,8 +122,9 @@ class Database:
         await register_vector(conn)
 
     async def disconnect(self) -> None:
-        if self.pool:
-            await self.pool.close()
+        if self._pool is not None:
+            await self._pool.close()
+            self._pool = None
             logger.info("Database pool closed.")
 
     # ---------- Documents ----------
@@ -121,7 +137,9 @@ class Database:
                    VALUES ($1, $2, $3, 'processing')
                    RETURNING id""",
                 filename[:255],
-                (content_type or "")[:50],  # column is VARCHAR(50); MIME types can be longer
+                (content_type or "")[
+                    :50
+                ],  # column is VARCHAR(50); MIME types can be longer
                 file_size_bytes,
             )
 
@@ -136,7 +154,7 @@ class Database:
                 status,
             )
 
-    async def get_document(self, document_id: int) -> Optional[dict]:
+    async def get_document(self, document_id: int) -> dict | None:
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow(
                 "SELECT * FROM documents WHERE id = $1", document_id
@@ -145,9 +163,7 @@ class Database:
 
     async def list_documents(self) -> list[dict]:
         async with self.pool.acquire() as conn:
-            rows = await conn.fetch(
-                "SELECT * FROM documents ORDER BY uploaded_at DESC"
-            )
+            rows = await conn.fetch("SELECT * FROM documents ORDER BY uploaded_at DESC")
             return [dict(r) for r in rows]
 
     async def delete_document(self, document_id: int) -> int:
@@ -203,7 +219,7 @@ class Database:
             return [dict(r) for r in rows]
 
     # ---------- Conversations & messages ----------
-    async def create_conversation(self, title: Optional[str] = None) -> UUID:
+    async def create_conversation(self, title: str | None = None) -> UUID:
         async with self.pool.acquire() as conn:
             return await conn.fetchval(
                 """INSERT INTO conversations (title, last_message_at)
@@ -225,7 +241,7 @@ class Database:
         conversation_id: UUID,
         role: str,
         content: str,
-        retrieved_chunk_ids: Optional[list[int]] = None,
+        retrieved_chunk_ids: list[int] | None = None,
         tokens_used: int = 0,
     ) -> UUID:
         async with self.pool.acquire() as conn:
@@ -251,7 +267,7 @@ class Database:
             )
             return message_id
 
-    async def get_conversation(self, conversation_id: UUID) -> Optional[dict]:
+    async def get_conversation(self, conversation_id: UUID) -> dict | None:
         async with self.pool.acquire() as conn:
             convo = await conn.fetchrow(
                 "SELECT * FROM conversations WHERE id = $1", conversation_id
@@ -277,7 +293,3 @@ class Database:
                 ),
                 "total_messages": await conn.fetchval("SELECT COUNT(*) FROM messages"),
             }
-
-
-# Module-level singleton.
-database = Database()

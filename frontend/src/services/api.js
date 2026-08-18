@@ -58,7 +58,10 @@ export const api = {
    * a JSON body. Callbacks: onSources(chunks), onToken(text), onDone(meta),
    * onError(detail). Returns a function to abort the stream.
    */
-  chatStream({ question, conversationId, k = 5 }, { onSources, onToken, onDone, onError }) {
+  chatStream(
+    { question, conversationId, k = 5 },
+    { onSources, onToken, onDone, onError }
+  ) {
     const controller = new AbortController();
 
     (async () => {

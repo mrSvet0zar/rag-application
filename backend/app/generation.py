@@ -1,20 +1,21 @@
-"""RAG orchestration: text chunking + answer generation with Claude.
+"""Answer generation from retrieved context.
 
-- Chunking uses LangChain's RecursiveCharacterTextSplitter (stable, standalone
-  `langchain-text-splitters` package).
-- Generation uses the Anthropic SDK directly. When no API key is configured the
-  pipeline falls back to a local "demo" answer built from the retrieved context,
-  so the whole app stays runnable end-to-end without any paid credentials.
+Uses the Anthropic SDK directly. When no API key is configured the generator
+falls back to a local "demo" answer built from the retrieved context, so the
+whole app stays runnable end-to-end without any paid credentials. API failures
+degrade the same way rather than surfacing a 500.
+
+Chunking lives in `app.chunking` — this module only turns context into answers.
 """
 
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
 
 import anthropic
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from app.config import get_settings
+from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,34 +31,20 @@ SYSTEM_PROMPT = (
 )
 
 
-class RAGPipeline:
-    """Handles chunking and LLM answer generation."""
+class AnswerGenerator:
+    """Generates answers with Claude, with demo/error fallbacks."""
 
-    def __init__(self, settings=None) -> None:
-        # settings is injectable so tests can force demo mode regardless of
-        # the ambient .env.
-        self.settings = settings or get_settings()
-        self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.settings.chunk_size,
-            chunk_overlap=self.settings.chunk_overlap,
-            separators=["\n\n", "\n", ". ", " ", ""],
-        )
-        self._client = None
-        if not self.settings.demo_mode:
-            from anthropic import AsyncAnthropic
-
-            self._client = AsyncAnthropic(api_key=self.settings.anthropic_api_key)
-            logger.info("Anthropic client ready (model=%s).", self.settings.chat_model)
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self._client: anthropic.AsyncAnthropic | None = None
+        if not settings.demo_mode:
+            self._client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+            logger.info("Anthropic client ready (model=%s).", settings.chat_model)
         else:
             logger.warning(
                 "ANTHROPIC_API_KEY not set -> running in DEMO mode "
                 "(answers generated locally from retrieved context)."
             )
-
-    # ---------- Chunking ----------
-    def split_text(self, text: str) -> list[str]:
-        """Split raw document text into overlapping chunks."""
-        return [c.strip() for c in self.text_splitter.split_text(text) if c.strip()]
 
     # ---------- Prompt building ----------
     @staticmethod
@@ -70,9 +57,7 @@ class RAGPipeline:
         return "\n\n".join(blocks)
 
     # ---------- Generation ----------
-    async def generate_response(
-        self, query: str, chunks: list[dict]
-    ) -> tuple[str, int]:
+    async def generate_response(self, query: str, chunks: list[dict]) -> tuple[str, int]:
         """Generate an answer from the query + retrieved chunks.
 
         Returns (answer_text, tokens_used).
@@ -80,38 +65,32 @@ class RAGPipeline:
         if not chunks:
             return self._no_context_message(), 0
 
-        context = self._build_context(chunks)
-
         if self._client is None:
             return self._demo_answer(query, chunks), 0
 
+        context = self._build_context(chunks)
         try:
             message = await self._client.messages.create(
                 model=self.settings.chat_model,
                 max_tokens=self.settings.max_tokens,
                 system=SYSTEM_PROMPT,
-                messages=[
-                    {"role": "user", "content": self._user_prompt(query, context)}
-                ],
+                messages=[{"role": "user", "content": self._user_prompt(query, context)}],
             )
         except anthropic.APIError as exc:
             logger.error("Anthropic API error: %s", exc)
             return self._llm_error_answer(query, chunks, exc), 0
 
-        answer = "".join(
-            block.text for block in message.content if block.type == "text"
-        )
+        answer = "".join(block.text for block in message.content if block.type == "text")
         tokens = message.usage.input_tokens + message.usage.output_tokens
         return answer, tokens
 
-    async def stream_response(self, query: str, chunks: list[dict]):
+    async def stream_response(
+        self, query: str, chunks: list[dict]
+    ) -> AsyncIterator[tuple[str, object]]:
         """Stream an answer as it is generated.
 
-        Async generator yielding tuples:
-          ("token", str)  -> a text delta to append to the answer
-          ("usage", int)  -> total tokens used (emitted once, at the end)
-        Works both with Claude (real token stream) and in demo mode
-        (the local answer is streamed word by word for a consistent UX).
+        Yields ("token", str) deltas, then a single ("usage", int) total.
+        Demo mode streams the local answer word by word for a consistent UX.
         """
         if not chunks:
             yield ("token", self._no_context_message())
@@ -130,9 +109,7 @@ class RAGPipeline:
                 model=self.settings.chat_model,
                 max_tokens=self.settings.max_tokens,
                 system=SYSTEM_PROMPT,
-                messages=[
-                    {"role": "user", "content": self._user_prompt(query, context)}
-                ],
+                messages=[{"role": "user", "content": self._user_prompt(query, context)}],
             ) as stream:
                 async for text in stream.text_stream:
                     yield ("token", text)
@@ -144,6 +121,7 @@ class RAGPipeline:
                 yield ("token", word + " ")
             yield ("usage", 0)
 
+    # ---------- Canned messages ----------
     @staticmethod
     def _user_prompt(query: str, context: str) -> str:
         return (
@@ -161,9 +139,7 @@ class RAGPipeline:
         )
 
     @classmethod
-    def _llm_error_answer(
-        cls, query: str, chunks: list[dict], exc: Exception
-    ) -> str:
+    def _llm_error_answer(cls, query: str, chunks: list[dict], exc: Exception) -> str:
         """Graceful fallback when Claude can't be reached: explain briefly and
         still surface the retrieved context so the request isn't a dead end."""
         reason = str(getattr(exc, "message", "") or exc)

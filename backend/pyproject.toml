@@ -1,0 +1,89 @@
+[project]
+name = "rag-application-backend"
+version = "1.0.0"
+description = "RAG chatbot backend: FastAPI + pgvector + Claude"
+requires-python = ">=3.10"
+
+# ---------------------------------------------------------------- ruff ----
+[tool.ruff]
+line-length = 90
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes (unused imports/variables — catches dead code)
+    "I",    # isort (import ordering)
+    "UP",   # pyupgrade
+    "B",    # bugbear (mutable defaults, shadowed loop vars, ...)
+    "C4",   # comprehensions
+    "SIM",  # simplifications
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "B008",  # FastAPI's `= File(...)` / `= Depends(...)` defaults are idiomatic
+    "E501",  # long lines are reported by the formatter, not the linter
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Test doubles intentionally accept and ignore arguments.
+"tests/**" = ["B017"]
+
+# ---------------------------------------------------------------- mypy ----
+[tool.mypy]
+python_version = "3.10"
+files = ["app", "tests"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = true
+no_implicit_optional = true
+show_error_codes = true
+
+# Third-party packages that ship no type information.
+[[tool.mypy.overrides]]
+module = [
+    "sentence_transformers.*",
+    "langchain_text_splitters.*",
+    "pgvector.*",
+    "asyncpg.*",
+    "docx.*",
+    "pypdf.*",
+    "bs4.*",
+]
+ignore_missing_imports = true
+
+# Tests favour readability over exhaustive annotations. `index` is disabled
+# because assertions routinely index results the checker sees as Optional
+# (e.g. `get_document()`), and adding a None-assert before each one is noise.
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disable_error_code = ["index"]
+
+# -------------------------------------------------------------- pytest ----
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+markers = ["rerank: wire a reranker into the app under test"]
+
+# ------------------------------------------------------------ coverage ----
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# The suite must not be allowed to rot; raise this as coverage improves.
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "\\.\\.\\.",  # Protocol method bodies
+]

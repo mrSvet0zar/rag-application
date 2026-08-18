@@ -1,382 +1,116 @@
-"""FastAPI application: document upload, RAG chat, conversations, stats."""
+"""Application factory.
+
+`create_app` builds a fully wired FastAPI app. Tests call it with their own
+settings and a services builder that swaps in fast, deterministic doubles; the
+module-level `app` is what uvicorn serves in production.
+"""
 
 from __future__ import annotations
 
-import asyncio
-import io
-import json
 import logging
-import time
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
-from urllib.parse import urlparse
-from uuid import UUID
 
-import httpx
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse
 
-from app.config import get_settings
-from app.embeddings import embedding_service
-from app.ingestion import docx_to_text, html_to_text, validate_public_url
-from app.rag_pipeline import RAGPipeline
-from app.reranker import rerank_service
-from app.schemas import (
-    ChatRequest,
-    ChatResponse,
-    ConversationResponse,
-    DocumentResponse,
-    RetrievedChunk,
-    StatsResponse,
-    UrlImportRequest,
+from app.api import chat, conversations, documents, health, stats
+from app.config import Settings, get_settings
+from app.errors import (
+    AppError,
+    IngestionFailedError,
+    NotFoundError,
+    UnreadableDocumentError,
+    UrlFetchError,
+    UrlNotAllowedError,
 )
-from app.vector_db import database
+from app.services import Services, build_services
 
-# Cap on how much of a fetched web page we'll read (bytes).
-MAX_URL_BYTES = 5 * 1024 * 1024
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
 logger = logging.getLogger("rag")
 
-settings = get_settings()
-rag_pipeline: RAGPipeline | None = None
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Startup/shutdown: open DB pool and build the RAG pipeline."""
-    global rag_pipeline
-    await database.connect()
-    rag_pipeline = RAGPipeline()
-    logger.info("Startup complete (demo_mode=%s).", settings.demo_mode)
-    yield
-    await database.disconnect()
-
-
-app = FastAPI(title="RAG Application API", version="1.0.0", lifespan=lifespan)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# Domain error -> HTTP status. Ordered: the first matching class wins, so put
+# subclasses before their parents if that ever applies.
+_ERROR_STATUS: tuple[tuple[type[AppError], int], ...] = (
+    (NotFoundError, 404),
+    (UnreadableDocumentError, 400),
+    (UrlNotAllowedError, 400),
+    (UrlFetchError, 400),
+    (IngestionFailedError, 500),
 )
 
 
-# ============ Helpers ============
-SUPPORTED_TEXT_TYPES = {".txt", ".md", ".markdown", ".csv", ".json"}
+def _status_for(exc: AppError) -> int:
+    for error_type, status in _ERROR_STATUS:
+        if isinstance(exc, error_type):
+            return status
+    return 500
 
 
-def _extract_text(filename: str, content: bytes) -> str:
-    """Extract plain text from an uploaded file (txt/md/pdf/docx/html)."""
-    lower = filename.lower()
-    if lower.endswith(".pdf"):
-        from pypdf import PdfReader
+def create_app(
+    settings: Settings | None = None,
+    services_builder: Callable[[Settings], Services] = build_services,
+) -> FastAPI:
+    """Build the application. Pure wiring — no I/O until startup."""
+    settings = settings or get_settings()
 
-        reader = PdfReader(io.BytesIO(content))
-        return "\n\n".join(page.extract_text() or "" for page in reader.pages)
-    if lower.endswith(".docx"):
-        return docx_to_text(content)
-    if lower.endswith((".html", ".htm")):
-        return html_to_text(content.decode("utf-8", errors="replace"))[1]
-    # Default: treat as text.
-    try:
-        return content.decode("utf-8")
-    except UnicodeDecodeError:
-        return content.decode("latin-1")
-
-
-async def _ingest(
-    filename: str, content_type: str, size_bytes: int, text: str
-) -> DocumentResponse:
-    """Shared pipeline: chunk -> embed -> store -> finalize a document record.
-
-    Used by both file upload and URL import.
-    """
-    chunks = rag_pipeline.split_text(text)
-    if not chunks:
-        raise HTTPException(status_code=400, detail="Document produced no chunks.")
-
-    document_id = await database.create_document(filename, content_type, size_bytes)
-    try:
-        embeddings = await asyncio.to_thread(embedding_service.embed_documents, chunks)
-        chunk_data = [
-            (chunk, embedding, {"filename": filename})
-            for chunk, embedding in zip(chunks, embeddings)
-        ]
-        stored = await database.store_chunks(document_id, chunk_data)
-        await database.finalize_document(document_id, stored, status="completed")
-    except Exception as exc:  # noqa: BLE001
-        await database.finalize_document(document_id, 0, status="failed")
-        logger.exception("Failed to process document %s", document_id)
-        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
-
-    return DocumentResponse(**await database.get_document(document_id))
-
-
-async def _retrieve_chunks(question: str, k: int) -> list[dict]:
-    """Embed the query, vector-search a candidate pool, then (optionally)
-    rerank it down to the top `k` with a cross-encoder.
-
-    When reranking is on we fetch a broad pool (`rerank_candidates`) with **no**
-    cosine floor, because the cross-encoder — not the bi-encoder — should decide
-    relevance; applying the 0.25 floor here would hide good chunks from it.
-    When reranking is off we fetch exactly `k` above `min_relevance_score`.
-    """
-    query_embedding = await asyncio.to_thread(embedding_service.embed_query, question)
-    if settings.rerank_enabled:
-        candidates = await database.search(
-            query_embedding, top_k=settings.rerank_candidates, min_score=0.0
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        services = services_builder(settings)
+        await services.db.connect()
+        app.state.services = services
+        logger.info(
+            "Startup complete (demo_mode=%s, rerank=%s).",
+            settings.demo_mode,
+            services.reranker is not None,
         )
-        if not candidates:
-            return []
-        return await asyncio.to_thread(rerank_service.rerank, question, candidates, k)
-    return await database.search(
-        query_embedding, top_k=k, min_score=settings.min_relevance_score
-    )
-
-
-# ============ Health ============
-@app.get("/api/health")
-async def health():
-    return {"status": "ok", "demo_mode": settings.demo_mode}
-
-
-# ============ Documents ============
-@app.post("/api/documents/upload", response_model=DocumentResponse)
-async def upload_document(file: UploadFile = File(...)):
-    """Upload a document (txt/md/pdf/docx/html): extract, chunk, embed, store."""
-    content = await file.read()
-    if not content:
-        raise HTTPException(status_code=400, detail="Empty file.")
-
-    try:
-        text = _extract_text(file.filename, content)
-    except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=400, detail=f"Could not read file: {exc}")
-
-    if not text.strip():
-        raise HTTPException(status_code=400, detail="No extractable text in file.")
-
-    return await _ingest(
-        filename=file.filename,
-        content_type=file.content_type or "text/plain",
-        size_bytes=len(content),
-        text=text,
-    )
-
-
-@app.post("/api/documents/import-url", response_model=DocumentResponse)
-async def import_url(req: UrlImportRequest):
-    """Fetch a web page, extract its readable text, and index it."""
-    url = str(req.url)
-
-    # SSRF guard (blocks localhost / private / metadata addresses).
-    try:
-        await asyncio.to_thread(validate_public_url, url)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=f"URL refusée : {exc}")
-
-    try:
-        async with httpx.AsyncClient(
-            timeout=20.0, follow_redirects=True, max_redirects=5
-        ) as client:
-            resp = await client.get(url, headers={"User-Agent": "RAG-App/1.0"})
-            resp.raise_for_status()
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=400, detail=f"Récupération impossible : {exc}")
-
-    if len(resp.content) > MAX_URL_BYTES:
-        raise HTTPException(status_code=400, detail="Page trop volumineuse (> 5 Mo).")
-
-    title, text = html_to_text(resp.text)
-    if not text.strip():
-        raise HTTPException(status_code=400, detail="Aucun texte extractible de cette page.")
-
-    parsed = urlparse(url)
-    filename = (title or f"{parsed.netloc}{parsed.path}").strip()[:255] or parsed.netloc
-    return await _ingest(
-        filename=filename,
-        content_type="text/html",
-        size_bytes=len(resp.content),
-        text=text,
-    )
-
-
-@app.get("/api/documents", response_model=list[DocumentResponse])
-async def list_documents():
-    return [DocumentResponse(**d) for d in await database.list_documents()]
-
-
-@app.delete("/api/documents/{doc_id}")
-async def delete_document(doc_id: int):
-    doc = await database.get_document(doc_id)
-    if not doc:
-        raise HTTPException(status_code=404, detail="Document not found.")
-    deleted = await database.delete_document(doc_id)
-    return {"status": "deleted", "chunks_deleted": deleted}
-
-
-# ============ Chat ============
-@app.post("/api/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
-    """Answer a question using retrieval-augmented generation."""
-    start = time.time()
-
-    # 1. Retrieve relevant chunks (vector search + optional cross-encoder rerank).
-    chunks = await _retrieve_chunks(request.question, request.k)
-
-    # 2. Generate the answer (Claude, or demo fallback).
-    answer, tokens = await rag_pipeline.generate_response(request.question, chunks)
-
-    # 3. Persist the conversation and both messages.
-    conversation_id = request.conversation_id
-    if conversation_id is None or not await database.conversation_exists(conversation_id):
-        conversation_id = await database.create_conversation()
-
-    await database.add_message(conversation_id, "user", request.question)
-    chunk_ids = [c["id"] for c in chunks]
-    message_id = await database.add_message(
-        conversation_id, "assistant", answer, retrieved_chunk_ids=chunk_ids, tokens_used=tokens
-    )
-
-    processing_ms = (time.time() - start) * 1000
-    return ChatResponse(
-        response=answer,
-        conversation_id=conversation_id,
-        message_id=message_id,
-        retrieved_chunks=[
-            RetrievedChunk(
-                id=c["id"],
-                text=c["text"],
-                document_id=c["document_id"],
-                filename=c.get("filename"),
-                similarity_score=round(float(c["similarity"]), 4),
-                rerank_score=(
-                    round(float(c["rerank_score"]), 4)
-                    if c.get("rerank_score") is not None
-                    else None
-                ),
-            )
-            for c in chunks
-        ],
-        tokens_used=tokens,
-        processing_time_ms=round(processing_ms, 2),
-    )
-
-
-def _sse(event: str, data: dict) -> str:
-    """Format a Server-Sent Event frame."""
-    return f"event: {event}\ndata: {json.dumps(data)}\n\n"
-
-
-@app.post("/api/chat/stream")
-async def chat_stream(request: ChatRequest):
-    """Same as /api/chat but streams the answer token-by-token over SSE.
-
-    Event sequence:
-      sources -> {retrieved_chunks: [...]}   (once, before generation)
-      token   -> {text: "..."}               (many)
-      done    -> {conversation_id, message_id, tokens_used, processing_time_ms}
-      error   -> {detail: "..."}             (on failure)
-    """
-
-    async def event_generator():
-        start = time.time()
         try:
-            chunks = await _retrieve_chunks(request.question, request.k)
+            yield
+        finally:
+            await services.db.disconnect()
 
-            sources = [
-                {
-                    "id": c["id"],
-                    "text": c["text"],
-                    "document_id": c["document_id"],
-                    "filename": c.get("filename"),
-                    "similarity_score": round(float(c["similarity"]), 4),
-                    "rerank_score": (
-                        round(float(c["rerank_score"]), 4)
-                        if c.get("rerank_score") is not None
-                        else None
-                    ),
-                }
-                for c in chunks
-            ]
-            yield _sse("sources", {"retrieved_chunks": sources})
+    app = FastAPI(title="RAG Application API", version="1.0.0", lifespan=lifespan)
 
-            parts: list[str] = []
-            tokens = 0
-            async for kind, data in rag_pipeline.stream_response(
-                request.question, chunks
-            ):
-                if kind == "token":
-                    parts.append(data)
-                    yield _sse("token", {"text": data})
-                elif kind == "usage":
-                    tokens = data
-
-            answer = "".join(parts)
-
-            conversation_id = request.conversation_id
-            if conversation_id is None or not await database.conversation_exists(
-                conversation_id
-            ):
-                conversation_id = await database.create_conversation()
-            await database.add_message(conversation_id, "user", request.question)
-            message_id = await database.add_message(
-                conversation_id,
-                "assistant",
-                answer,
-                retrieved_chunk_ids=[c["id"] for c in chunks],
-                tokens_used=tokens,
-            )
-
-            yield _sse(
-                "done",
-                {
-                    "conversation_id": str(conversation_id),
-                    "message_id": str(message_id),
-                    "tokens_used": tokens,
-                    "processing_time_ms": round((time.time() - start) * 1000, 2),
-                },
-            )
-        except Exception as exc:  # noqa: BLE001
-            logger.exception("Streaming chat failed")
-            yield _sse("error", {"detail": str(exc)})
-
-    return StreamingResponse(
-        event_generator(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",  # disable proxy buffering (nginx/railway)
-        },
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins_list,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
+    @app.exception_handler(AppError)
+    async def handle_app_error(_: Request, exc: AppError) -> JSONResponse:
+        """Single place translating domain failures into responses.
 
-@app.get("/api/conversations/{conversation_id}", response_model=ConversationResponse)
-async def get_conversation(conversation_id: UUID):
-    convo = await database.get_conversation(conversation_id)
-    if not convo:
-        raise HTTPException(status_code=404, detail="Conversation not found.")
-    return ConversationResponse(**convo)
+        Keeps the `{"detail": ...}` shape FastAPI uses for HTTPException so
+        clients see one consistent error envelope.
+        """
+        status = _status_for(exc)
+        if status >= 500:
+            logger.exception("Unhandled domain error", exc_info=exc)
+        return JSONResponse(status_code=status, content={"detail": str(exc)})
+
+    for router in (
+        health.router,
+        documents.router,
+        chat.router,
+        conversations.router,
+        stats.router,
+    ):
+        app.include_router(router, prefix="/api")
+
+    return app
 
 
-# ============ Stats ============
-@app.get("/api/stats", response_model=StatsResponse)
-async def get_stats():
-    stats = await database.get_stats()
-    return StatsResponse(
-        **stats,
-        demo_mode=settings.demo_mode,
-        chat_model=settings.chat_model,
-        embedding_model=settings.embedding_model,
-        rerank_enabled=settings.rerank_enabled,
-    )
+app = create_app()
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host=settings.api_host, port=settings.api_port)
+    _settings = get_settings()
+    uvicorn.run(app, host=_settings.api_host, port=_settings.api_port)

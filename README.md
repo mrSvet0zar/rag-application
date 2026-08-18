@@ -126,11 +126,28 @@ npm install && npm run dev
 | `GET`    | `/api/conversations/{id}`    | Historique d'une conversation            |
 | `GET`    | `/api/stats`                 | Statistiques globales                    |
 
-## 🧪 Tests
+## 🧪 Qualité
 
 ```bash
-cd backend && pytest      # 21 tests (chunking, prompt, reranking, ingestion, SSRF)
+cd backend
+pip install -r requirements-dev.txt
+
+pytest                      # 80 tests (unitaires + intégration), gate de couverture à 80 %
+pytest tests/unit           # sans base de données
+ruff check . && ruff format --check .
+mypy
 ```
+
+Les tests d'intégration tournent sur une **vraie** base pgvector (créée à la volée,
+tables vidées entre chaque test) et remplacent uniquement les modèles ML par des
+doublures déterministes. Sans PostgreSQL joignable, ils sont ignorés proprement —
+pointez-les ailleurs avec `TEST_DATABASE_URL`.
+
+```bash
+cd frontend && npm run lint && npm run format:check && npm run build
+```
+
+La CI rejoue tout (lint, types, tests + couverture, build front, build de l'image Docker).
 
 ## ⚙️ Configuration
 
@@ -156,16 +173,28 @@ rag-application/
 ├── docker-compose.yml          # PostgreSQL + pgvector
 ├── backend/
 │   ├── app/
-│   │   ├── main.py             # FastAPI + routes
-│   │   ├── rag_pipeline.py     # chunking + génération Claude / démo
-│   │   ├── reranker.py         # reranking cross-encoder
+│   │   ├── main.py             # app factory + mapping erreurs -> HTTP
+│   │   ├── services.py         # composition root (l'objet graphe câblé)
+│   │   ├── deps.py             # providers d'injection FastAPI
+│   │   ├── protocols.py        # interfaces (Embedder, Reranker, Generator…)
+│   │   ├── api/                # routers (health, documents, chat, …)
+│   │   ├── retrieval.py        # récupération à deux étages
+│   │   ├── ingestor.py         # ingestion : chunks -> embeddings -> stockage
+│   │   ├── generation.py       # génération Claude + repli démo/erreur
+│   │   ├── chunking.py         # découpage du texte
 │   │   ├── embeddings.py       # embeddings locaux
-│   │   ├── ingestion.py        # extraction docx/html + garde anti-SSRF
+│   │   ├── reranker.py         # reranking cross-encoder
+│   │   ├── ingestion.py        # extraction docx/html/pdf + garde anti-SSRF
+│   │   ├── errors.py           # erreurs métier
 │   │   └── vector_db.py        # accès DB async + recherche vectorielle
 │   └── tests/
+│       ├── doubles.py          # faux embedder/reranker/générateur
+│       ├── unit/               # logique pure, sans I/O
+│       └── integration/        # vraie PostgreSQL + API de bout en bout
 └── frontend/
     └── src/
         ├── services/api.js
+        ├── hooks/useTheme.js
         └── components/{Navbar,DocumentPanel,ChatInterface}.jsx
 ```
 

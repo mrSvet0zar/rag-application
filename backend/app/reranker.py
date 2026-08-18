@@ -16,8 +16,10 @@ from __future__ import annotations
 import logging
 import math
 import threading
+from collections.abc import Sequence
+from typing import Any
 
-from app.config import get_settings
+from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +27,12 @@ logger = logging.getLogger(__name__)
 class RerankService:
     """Reranks retrieved chunks with a multilingual cross-encoder."""
 
-    def __init__(self, settings=None) -> None:
-        self._settings = settings or get_settings()
+    def __init__(self, settings: Settings) -> None:
+        self._settings = settings
         self._model = None
         self._lock = threading.Lock()
 
-    def _ensure_model(self):
+    def _ensure_model(self) -> Any:
         if self._model is None:
             with self._lock:
                 if self._model is None:
@@ -60,7 +62,10 @@ class RerankService:
 
     @staticmethod
     def _assemble(
-        chunks: list[dict], scores, top_n: int, min_score: float = 0.0
+        chunks: list[dict],
+        scores: Sequence[float],
+        top_n: int,
+        min_score: float = 0.0,
     ) -> list[dict]:
         """Attach normalized scores, sort by relevance, drop those below
         `min_score` (but always keep the single best), and keep the top_n.
@@ -68,7 +73,7 @@ class RerankService:
         Pure/deterministic so it can be unit-tested without loading a model.
         """
         scored = []
-        for chunk, raw in zip(chunks, scores):
+        for chunk, raw in zip(chunks, scores, strict=False):
             enriched = dict(chunk)
             enriched["rerank_score"] = _sigmoid(float(raw))
             scored.append(enriched)
@@ -86,7 +91,3 @@ def _sigmoid(x: float) -> float:
         z = math.exp(x)
         return z / (1.0 + z)
     return 1.0 / (1.0 + math.exp(-x))
-
-
-# Module-level singleton.
-rerank_service = RerankService()

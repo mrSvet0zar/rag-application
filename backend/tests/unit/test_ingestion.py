@@ -11,13 +11,13 @@ from app.ingestion import html_to_text, validate_public_url
 @pytest.mark.parametrize(
     "url",
     [
-        "ftp://example.com/file",          # non-http scheme
-        "http://localhost/admin",          # loopback
-        "http://127.0.0.1:8000/",          # loopback IP
-        "http://10.0.0.5/",                # private range
-        "http://192.168.1.1/",             # private range
+        "ftp://example.com/file",  # non-http scheme
+        "http://localhost/admin",  # loopback
+        "http://127.0.0.1:8000/",  # loopback IP
+        "http://10.0.0.5/",  # private range
+        "http://192.168.1.1/",  # private range
         "http://169.254.169.254/latest/",  # cloud metadata (link-local)
-        "http://[::1]/",                   # IPv6 loopback
+        "http://[::1]/",  # IPv6 loopback
     ],
 )
 def test_validate_public_url_rejects_unsafe(url):

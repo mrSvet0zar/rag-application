@@ -25,9 +25,7 @@ class Settings(BaseSettings):
     max_tokens: int = 1024
 
     # --- Embeddings ---
-    embedding_model: str = (
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    )
+    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     pgvector_dimension: int = 384
 
     # --- App ---

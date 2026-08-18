@@ -1,4 +1,3 @@
-import React from 'react';
 import useTheme from '../hooks/useTheme';
 
 export default function Navbar({ stats }) {
@@ -33,7 +32,9 @@ export default function Navbar({ stats }) {
                     ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'
                     : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
                 }`}
-                title={stats.demo_mode ? 'Aucune clé Anthropic configurée' : stats.chat_model}
+                title={
+                  stats.demo_mode ? 'Aucune clé Anthropic configurée' : stats.chat_model
+                }
               >
                 {stats.demo_mode ? '⚙️ Mode démo' : `✅ ${stats.chat_model}`}
               </span>
@@ -42,7 +43,9 @@ export default function Navbar({ stats }) {
 
           <button
             onClick={toggle}
-            aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+            aria-label={
+              theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'
+            }
             title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
@@ -57,7 +60,9 @@ export default function Navbar({ stats }) {
 function Stat({ label, value }) {
   return (
     <div className="hidden text-center sm:block">
-      <div className="font-semibold text-slate-900 dark:text-slate-100">{value ?? '—'}</div>
+      <div className="font-semibold text-slate-900 dark:text-slate-100">
+        {value ?? '—'}
+      </div>
       <div className="text-[11px] uppercase tracking-wide text-slate-400 dark:text-slate-500">
         {label}
       </div>

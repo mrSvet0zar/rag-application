@@ -12,7 +12,17 @@ import socket
 from urllib.parse import urlparse
 
 # Tags whose text is boilerplate, not content.
-_STRIP_TAGS = ["script", "style", "noscript", "header", "footer", "nav", "aside", "form", "svg"]
+_STRIP_TAGS = [
+    "script",
+    "style",
+    "noscript",
+    "header",
+    "footer",
+    "nav",
+    "aside",
+    "form",
+    "svg",
+]
 
 
 def validate_public_url(url: str) -> None:
@@ -88,3 +98,29 @@ def docx_to_text(content: bytes) -> str:
             if cells:
                 parts.append(" | ".join(cells))
     return "\n\n".join(parts)
+
+
+def pdf_to_text(content: bytes) -> str:
+    """Extract text from a PDF's bytes."""
+    from pypdf import PdfReader
+
+    reader = PdfReader(io.BytesIO(content))
+    return "\n\n".join(page.extract_text() or "" for page in reader.pages)
+
+
+def extract_text(filename: str, content: bytes) -> str:
+    """Dispatch to the right extractor based on the file extension.
+
+    Anything unrecognised is treated as plain text (utf-8, then latin-1).
+    """
+    lower = filename.lower()
+    if lower.endswith(".pdf"):
+        return pdf_to_text(content)
+    if lower.endswith(".docx"):
+        return docx_to_text(content)
+    if lower.endswith((".html", ".htm")):
+        return html_to_text(content.decode("utf-8", errors="replace"))[1]
+    try:
+        return content.decode("utf-8")
+    except UnicodeDecodeError:
+        return content.decode("latin-1")

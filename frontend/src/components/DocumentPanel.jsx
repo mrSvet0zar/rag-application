@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 
@@ -50,8 +50,12 @@ export default function DocumentPanel() {
   return (
     <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">📄 Documents</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">Base de connaissances</p>
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          📄 Documents
+        </h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Base de connaissances
+        </p>
       </div>
 
       {/* Dropzone */}
@@ -127,7 +131,9 @@ export default function DocumentPanel() {
         {isLoading ? (
           <p className="text-sm text-slate-400 dark:text-slate-500">Chargement…</p>
         ) : documents.length === 0 ? (
-          <p className="text-sm text-slate-400 dark:text-slate-500">Aucun document pour l’instant.</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">
+            Aucun document pour l’instant.
+          </p>
         ) : (
           <ul className="space-y-2">
             {documents.map((doc) => (
