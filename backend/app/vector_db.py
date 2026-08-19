@@ -135,6 +135,21 @@ class Database:
                 status,
             )
 
+    async def fail_stale_processing(self) -> int:
+        """Mark documents left mid-ingestion as failed. Returns how many.
+
+        Ingestion runs in the background, so a restart during a job leaves its
+        row stuck in `processing` forever — no worker will ever pick it up
+        again. Reconciling at startup turns an invisible zombie into an honest
+        failure the user can retry.
+        """
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(
+                "UPDATE documents SET status = 'failed' "
+                "WHERE status = 'processing' RETURNING id"
+            )
+            return len(rows)
+
     async def get_document(self, document_id: int) -> dict | None:
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow(

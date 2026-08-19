@@ -7,7 +7,7 @@ import logging
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, UploadFile, status
 
 from app.deps import DbDep, IngestorDep, SettingsDep
 from app.errors import (
@@ -29,11 +29,22 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
-@router.post("/upload", response_model=DocumentResponse)
+@router.post(
+    "/upload", response_model=DocumentResponse, status_code=status.HTTP_202_ACCEPTED
+)
 async def upload_document(
-    ingestor: IngestorDep, file: UploadFile = File(...)
+    ingestor: IngestorDep,
+    background: BackgroundTasks,
+    file: UploadFile = File(...),
 ) -> DocumentResponse:
-    """Upload a document (txt/md/pdf/docx/html): extract, chunk, embed, store."""
+    """Accept a document (txt/md/pdf/docx/html) and index it in the background.
+
+    Returns 202 with the row in `processing`: chunking and embedding a large
+    file takes longer than a client will hold the connection open, so the work
+    is detached and the client polls the document's status. Anything cheap
+    enough to fail fast — unreadable file, no extractable text, no chunks — is
+    still checked here, while there is someone to tell.
+    """
     content = await file.read()
     if not content:
         raise UnreadableDocumentError("Empty file.")
@@ -47,18 +58,24 @@ async def upload_document(
     if not text.strip():
         raise UnreadableDocumentError("No extractable text in file.")
 
-    document = await ingestor.ingest(
+    document = await ingestor.create_pending(
         filename=filename,
         content_type=file.content_type or "text/plain",
         size_bytes=len(content),
         text=text,
     )
+    background.add_task(ingestor.process, document["id"], filename, text)
     return DocumentResponse(**document)
 
 
-@router.post("/import-url", response_model=DocumentResponse)
+@router.post(
+    "/import-url", response_model=DocumentResponse, status_code=status.HTTP_202_ACCEPTED
+)
 async def import_url(
-    req: UrlImportRequest, ingestor: IngestorDep, settings: SettingsDep
+    req: UrlImportRequest,
+    ingestor: IngestorDep,
+    settings: SettingsDep,
+    background: BackgroundTasks,
 ) -> DocumentResponse:
     """Fetch a web page, extract its readable text, and index it."""
     url = str(req.url)
@@ -93,12 +110,22 @@ async def import_url(
 
     parsed = urlparse(url)
     filename = (title or f"{parsed.netloc}{parsed.path}").strip()[:255] or parsed.netloc
-    document = await ingestor.ingest(
+    document = await ingestor.create_pending(
         filename=filename,
         content_type="text/html",
         size_bytes=len(raw),
         text=text,
     )
+    background.add_task(ingestor.process, document["id"], filename, text)
+    return DocumentResponse(**document)
+
+
+@router.get("/{doc_id}", response_model=DocumentResponse)
+async def get_document(doc_id: int, db: DbDep) -> DocumentResponse:
+    """One document, including its ingestion status — what a client polls."""
+    document = await db.get_document(doc_id)
+    if not document:
+        raise NotFoundError("Document not found.")
     return DocumentResponse(**document)
 
 

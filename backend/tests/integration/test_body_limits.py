@@ -39,8 +39,11 @@ async def test_upload_under_the_limit_still_works(harness: Harness):
         files={"file": ("small.txt", b"Un contenu court mais reel.", "text/plain")},
     )
 
-    assert response.status_code == 200, response.text
-    assert response.json()["total_chunks"] >= 1
+    assert response.status_code == 202, response.text
+    document = (
+        await harness.client.get(f"/api/documents/{response.json()['id']}")
+    ).json()
+    assert document["total_chunks"] >= 1
 
 
 @pytest.mark.max_body(LIMIT)

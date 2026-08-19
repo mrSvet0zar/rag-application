@@ -38,6 +38,7 @@ Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonc
 - 🔍 **Recherche hybride + reranking** — recherche vectorielle (pgvector, HNSW) **et** lexicale full-text, fusionnées par *Reciprocal Rank Fusion*, puis re-classées par un cross-encoder multilingue. Le vectoriel comprend la paraphrase, le lexical rattrape les sigles et noms propres qu'il rate.
 - 🧠 **Génération Claude** avec **citation des sources** (`[source: fichier]`) et **streaming SSE** token par token.
 - 🌍 **Embeddings 100 % locaux** (`sentence-transformers`, multilingue FR/EN, 384 dims) — gratuits, sans clé, sans coût.
+- ⚡ **Ingestion asynchrone** — l'upload répond `202` en quelques millisecondes et l'indexation se poursuit en tâche de fond, avec un statut à sonder (un document de 445 chunks répond en 0,04 s au lieu de bloquer 38 s).
 - 📥 **Ingestion multi-formats** — `.txt`, `.md`, `.pdf`, `.docx`, `.html`, et **import depuis une URL** (avec garde **anti-SSRF**).
 - 💬 **Conversations persistées** (documents, chunks, conversations, messages en base).
 - 🌗 **Mode clair / sombre** persistant (respecte la préférence système, sans flash au chargement).
@@ -123,9 +124,10 @@ npm install && npm run dev
 
 | Méthode  | Route                        | Description                              |
 | -------- | ---------------------------- | ---------------------------------------- |
-| `POST`   | `/api/documents/upload`      | Upload (txt/md/pdf/docx/html) + index    |
-| `POST`   | `/api/documents/import-url`  | Importe une page web (SSRF-guarded)      |
-| `GET`    | `/api/documents`             | Liste des documents                      |
+| `POST`   | `/api/documents/upload`      | Upload (txt/md/pdf/docx/html) → **202**, indexé en tâche de fond |
+| `POST`   | `/api/documents/import-url`  | Importe une page web (SSRF-guarded) → **202** |
+| `GET`    | `/api/documents`             | Liste des documents (avec leur statut)   |
+| `GET`    | `/api/documents/{id}`        | Un document — ce qu'on sonde pendant l'indexation |
 | `DELETE` | `/api/documents/{id}`        | Supprime un document et ses chunks       |
 | `GET`    | `/api/health` · `/api/ready` | Vivacité · capacité à servir (teste la DB) |
 | `POST`   | `/api/chat`                  | Question (RAG, réponse complète)         |

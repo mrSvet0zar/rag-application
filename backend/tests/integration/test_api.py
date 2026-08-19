@@ -53,20 +53,32 @@ async def test_stats_reflect_ingested_content(harness: Harness):
 
 
 # ---------- upload ----------
-async def test_upload_indexes_the_document(harness: Harness):
+async def test_upload_is_accepted_immediately(harness: Harness):
+    """202 with the row still `processing`: the client gets a receipt, not a wait."""
     resp = await upload(harness, "guide.md", b"pgvector et HNSW")
 
-    assert resp.status_code == 200
+    assert resp.status_code == 202
     body = resp.json()
     assert body["filename"] == "guide.md"
-    assert body["status"] == "completed"
-    assert body["total_chunks"] == 1
+    assert body["status"] == "processing"
     assert body["file_size_bytes"] == len(b"pgvector et HNSW")
+
+
+async def test_upload_indexes_the_document_in_the_background(harness: Harness):
+    resp = await upload(harness, "guide.md", b"pgvector et HNSW")
+
+    document = (await harness.client.get(f"/api/documents/{resp.json()['id']}")).json()
+
+    assert document["status"] == "completed"
+    assert document["total_chunks"] == 1
 
 
 async def test_upload_splits_long_documents(harness: Harness):
     resp = await upload(harness, "long.md", ("Phrase de test. " * 300).encode())
-    assert resp.json()["total_chunks"] > 1
+
+    document = (await harness.client.get(f"/api/documents/{resp.json()['id']}")).json()
+
+    assert document["total_chunks"] > 1
 
 
 async def test_upload_rejects_an_empty_file(harness: Harness):
@@ -95,8 +107,9 @@ async def test_upload_accepts_docx(harness: Harness):
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     )
 
-    assert resp.status_code == 200
-    assert resp.json()["total_chunks"] == 1
+    assert resp.status_code == 202
+    document = (await harness.client.get(f"/api/documents/{resp.json()['id']}")).json()
+    assert document["total_chunks"] == 1
 
 
 async def test_upload_failure_marks_the_document_failed(
@@ -111,9 +124,10 @@ async def test_upload_failure_marks_the_document_failed(
 
     resp = await upload(harness, "a.md", b"du contenu")
 
-    assert resp.status_code == 500
+    # Accepted, because the failure happens after the client has been answered.
+    assert resp.status_code == 202
     [document] = (await harness.client.get("/api/documents")).json()
-    assert document["status"] == "failed"
+    assert document["status"] == "failed", "jamais laissé en `processing`"
 
 
 # ---------- listing & deletion ----------
@@ -216,11 +230,13 @@ async def test_import_url_titles_the_document_from_the_page(
         "/api/documents/import-url", json={"url": "https://example.com/guide"}
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == 202
     body = resp.json()
     assert body["filename"] == "Guide pgvector"
     assert body["content_type"] == "text/html"
-    assert body["total_chunks"] == 1
+
+    document = (await harness.client.get(f"/api/documents/{body['id']}")).json()
+    assert document["total_chunks"] == 1
 
 
 async def test_import_url_rejects_a_page_without_text(

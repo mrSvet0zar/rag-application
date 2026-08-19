@@ -53,7 +53,7 @@ async def test_ingestion_is_throttled_too(harness: Harness):
     first = await harness.client.post("/api/documents/upload", files=files)
     second = await harness.client.post("/api/documents/upload", files=files)
 
-    assert first.status_code == 200
+    assert first.status_code == 202
     assert second.status_code == 429
 
 

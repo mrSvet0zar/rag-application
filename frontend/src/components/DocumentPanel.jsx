@@ -12,6 +12,11 @@ export default function DocumentPanel() {
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ['documents'],
     queryFn: api.listDocuments,
+    // Ingestion is accepted with a 202 and finishes in the background, so the
+    // list is polled while anything is still processing — and left alone once
+    // nothing is, rather than polling forever.
+    refetchInterval: (query) =>
+      query.state.data?.some((doc) => doc.status === 'processing') ? 1500 : false,
   });
 
   const invalidate = () => {
@@ -22,6 +27,7 @@ export default function DocumentPanel() {
   const uploadMutation = useMutation({
     mutationFn: api.uploadDocument,
     onMutate: () => setError(null),
+    // The response only means "accepted"; the polling above reports the outcome.
     onSuccess: invalidate,
     onError: (err) =>
       setError(err.response?.data?.detail || err.message || 'Échec de l’upload'),
@@ -146,7 +152,9 @@ export default function DocumentPanel() {
                     {doc.filename}
                   </p>
                   <p className="text-xs text-slate-400 dark:text-slate-500">
-                    {doc.total_chunks} chunks · {statusLabel(doc.status)}
+                    {doc.status === 'processing'
+                      ? statusLabel(doc.status)
+                      : `${doc.total_chunks} chunks · ${statusLabel(doc.status)}`}
                   </p>
                 </div>
                 <button
@@ -167,7 +175,7 @@ export default function DocumentPanel() {
 
 function statusLabel(status) {
   return (
-    { completed: '✅ prêt', processing: '⏳ traitement', failed: '❌ échec' }[status] ||
+    { completed: '✅ prêt', processing: '⏳ indexation…', failed: '❌ échec' }[status] ||
     status
   );
 }

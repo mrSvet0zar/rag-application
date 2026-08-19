@@ -129,13 +129,29 @@ chemins d'entrée :
 Cinq tests d'intégration + quatre unitaires ; comportement confirmé aussi sous
 uvicorn réel (11 Mo → 413, upload normal → 200).
 
-### B3. Ingestion synchrone dans la requête 🟠
+### B3. Ingestion asynchrone ✅
 
-Extraction + chunking + embeddings se font dans le cycle de la requête HTTP. Un
-gros PDF = timeout, aucune reprise, aucune progression côté client. La colonne
-`documents.status` (`processing`/`completed`/`failed`) existe déjà mais n'est
-jamais exploitée de façon asynchrone.
-→ File de jobs (ARQ/Celery) ou, a minima, tâche de fond + polling du statut.
+**Faite.** L'upload et l'import d'URL répondent **202 Accepted** avec la ligne en
+`processing` ; le découpage et les embeddings se font en tâche de fond, et le
+client sonde `GET /api/documents/{id}`. Mesuré : un document de 445 chunks
+répond en **0,04 s** au lieu de bloquer **38 s**.
+
+Ce qu'il a fallu traiter, et qui n'existait pas en synchrone :
+- **Réconciliation au démarrage** : une ingestion interrompue par un redémarrage
+  ne peut pas reprendre ; sa ligne resterait en `processing` indéfiniment. Elle
+  est passée à `failed` au boot — un échec honnête plutôt qu'un zombie.
+- **Concurrence bornée** (sémaphore) : chaque job garde un document en mémoire
+  et sature un cœur ; des jobs illimités épuiseraient le conteneur bien avant
+  que le rate limiter ne s'en aperçoive.
+- **`process` ne lève jamais** : il n'y a plus personne à qui remonter
+  l'exception, donc l'issue est écrite sur la ligne, que le client sonde.
+- Les validations bon marché (fichier illisible, aucun texte, aucun chunk)
+  restent **dans la requête**, tant qu'il y a quelqu'un pour les entendre.
+
+> Limite assumée : les tâches de fond vivent dans le processus. C'est adapté à
+> une instance unique, et la réconciliation couvre le redémarrage. Passer à une
+> vraie file (ARQ/Celery + Redis) deviendrait justifié avec plusieurs répliques,
+> des reprises automatiques ou des ingestions de plusieurs minutes.
 
 ### B4. Pas de rate limiting 🟠
 
@@ -181,5 +197,5 @@ markdown maison sont les zones les plus fragiles.
 2. ~~**B2** (limite d'upload)~~ ✅
 3. ~~**A1 → A2** (harness + baseline)~~ ✅
 4. ~~**A3 → A4 → A5**~~ ✅ (hybride, A/B chunking, tableau de résultats).
-5. **B3 → B6** (asynchrone, rate limit, readiness, observabilité).
+5. ~~**B3 → B6**~~ ✅ (asynchrone, rate limit, readiness, observabilité).
 6. **B7 → B9** (durcissement, API, tests frontend).

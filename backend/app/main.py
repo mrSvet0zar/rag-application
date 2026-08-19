@@ -72,6 +72,15 @@ def create_app(
         services = services_builder(settings)
         await services.db.connect()
         app.state.services = services
+
+        # A background ingestion interrupted by a restart cannot resume, so its
+        # row would sit in `processing` forever. Better an honest failure.
+        abandoned = await services.db.fail_stale_processing()
+        if abandoned:
+            logger.warning(
+                "marked abandoned ingestions as failed",
+                extra={"event": "ingestion.reconciled", "documents": abandoned},
+            )
         logger.info(
             "Startup complete (demo_mode=%s, rerank=%s).",
             settings.demo_mode,
