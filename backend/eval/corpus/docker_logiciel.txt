@@ -1,0 +1,154 @@
+# Docker (logiciel)
+
+Source : fr.wikipedia.org, révision 238550846
+
+Pour les articles homonymes, voir Docker (homonymie).
+Informations
+Créateur
+Solomon Hykes
+Développé par
+Docker, Inc. ( en )
+Première version
+14 mars 2013
+Dernière version
+29.7.2 ( 6 août 2026 )
+Dépôt
+github.com/docker
+État du projet
+En développement actif
+Écrit en
+Système d'exploitation
+Linux, Microsoft Windows, macOS et type Unix
+Environnement
+Multi-plateforme
+Formats lus
+Dockerfile ( en )
+Formats écrits
+Dockerfile ( en )
+Type
+Conteneur
+Politique de distribution
+Parfois gratuit
+Licence
+Licence propriétaire et licence Apache 2.0
+Documentation
+docs.docker.com/engine
+Site web
+www.docker.com
+modifier - modifier le code - voir Wikidata (aide)
+Docker est à la fois une bibliothèque et une plateforme logicielle permettant de faire tourner certaines applications dans des conteneurs. La première mouture de Docker a été publiée en 2013.
+Docker permet d'empaqueter une application et ses dépendances dans un conteneur isolé, qui peut être exécuté sur n'importe quel serveur. Il ne s'agit pas de virtualisation, mais de conteneurisation, une forme plus légère qui s'appuie sur certaines parties de la machine hôte pour son fonctionnement. Cette approche permet d'accroître la flexibilité et la portabilité d'exécution d'une application, laquelle peut tourner de façon fiable et prévisible sur une grande variété de machines hôtes, que ce soit sur une machine locale, un cloud privé ou public, une machine nue, etc.
+Techniquement, Docker étend le format de conteneur Linux standard, LXC, avec une API de haut niveau fournissant une solution pratique de virtualisation qui exécute les processus de façon isolée. Pour ce faire, Docker utilise entre autres LXC, cgroups et le noyau Linux lui-même. Contrairement aux machines virtuelles traditionnelles, un conteneur Docker n'inclut pas de système d'exploitation, mais s'appuie au contraire sur les fonctionnalités du système d’exploitation fournies par la machine hôte.
+Docker peut être utilisée pour étendre des systèmes distribués de façon qu'ils s'exécutent de manière autonome depuis une seule machine physique ou une seule instance par nœud. Cela permet aux nœuds d'être déployés au fur et à mesure que les ressources sont disponibles, offrant un déploiement transparent et similaire aux PaaS pour des systèmes comme Apache Cassandra, Riak, ou d'autres systèmes distribués.
+Vue d’ensemble
+Schéma des interfaces de Docker.
+Docker permet la mise en œuvre de conteneurs s'exécutant en isolation, via une API de haut niveau. Construit sur des capacités du noyau Linux (surtout les cgroups et espaces de nommage), un conteneur Docker, à l'opposé de machines virtuelles traditionnelles, ne requiert aucun système d'exploitation séparé et n'en fournit aucun. Il s'appuie plutôt sur les fonctionnalités du noyau et utilise l'isolation de ressources (comme le processeur, la mémoire, les entrées et sorties et les connexions réseau) ainsi que des espaces de noms séparés pour isoler le système d'exploitation tel que vu par l'application. Docker accède aux capacités de virtualisation du noyau Linux, soit directement à travers la bibliothèque runc (disponible depuis Docker 0.9), soit indirectement via libvirt, LXC (Linux Containers) ou systemd-nspawn.
+Utiliser Docker pour créer et gérer des conteneurs peut simplifier la mise en œuvre de systèmes distribués en permettant à de multiples applications, tâches de fond et autres processus de s'exécuter de façon autonome sur une seule machine physique ou à travers un éventail de machines isolées. Ceci permet de déployer des nœuds en tant que ressources sur besoin, fournissant ainsi une plateforme de déploiement de style PaaS et l' extensibilité de systèmes tels Apache Cassandra, MongoDB ou Riak, ainsi que la simplification de la création et maintenance de queues de tâches ou autres systèmes distribués.
+La notion de conteneur
+L'objectif d'un conteneur est le même que pour un serveur dédié virtuel: héberger des services sur un même serveur physique tout en les isolant les uns des autres. Un conteneur est cependant moins figé qu'une machine virtuelle en matière de taille de disque et de ressources allouées.
+Un conteneur permet d'isoler chaque service: le serveur web, la base de données, des applications pouvant être exécutées de façon indépendante dans leur conteneur dédié, contenant uniquement les dépendances nécessaires. Chaque conteneur peut être relié aux autres par des réseaux virtuels. Il est possible de monter des volumes de disque de la machine hôte dans un conteneur. Si aucun processus n'est démarré dans le conteneur, alors celui-ci s'arrête. On parle parfois de virtualisation d'OS: contrairement à la virtualisation qui émule par logiciel différentes machines sur une machine physique, la conteneurisation émule différents OS sur un seul OS.
+Histoire
+Docker est développé par Solomon Hykes pour un projet interne de dotCloud, une entreprise française proposant une plate-forme en tant que service, avec les contributions d'Andrea Luzzardi et Francois-Xavier Bourlet, également employés de dotCloud. Docker est une évolution basée sur les technologies propriétaires de dotCloud, elles-mêmes construites sur des projets open source.
+Docker est distribué en tant que projet open source à partir de mars 2013.
+Docker connaît une adoption rapide dans des secteurs très variés, des simulations de stellarators pour la fusion nucléaire chez Proxima Fusion aux services de streaming vidéo chez Netflix, jusqu'au déploiement logiciel embarqué dans l'espace avec BalenaOS. Docker figure ainsi de façon constante en tête des classements de popularité des développeurs (2026).
+Un grand avantage de Docker est la possibilité de modéliser chaque conteneur sous la forme d'une image que l'on peut stocker localement ou sur le Docker Hub, dépôt public où de nombreuses images (applicatives) sont publiées régulièrement; en 2026, le Docker Hub héberge plus de 14 millions d'images et enregistre plus de 11 milliards de téléchargements par mois
+En 2019 est annoncée la version 3 de la plateforme Docker lors de la conférence DockerCon 2019. En novembre 2019, la société Docker revend son produit « Docker Enterprise » à Mirantis, et effectue une levée de fonds de près de 35 millions de dollars.
+En août 2021, Docker met fin à la gratuité de Docker Desktop (Windows, macOS) pour les grandes entreprises; Docker Engine sous Linux reste gratuit.
+Environnement d’exécution (Runtime)
+L’exécution des conteneurs avec Docker repose sur le standard de facto nommé containerd. Il s'agit d'un composant permettant l’exécution des conteneurs sur le système d'exploitation hôte.
+Docker peut être vu comme un ensemble d'outils permettant une gestion facilitée des conteneurs ainsi que de leur écosystème dans leur environnement containerd.
+En février 2019 containerd est devenu un projet à part entière au sein de la Cloud Native Computing Foundation (CNCF). Il est également l'un des environnements d'exécution du système d'orchestration de conteneurs Kubernetes qui n'utilise plus Docker comme environnement d’exécution depuis 2020.
+Sécurité
+Intégration avec d'autres systèmes
+L'intégration de Docker a été faite avec les outils de gestion d'infrastructures suivants:
+Ansible
+Chef
+Puppet
+ProGet
+Salt
+Vagrant
+Jenkins
+OpenStack Nova
+OpenSVC
+Le 19 septembre 2013, Red Hat et Docker ont annoncé une collaboration concernant Fedora, Red Hat Enterprise Linux et Openshift. En mai 2015, Synology, un constructeur de NAS, intègre Docker dans son logiciel interne DSM v5.2.
+Outils associés
+Docker Compose est un logiciel pour définir et exécuter des applications à partir de multiples conteneurs. Il est basé sur un fichier YAML qui permet de définir les services et les paramètres de leurs créations et ainsi de les démarrer par une commande unique. La V1 avait son propre exécutable ( docker-compose ) alors que la V2 est un plugin de Docker, lançable par la commande docker compose.
+Références
+↑ « v29.7.2 », 6 août 2026 (consulté le 6 août 2026 )
+↑ a et b Katherine Noyes, « Docker: A 'Shipping Container' for Linux Code », Linux, 1 er août 2013 (consulté le 9 août 2013 )
+↑ a et b Abel Avram, « Docker: Automated and Consistent Software Deployments », InfoQ, 27 mars 2013 (consulté le 9 août 2013 )
+↑ Alex Williams, « The Matrix Of Hell And Two Open-Source Projects For The Emerging Agnostic Cloud », TechCrunch, 28 juillet 2013 (consulté le 9 août 2013 )
+↑ Adron Hall, « OSCON: Conversations, Deployments, Architecture, Docker and the Future? », CloudAve, 31 juillet 2013 (consulté le 9 août 2013 )
+↑ a b et c (en) Anil Madhavapeddy, David J. Scott, Justin Cormack, « A Decade of Docker Containers », sur Communications of the ACM, février 2026
+↑ « Docker: une plateforme 3.0 pour lier toujours plus les développeurs aux containers… et à Kubernetes », sur LeMagIT (consulté le 7 mai 2019 )
+↑ « Que devient Docker? », sur Journal du Net, 3 juillet 2020
+↑ (en) Scott Carey, « Docker Desktop is no longer free for enterprise users », sur InfoWorld, 31 août 2021
+↑ (en-US) « containerd », sur CNCF, 4 mars 2024 (consulté le 4 mars 2024 )
+↑ (en) « Don't Panic: Kubernetes and Docker », sur kubernetes.io, 2 décembre 2020 (consulté le 4 mars 2024 )
+↑ Ansible, Inc., « Ansible and Docker », sur www.ansible.com (consulté le 22 février 2016 )
+↑ (en) « thoward/docker-cookbook », sur GitHub (consulté le 12 décembre 2015 )
+↑ (en) « garethr/docker · Puppet Forge », sur forge.puppetlabs.com (consulté le 12 décembre 2015 )
+↑ (en) « containers docker registry », sur www.inedo.com (consulté le 12 novembre 2017 )
+↑ (en) « Using SaltStack in production to manage Docker application containers », sur saltstack.com, 3 décembre 2014
+↑ « github.com/philspitler/vagrant… » ( Archive.org • Wikiwix • Google • Que faire? ).
+↑ (en) « georgebashi/jenkins-docker-plugin », sur GitHub (consulté le 12 décembre 2015 )
+↑ (en) « OpenStack Community Weekly Newsletter (May 31 – June 7) », sur www.openstack.org, 7 juin 2013 (consulté le 12 décembre 2015 )
+↑ (en) « OpenSVC documentation — OpenSVC documentation », sur docs.opensvc.com (consulté le 12 décembre 2015 )
+↑ (en) Alex Williams, « DotCloud Pivots And Wins Big With Docker, The Cloud Service Now Part Of Red Hat OpenShift », 19 septembre 2013 (consulté le 12 décembre 2015 )
+↑ http://www.cachem.fr/synology-dsm-5-2-disponible-version-finale/ DSM v5.2
+Annexes
+Sur les autres projets Wikimedia:
+Docker (logiciel), sur Wikibooks
+Articles connexes
+Microservices
+Devops
+LXC
+Podman
+Liens externes
+(en) Docker: Accelerated Container Application Development
+v · m Virtualisation
+Hyperviseur
+Hyper-V
+vSphere
+vCloud
+Xen
+KVM
+Oracle VM
+Proxmox VE
+oVirt
+Isolateur
+Podman
+BSD Jail
+chroot
+Docker
+Linux-VServer
+LXC
+OpenVZ
+Noyau en espace utilisateur
+Cooperative Linux
+User Mode Linux
+Machine virtuelle et/ou émulateur
+Bochs
+Box64
+Box86 (en)
+DOSBox
+Parallels Desktop
+PearPC
+Plex86
+QEMU
+VirtualBox
+TinyEmu
+VMWare Workstation
+VirtualPC
+Virtual Server
+Z-machine
+Autre
+LPAR
+Ganeti
+libvirt
+Flatpak
+Vagrant
+Portail des entreprises
+Portail de Linux
+Portail des logiciels libres
+Portail de l’informatique

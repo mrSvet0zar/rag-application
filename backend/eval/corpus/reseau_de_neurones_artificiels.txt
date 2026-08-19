@@ -1,0 +1,564 @@
+# Réseau de neurones artificiels
+
+Source : fr.wikipedia.org, révision 238233610
+
+Pour les articles homonymes, voir Réseau de neurones (biologie) et Réseau (homonymie).
+Type
+Type de modèle statistique ( d ), réseau neural ( en ), modèle discriminatif
+Aspect de
+Intelligence artificielle, apprentissage automatique
+modifier - modifier le code - modifier Wikidata
+Un réseau de neurones artificiels,, ou réseau neuronal artificiel, est un système informatique dont la conception est inspirée à l'origine du fonctionnement des neurones mais qui, par la suite, s'est rapproché des méthodes statistiques.
+Les réseaux de neurones artificiels sont généralement optimisés par des méthodes d'apprentissage de type probabiliste, en particulier bayésien. Ils sont placés d'une part dans la famille des applications statistiques, qu'ils enrichissent avec un ensemble de paradigmes permettant de créer des classifications rapides ( réseaux de Kohonen en particulier), et d'autre part dans la famille des méthodes de l' intelligence artificielle auxquelles ils fournissent un mécanisme perceptif indépendant des idées propres de l'implémenteur, et des informations d'entrée au raisonnement logique formel (voir apprentissage profond ).
+En modélisation des circuits biologiques, ils permettent de tester quelques hypothèses fonctionnelles issues de la neurophysiologie, ou encore les conséquences de ces hypothèses pour les comparer au réel.
+Historique
+Les réseaux neuronaux sont construits sur un paradigme biologique, celui du neurone formel (comme les algorithmes génétiques le sont sur la sélection naturelle ). Ce type de métaphore biologique est devenu courant avec les idées de la cybernétique et biocybernétique. Les premiers travaux sur les réseaux de neurones commencent dès les années 1950, se développent avant de tomber en désuétude dans le courant des années 1990 et 2000 avant un retour en grâce dans les années 2010 avec des succès dans la reconnaissance d'image, les jeux (notamment le jeu de go ) puis l' intelligence artificielle générative.
+Neurone formel
+Les neurologues Warren McCulloch et Walter Pitts publient à la fin des années 1950 des travaux sur les réseaux de neurones, dont on retient l'article fondateur « What the frog’s eye tells the frog’s brain » (« Ce que l'œil d'une grenouille dit au cerveau d'une grenouille »). Ils construisent un modèle de neurone, communément appelé neurone formel, et montrent que des réseaux de neurones formels simples peuvent théoriquement réaliser des fonctions logiques, arithmétiques et symboliques complexes.
+Représentation d'un neurone formel (ou logique)
+Le neurone formel est conçu comme un automate doté d'une fonction de transfert qui transforme ses entrées en sortie selon des règles précises. Par exemple, un neurone additionne ses valeurs d'entrée, compare la somme résultante à une valeur de seuil, et émet un signal si cette somme est supérieure ou égale au seuil (modèle ultra-simplifié du fonctionnement d'un neurone biologique). Ces neurones sont par ailleurs associés en réseaux dont la topologie des connexions est variable: réseaux proactifs, récurrents, etc. Enfin, l'efficacité de la transmission des signaux d'un neurone à l'autre peut varier: on parle de poids synaptique susceptibles d'être modulés par des règles d'apprentissage (ce qui mime la plasticité synaptique des réseaux biologiques).
+Une fonction des réseaux de neurones formels, à l'instar du modèle vivant, est d'opérer rapidement des classifications et d'apprendre à les améliorer. À l'opposé des méthodes traditionnelles de résolution informatique, on ne doit pas construire un programme pas à pas en fonction de la compréhension de celui-ci. Les paramètres importants de ce modèle sont les coefficients synaptiques et le seuil de chaque neurone, et la façon de les ajuster. Ce sont eux qui déterminent l'évolution du réseau en fonction de ses informations d'entrée. Il faut choisir un mécanisme permettant de les calculer et de les faire converger si possible vers une valeur assurant une classification aussi proche que possible de l'optimale. C'est ce qu'on nomme la phase d'apprentissage du réseau. Dans un modèle de réseau de neurones formels, apprendre revient donc à déterminer les coefficients synaptiques les plus adaptés à classifier les exemples présentés.
+Premiers réseaux
+Warren McCulloch (qui veut « comprendre comment on comprend ») et Walter Pitts publient en 1943 l'un des articles considéré comme ayant lancé la mode de l'intelligence artificielle: « A logical calculus of the ideas immanent in nervous activity », Bulletin of Mathematical Biophysics,‎ 1943 ( lire en ligne ). Ils considèrent que le fonctionnement des neurones naturels évoque celui des portes logiques en électronique. Mais ils ne donnent pas d'indication méthodologique pour calculer la valeur des « coefficients synaptiques ». Cette question est pourtant au cœur des réflexions sur l'apprentissage, et connait un début de réponse grâce aux travaux du physiologiste canadien Donald Hebb en 1949 ( The Organization of Behaviour ). Donald Hebb propose une règle permettant d'adapter la valeur des « coefficients synaptiques » à l'activité des unités qu'ils relient. Cette règle, connue sous le nom de « règle de Hebb », est présente presque partout dans les modèles actuels, même les plus sophistiqués.
+Réseau de neurones avec rétroaction
+L'idée de « coefficients synaptiques » qui s'auto-adaptent amène le psychologue Frank Rosenblatt à proposer en 1958 le modèle du perceptron. C'est le premier système artificiel capable d'apprendre par expérience, y compris quand son instructeur commet des erreurs (ce en quoi il diffère nettement d'un système d'apprentissage logique formel). Les médias américains, dont le New York Times, publient une vague d'articles enthousiastes et annoncent pour bientôt une machine capable de tout reconnaitre, de penser, de marcher, se reproduire. Certains déclarent que le perceptron pourra bientôt faire de l' exploration spatiale. Le magazine Science dit que le perceptron pourra apprendre, prendre des décisions et traduire des langues.
+Warren McCulloch, interviewé par Radio Canada en 1969 (peu avant son décès), explique que:
+« les machines informatiques pensent avec un langage qui est celui des nombres; nous transformons tout en chiffre pour les faire fonctionner. Elles sont nulles en matière de perception. Elles n'ont pas de langage naturel sous-jacent, comme nous ou les animaux. Lorsqu'on veut les faire développer un modèle du monde autour d'elles-mêmes, on s'aperçoit que ce n'est pas le bon dispositif. Vous voulez qu'elles jouent aux échecs, très bien. Notre programme de jeux d'échec au MIT est déjà un joueur de 2 e rang; dans un an je pense qu'il sera de 1 er rang; ce sera pas un maitre au bout d'un an mais dans six ans environ. Dans six ans, il deviendra une technologie de 1 er rang qu'aucun humain ne pourra dépasser. Je souhaite que ca aille plus loin, et ça ira plus loin, car nous pouvons réduire ces choses là à des nombres. »
+Cette même année 1969, un coup d'arrêt est donné à cette piste par Marvin Lee Minsky et Seymour Papert, qui estiment qu'imiter le cerveau est trop complexe. Ces derniers co-publient un ouvrage conséquent, pédagogique et apparemment complet, intitulé Perceptrons, mettant en exergue certaines des limitations théoriques, selon eux insurmontables, du perceptron, et plus généralement des classifieurs linéaires; ces derniers ne peuvent pas traiter des problèmes non linéaires ou de connexité (par exemple, le cas de la fonction XOR ). Minsky et Paperts étendent implicitement ces limitations à tous modèles de réseaux de neurones artificiels. Paraissant alors dans une impasse, la Recherche sur les réseaux de neurones perd l'essentiel de ses financements publics, et le secteur industriel s'en détourna aussi. Les fonds destinés à l' intelligence artificielle furent redirigés plutôt vers la logique formelle. Cependant, les solides qualités de certains réseaux de neurones en matière adaptative (exemple: Adaline ), leur permettant de modéliser de façon évolutive des phénomènes eux-mêmes évolutifs, les amèneront à être intégrés sous des formes plus ou moins explicites dans le corpus des systèmes adaptatifs; utilisés dans le domaine des télécommunications ou celui du contrôle de processus industriels.
+En 1982, John Joseph Hopfield donne un nouveau souffle à la métaphore neuronale avec son article introduisant un nouveau modèle de réseau de neurones dit de Hopfield. L'article connait le succès pour plusieurs raisons, dont la principale est de teinter la théorie des réseaux de neurones de la rigueur propre aux physiciens. Le neuronal redevient un sujet d'étude acceptable, bien que le modèle souffre des limitations des modèles des années 1960, notamment l'impossibilité de traiter les problèmes non linéaires.
+Perceptron multicouche
+En 1970, Seppo Linnainmaa publie la méthode générale de dérivation automatique (DA) des réseaux connectés discrets de fonctions différentiables imbriquées. En 1973, Dreyfus utilise la rétropropagation pour adapter les paramètres des contrôleurs proportionnellement aux gradients d'erreur.
+L'algorithme de rétropropagation du gradient est formellement établi par Paul Werbos en 1974, et permet l'entraînement pratique des réseaux multicouches. En 1982, il a appliqué la méthode AD de Seppo Linnainmaa aux réseaux neuronaux de la manière qui est devenue largement utilisée,. Son application est popularisée dans le perceptron multi-couche développé en 1986 par David Rumelhart, Ronald J. Williams et Geoffrey Hinton.
+Les réseaux de neurones connaissent par la suite un essor considérable, dû en partie au développement de l' électronique numérique qui fournit davantage de puissance de calcul pour le développement de réseaux neuronaux artificiels dans les années 1980.
+Ces systèmes bénéficieront de l'éclairage de la théorie de la « régularisation statistique » introduite par Vladimir Vapnik en Union soviétique et popularisée en Occident depuis la chute du mur. [ réf. souhaitée] Cette théorie, l'une des plus importantes du domaine des statistiques, permet d'anticiper, d'étudier et de réguler les phénomènes liés au surapprentissage. Le surapprentissage est une difficulté à laquelle doivent faire face tous les systèmes d'apprentissage par l'exemple, que ceux-ci utilisent des méthodes d' optimisation directe (exemple: régression linéaire ), itératives (exemple: l' algorithme du gradient ), ou itératives semi-directes ( gradient conjugué, espérance-maximisation...) et que ceux-ci soient appliqués aux modèles statistiques classiques, aux modèles de Markov cachés ou aux réseaux de neurones formels.
+Réseau neuronal convolutif
+Les réseaux de neurones évoluent avec un nouveau type de réseau non complètement connecté, pour alléger les modèles en nombre de paramètres, et améliorer les performances et leur capacité de généralisation. Une des premières applications a été la reconnaissance automatique des codes postaux aux États-Unis, avec le réseau LeNet-5. En apprentissage automatique, un réseau de neurones convolutifs ou réseau de neurones à convolution (en anglais CNN ou ConvNet pour Convolutional Neural Networks) est un type de réseau de neurones artificiels acycliques (feed-forward), dans lequel le motif de connexion entre les neurones est inspiré par le cortex visuel des animaux. Les neurones de cette région du cerveau sont arrangés de sorte qu'ils correspondent à des régions qui se chevauchent lors du pavage du champ visuel. Leur fonctionnement est inspiré par les processus biologiques, ils consistent en un empilage multicouche de perceptrons, dont le but est de prétraiter de petites quantités d'informations. Les réseaux neuronaux convolutifs ont de larges applications dans la reconnaissance d'image et vidéo, les systèmes de recommandation et le traitement du langage naturel.
+Réseau de neurones à impulsions
+Utilisation
+Grâce à leur capacité de classification et de généralisation, les réseaux de neurones sont généralement utilisés dans des problèmes de nature statistique.
+Les réseaux de neurones sont réellement utilisés, par exemple:
+pour la classification d'espèces animales par espèce étant donné une analyse ADN;
+reconnaissance de motif; par exemple pour la reconnaissance optique de caractères (OCR), et notamment par les banques pour vérifier le montant des chèques, par La Poste pour trier le courrier en fonction du code postal, etc.; ou bien encore pour le déplacement automatisé de robots mobiles autonomes;
+approximation d'une fonction inconnue;
+modélisation accélérée d'une fonction connue mais très complexe à calculer avec exactitude; par exemple certaines fonctions d'inversions utilisées pour décoder les signaux de télédétection émis par les satellites et les transformer en données sur la surface de la mer;
+analyse des données d'un capteur;
+reconnaissance de la parole, reconnaissance de musique;
+en météorologie, pour la classification de conditions atmosphériques et la prévision statistique du temps;
+en auscultation des ouvrages hydrauliques, pour la compréhension physique des phénomènes de déplacements, sous-pressions et débits de fuite.
+Modèle
+Structure du réseau
+Structure d'un neurone artificiel ou neurone formel. Le neurone calcule la somme de ses entrées x, pondérée par les poids w, puis cette valeur passe à travers la fonction d'activation phi pour produire sa sortie o.
+Un réseau de neurones est en général composé d'une succession de couches dont chacune prend ses entrées sur les sorties de la précédente. Chaque couche (i) est composée de N i neurones, prenant leurs entrées sur les N i-1 neurones de la couche précédente. À chaque synapse est associé un poids synaptique, de sorte que les N i-1 sont multipliés par ce poids, puis additionnés par les neurones de niveau i, ce qui est équivalent à multiplier le vecteur d'entrée par une matrice de transformation. Mettre l'une derrière l'autre les différentes couches d'un réseau de neurones reviendrait à mettre en cascade plusieurs matrices de transformation et pourrait se ramener à une seule matrice, produit des autres, s'il n'y avait à chaque couche, la fonction de sortie qui introduit une non linéarité à chaque étape. Ceci montre l'importance du choix judicieux d'une bonne fonction de sortie: un réseau de neurones dont les sorties seraient linéaires n'aurait aucun intérêt.
+Au-delà de cette structure simple, le réseau de neurones peut également contenir des boucles qui en changent radicalement les possibilités mais aussi la complexité. De la même façon que des boucles peuvent transformer une logique combinatoire en logique séquentielle, les boucles dans un réseau de neurones transforment un simple dispositif de reconnaissance d'entrées en une machine complexe capable de toutes sortes de comportements.
+Fonction de combinaison
+Considérons un neurone quelconque.
+Il reçoit des neurones en amont un certain nombre de valeurs via ses connexions synaptiques, et il produit une certaine valeur en utilisant une fonction de combinaison.
+Cette fonction peut donc être formalisée comme étant une fonction vecteur -à- scalaire, notamment:
+les réseaux de type MLP ( multi-layer perceptron ) calculent une combinaison linéaire des entrées, c'est-à-dire que la fonction de combinaison renvoie le produit scalaire entre le vecteur des entrées et le vecteur des poids synaptiques;
+les réseaux de type RBF ( radial basis function ) calculent la distance entre les entrées, c'est-à-dire que la fonction de combinaison renvoie la norme euclidienne du vecteur issu de la différence vectorielle entre les vecteurs d'entrées.
+Fonction d'activation
+La fonction d'activation (ou fonction de seuillage ou encore fonction de transfert) sert à introduire une non-linéarité dans le fonctionnement du neurone.
+Les fonctions de seuillage présentent généralement trois intervalles:
+En dessous du seuil, le neurone est non-actif (souvent dans ce cas, sa sortie vaut 0 ou -1);
+Aux alentours du seuil, une phase de transition;
+Au-dessus du seuil, le neurone est actif (souvent dans ce cas, sa sortie vaut 1).
+Des exemples classiques de fonctions d'activation sont:
+La fonction sigmoïde;
+La fonction tangente hyperbolique;
+La fonction de Heaviside;
+La fonction ReLU (Rectified Linear Unit).
+La logique bayésienne, dont le théorème de Cox-Jaynes formalise les questions d'apprentissage, fait intervenir aussi une fonction en S qui revient de façon récurrente:
+Propagation de l'information
+Ce calcul effectué, le neurone propage son nouvel état interne sur son axone.
+Dans un modèle simple, la fonction neuronale est simplement une fonction de seuillage: elle vaut 1 si la somme pondérée dépasse un certain seuil; 0 sinon.
+Dans un modèle plus riche, le neurone fonctionne avec des nombres réels (souvent compris dans l'intervalle [0,1] ou [-1,1]).
+On dit que le réseau de neurones passe d'un état à un autre lorsque tous ses neurones recalculent en parallèle leur état interne, en fonction de leurs entrées.
+Apprentissage
+Base théorique
+L'apprentissage, connu depuis Sumer [réf. nécessaire], est peu modélisable par la logique déductive: cette dernière procède à partir de connaissances déjà établies dont on tire des connaissances dérivées. Or l'apprentissage emploie la démarche inverse: des observations limitées mènent à des généralisations plausibles, suivant une logique inductive.
+La notion de généralisation est traitée de façon plus ou moins complète par plusieurs approches théoriques.
+La généralisation est traitée de façon globale et générique par la théorie de la régularisation statistique introduite par Vladimir Vapnik. Cette théorie, développée à l'origine en Union soviétique, s'est diffusée en Occident depuis la chute du mur de Berlin. La théorie de la régularisation statistique s'est diffusée très largement parmi celles et ceux qui étudient les réseaux de neurones en raison de la forme générique des courbes d'erreurs résiduelles d'apprentissage et de généralisation issues des procédures d'apprentissage itératives telles que la descente de gradient utilisée pour l'optimisation des perceptrons multi-couches. Ces formes génériques correspondent aux formes prévues par la théorie de la régularisation statistique, du fait que les procédures d'apprentissage par descente de gradient partent d'une configuration initiale des poids synaptiques puis explorent progressivement l'espace des poids synaptiques possibles. On retrouve alors la problématique de l'augmentation progressive de la capacité d'apprentissage, concept fondamental au cœur de la théorie de la régularisation statistique.
+La généralisation est aussi au cœur de l'approche de l' inférence bayésienne, enseignée depuis plus longtemps. Le théorème de Cox-Jaynes fournit ainsi une base importante à un tel apprentissage, en nous apprenant que toute méthode d'apprentissage est soit isomorphe aux probabilités munies de la relation de Bayes, soit incohérente. C'est là un résultat extrêmement fort, et c'est pourquoi les méthodes bayésiennes sont largement utilisées dans le domaine.
+Dans le cas des systèmes d'apprentissage statistique, utilisés pour optimiser les modèles statistiques classiques, réseaux de neurones artificiels et automates markoviens, c'est la généralisation qui est l'objet de toute l'attention.
+Classe de problèmes solubles
+En fonction de la structure du réseau, différents types de fonction sont approchables grâce aux réseaux de neurones:
+Fonctions représentables par un perceptron
+Un perceptron (un réseau à une unité) accepte les fonctions booléennes suivantes: ET, OU, NON-ET, NON-OU mais pas le OU-exclusif. Comme toute fonction booléenne est représentable à l'aide de ces fonctions, un réseau de perceptrons est capable de représenter toutes les fonctions booléennes. En effet les fonctions NON-ET et NON-OU sont dites universelles: on peut par combinaison de l'une de ces fonctions représenter toutes les autres.
+Fonctions représentables par des réseaux de neurones multicouches acycliques
+Fonctions booléennes: toutes les fonctions booléennes sont représentables par un réseau à deux couches. Au pire des cas, le nombre de neurones de la couche cachée augmente de manière exponentielle en fonction du nombre d'entrées.
+Fonctions continues: toutes les fonctions continues bornées sont représentables, avec une précision arbitraire, par un réseau à deux couches (Cybenko, 1989). Ce théorème s'applique au réseau dont les neurones utilisent la sigmoïde dans la couche cachée et des neurones linéaires (sans seuil) dans la couche de sortie. Le nombre de neurones dans la couche cachée dépend de la fonction à approximer.
+Fonctions arbitraires: n'importe quelle fonction peut être approximée avec une précision arbitraire grâce à un réseau à trois couches (théorème de Cybenko, 1988).
+Algorithme
+La large majorité des réseaux de neurones possède un algorithme « d’entraînement » qui consiste à modifier les poids synaptiques en fonction d'un jeu de données présentées en entrée du réseau, par descente de gradient. Le but de cet entraînement est de permettre au réseau de neurones d'« apprendre » à partir des exemples. Si l'entraînement est correctement réalisé, le réseau est capable de fournir des réponses en sortie très proches des valeurs d'origine du jeu de données d'entraînement. Mais tout l'intérêt des réseaux de neurones réside dans leur capacité à généraliser à partir du jeu de test. Il est donc possible d'utiliser un réseau de neurones pour réaliser une mémoire; on parle alors de mémoire neuronale.
+La vision topologique d'un apprentissage correspond à la détermination de l' hypersurface sur où est l' ensemble des réels, et le nombre d'entrées du réseau.
+Apprentissage
+Mode supervisé ou non
+Un apprentissage est dit supervisé lorsque le réseau est forcé à converger vers un état final précis, en même temps qu'un motif lui est présenté.
+À l'inverse, lors d'un apprentissage non-supervisé, le réseau est laissé libre de converger vers n'importe quel état final lorsqu'un motif lui est présenté.
+Surapprentissage
+Il arrive souvent que les exemples de la base d'apprentissage comportent des valeurs approximatives ou bruitées. Si on oblige le réseau à répondre de façon quasi parfaite relativement à ces exemples, on peut obtenir un réseau qui est biaisé par des valeurs erronées.
+Par exemple, imaginons qu'on présente au réseau des couples situés sur une droite d'équation, mais bruités de sorte que les points ne soient pas exactement sur la droite. S'il y a un bon apprentissage, le réseau répond pour toute valeur de présentée. S'il y a surapprentissage, le réseau répond un peu plus que ou un peu moins, car chaque couple positionné en dehors de la droite va influencer la décision: il aura appris le bruit en plus, ce qui n'est pas souhaitable.
+Pour éviter le surapprentissage, il existe une méthode simple: il suffit de partager la base d'exemples en deux sous-ensembles. Le premier sert à l'apprentissage et le second sert à l'évaluation de l'apprentissage. Tant que l'erreur obtenue sur le deuxième ensemble diminue, on peut continuer l'apprentissage, sinon on arrête.
+Rétropropagation
+La rétropropagation consiste à rétropropager l'erreur commise par un neurone à ses synapses et aux neurones qui y sont reliés. Pour les réseaux de neurones, on utilise habituellement la rétropropagation du gradient de l'erreur, qui consiste à corriger les erreurs selon l'importance des éléments qui ont justement participé à la réalisation de ces erreurs: les poids synaptiques qui contribuent à engendrer une erreur importante se verront modifiés de manière plus significative que les poids qui ont engendré une erreur marginale.
+Élagage
+L'élagage ( pruning, en anglais) est une méthode qui permet d'éviter le surapprentissage tout en limitant la complexité du modèle. Elle consiste à supprimer des connexions (ou synapses), des entrées ou des neurones du réseau une fois l'apprentissage terminé. En pratique, les éléments qui ont la plus petite influence sur l'erreur de sortie du réseau sont supprimés. Deux exemples d'algorithmes d'élagage sont:
+Optimal brain damage (OBD) de Yann LeCun et al.;
+Optimal brain surgeon (OBS) de B. Hassibi et D. G. Stork.
+Limites
+Les réseaux de neurones artificiels ont besoin de cas réels servant d'exemples pour leur apprentissage (on appelle cela la base d'apprentissage ). Ces cas doivent être d'autant plus nombreux que le problème est complexe et que sa topologie est peu structurée. Ainsi on peut optimiser un système neuronal de lecture de caractères en utilisant le découpage manuel d'un grand nombre de mots écrits à la main par de nombreuses personnes. Chaque caractère peut alors être présenté sous la forme d'une image brute, disposant d'une topologie spatiale à deux dimensions, ou d'une suite de segments presque tous liés. La topologie retenue, la complexité du phénomène modélisé, et le nombre d'exemples doivent être en rapport. Sur un plan pratique, cela n'est pas toujours facile car les exemples peuvent être soit en quantité absolument limitée ou trop onéreux à collecter en nombre suffisant.
+Il y a des problèmes qui se traitent bien avec les réseaux de neurones, en particulier ceux de classification en domaines convexes (c'est-à-dire tels que si des points A et B font partie du domaine, alors tout le segment AB en fait partie aussi). Des problèmes comme « Le nombre d'entrées à 1 (ou à zéro) est-il pair ou impair? » se résolvent en revanche mal: pour affirmer de telles choses sur 2 puissance N points, si on se contente d'une approche naïve mais homogène, il faut précisément N-1 couches de neurones intermédiaires, ce qui nuit à la généralité du procédé.
+Un exemple caricatural, mais significatif est le suivant: disposant en entrée du seul poids d'une personne, le réseau doit déterminer si cette personne est une femme ou bien un homme. Les femmes étant statistiquement plus légères que les hommes, le réseau fera toujours un peu mieux qu'un simple tirage au hasard: cet exemple dépouillé indique la simplicité et les limitations de ces modèles mais il montre également comment l'étendre: l'information « port d'une jupe », si on l'ajoute, aurait clairement un coefficient synaptique plus grand que la simple information de poids.
+Opacité
+Les réseaux complexes de neurones artificiels ne peuvent généralement pas expliquer eux-mêmes leur façon de « penser ». Les calculs aboutissant à un résultat ne sont pas visibles pour les programmeurs qui ont créé le réseau neuronal. Une « neuroscience de l'intelligence artificielle » a donc été créée pour étudier la boîte noire que constituent les réseaux de neurones, science qui pourrait permettre d'augmenter la confiance dans les résultats produits par ces réseaux ou les intelligences artificielles qui les utilisent.
+Optimisation
+L'optimisation des hyperparamètres est une étape complexe et critique permettant d'assurer la convergence et l'efficacité du réseau de neurones. Il existe des méthodes de test des différents hyperparamètres utilisant des fonctions spécifiques de convergence vers les meilleurs hyperparamètres.
+Différents types de réseaux de neurones
+L'ensemble des poids des liaisons synaptiques détermine le fonctionnement du réseau de neurones. Les motifs sont présentés à un sous-ensemble du réseau de neurones: la couche d'entrée. Lorsqu'un motif est appliqué à un réseau, celui-ci cherche à atteindre un état stable. Lorsqu'il est atteint, les valeurs d'activation des neurones de sortie constituent le résultat. Les neurones qui ne font ni partie de la couche d'entrée ni de la couche de sortie sont dits neurones cachés.
+Les types de réseau de neurones diffèrent par plusieurs paramètres:
+la topologie des connexions entre les neurones;
+la fonction d'agrégation utilisée (somme pondérée, distance pseudo-euclidienne…);
+la fonction de seuillage utilisée ( sigmoïde, échelon, fonction linéaire, fonction de Gauss …);
+l'algorithme d'apprentissage ( rétropropagation du gradient, cascade correlation);
+d'autres paramètres, spécifiques à certains types de réseaux de neurones, tels que la méthode de relaxation pour les réseaux de neurones (réseaux de Hopfield par exemple) qui ne sont pas à propagation simple (perceptron multicouche par exemple).
+De nombreux autres paramètres sont susceptibles d'être mis en œuvre dans le cadre de l'apprentissage de ces réseaux de neurones par exemple:
+la méthode de dégradation des pondérations ( weight decay ), permettant d'éviter les effets de bord et de neutraliser le surapprentissage.
+Réseaux à apprentissages supervisés
+Sans rétropropagation
+Perceptron
+ADALINE ( Adaptive Linear Neuron )
+Le réseau ADALINE est proche du modèle perceptron, seule sa fonction d'activation est différente puisqu'il utilise une fonction linéaire. Afin de réduire les parasites reçus en entrée, les réseaux ADALINE utilisent la méthode des moindres carrés.
+Le réseau réalise une somme pondérée de ses valeurs d'entrées et y rajoute une valeur de seuil prédéfinie. La fonction de transfert linéaire est ensuite utilisée pour l'activation du neurone. Lors de l'apprentissage, les coefficients synaptiques des différentes entrées sont modifiés en utilisant la loi de Widrow-Hoff (en). Ces réseaux sont souvent employés en traitement de signaux, notamment pour la réduction de bruit.
+Machine de Cauchy
+Une machine de Cauchy est un réseau de neurones artificiels assez proche dans le fonctionnement d'une machine de Boltzmann. Cependant les lois de probabilités utilisées ne sont pas les mêmes.
+Non détaillés
+Adaptive heuristic critic (AHC)
+Time delay neural network (TDNN)
+Associative reward penalty (ARP)
+Avalanche matched filter (AMF)
+Backpercolation (Perc)
+Artmap
+Adaptive logic network (ALN)
+Cascade correlation (CasCor)
+Extended Kalman filter (EKF)
+Learning vector quantization (LVQ)
+Probabilistic neural network (PNN)
+General regression neural network (GRNN)
+Avec rétropropagation
+Réseau neuronal à convolution (CNN)
+Perceptron multicouche
+Non détaillés
+Brain-State-in-a-Box (BSB)
+Fuzzy cognitive map (FCM)
+Mean field annealing (MFT)
+Recurrent cascade correlation (RCC)
+Backpropagation through time (BPTT)
+Real-time recurrent learning (RTRL)
+Recurrent extended Kalman filter (EKF)
+Réseaux à apprentissage non supervisé
+Avec rétropropagation
+Carte auto adaptative
+Machine de Boltzmann restreinte (RBM)
+Codage parcimonieux
+Non détaillés
+Additive Grossberg (AG)
+Shunting Grossberg (SG)
+Binary adaptive resonance theory (ART1)
+Analog adaptive resonance theory (ART2, ART2a)
+Discrete Hopfield (DH)
+Continuous Hopfield (CH)
+Chaos fractal,,
+Discrete bidirectional associative memory (BAM)
+Temporal associative memory (TAM)
+Adaptive bidirectional associative memory (ABAM)
+Apprentissage compétitif
+Dans ce type d'apprentissage non supervisé, les neurones sont en compétition pour être actifs. Ils sont à sortie binaire et on dit qu'ils sont actifs lorsque leur sortie vaut 1. Alors que dans les autres règles plusieurs sorties de neurones peuvent être actives simultanément, dans le cas de l'apprentissage compétitif, un seul neurone est actif à un instant donné. Chaque neurone de sortie est spécialisé pour « détecter » une suite de formes similaires et devient alors un détecteur de caractéristiques. La fonction d'entrée est dans ce cas, où, et sont respectivement les vecteurs seuil, poids synaptiques et entrées. Le neurone gagnant est celui pour lequel h est maximum donc si les seuils sont identiques, celui dont les poids sont les plus proches des entrées. Le neurone dont la sortie est maximale sera le vainqueur et sa sortie sera mise à 1 alors que les perdants auront leur sortie mise à 0. Un neurone apprend en déplaçant ses poids vers les valeurs des entrées qui l'activent pour augmenter ses chances de gagner. Si un neurone ne répond pas à une entrée, aucun ajustement de poids n'intervient. Si un neurone gagne, une portion des poids de toutes les entrées est redistribuée vers les poids des entrées actives. L'application de la règle donne les résultats suivants (Grossberg):
+si le neurone i gagne,
+si le neurone i perd.
+Cette règle a pour effet de rapprocher le vecteur poids synaptique de la forme d'entrée.
+Exemple: considérons deux nuages de points du plan que l'on désire séparer en deux classes. et sont les deux entrées, et sont les poids du neurone 1 que l'on peut considérer comme les coordonnées d'un point ‘poids du neurone 1’ et et sont les poids du neurone 2. Si les seuils sont nuls, hi sera la distance entre les points à classer et les points poids. La règle précédente tend à diminuer cette distance avec le point échantillon lorsque le neurone gagne. Elle doit donc permettre à chaque point poids de se positionner au milieu d'un nuage. Si on fixe initialement les poids de manière aléatoire, il se peut que l'un des neurones se positionne près des deux nuages et que l'autre se positionne loin de sorte qu'il ne gagne jamais. Ses poids ne pourront jamais évoluer alors que ceux de l'autre neurone vont le positionner au milieu des deux nuages. Le problème de ces neurones que l'on qualifie de morts peut être résolu en jouant sur les seuils. En effet, il suffit d'augmenter le seuil de ces neurones pour qu'ils commencent à gagner.
+Applications: ce type de réseau et la méthode d'apprentissage correspondant peuvent être utilisés en analyse de données afin de mettre en évidence des similitudes entre certaines données.
+Réseau de neurones sur graphe
+Scarselli et al. (2009) introduit la notion de réseau de neurones sur graphe (en) (ou Graph neural network, GNN), un type de réseau de neurones artificiels conçu pour prendre en entrée un graphe.
+Précisions
+S'agissant d'un modèle, les réseaux de neurones sont généralement utilisés dans le cadre de simulation logicielle. IMSL et Matlab disposent ainsi de bibliothèques dédiées aux réseaux de neurones. Cependant, il existe quelques implémentations matérielles des modèles les plus simples, comme la puce ZISC.
+Notes et références
+↑ a et b « réseau de neurones artificiels », Grand Dictionnaire terminologique, Office québécois de la langue française (consulté le 28 janvier 2020 ).
+↑ [PDF] Commission d'enrichissement de la langue française, « Vocabulaire de l’intelligence artificielle (liste de termes, expressions et définitions adoptés) », Journal officiel de la République française n o 0285 du 9 décembre 2018 [ lire en ligne ].
+↑ Gerstner 2006, p. 3.
+↑ Ces paradigmes correspondent aux différents types d'apprentissage par réseau neuronal, notamment les apprentissages supervisés ou non et l'apprentissage par renforcement.
+↑ David Louapre, Le Labo du jeu vidéo, Paris, Albin Michel, coll. « Sciences », 2026, 432 p. ( ISBN 978-2-226-49023-0 ), 3 – Algorithmes et comportements, chap. 16 (« Intelligence(s) artificielle(s) »), p. 212-220.
+↑ J. Lettvin, H. Maturana, W. McCulloch et W. Pitts, « What the Frog's Eye Tells the Frog's Brain », Proceedings of the IRE, vol. 47, n o 11,‎ novembre 1959, p. 1940–1951 ( ISSN 0096-8390, DOI 10.1109/JRPROC.1959.287207 ).
+↑ (en) Donald O. Hebb, The Organization of Behavior: A Neuropsychological Theory, Wiley, coll. « Wiley book in clinical psychology », 1966.
+↑ (en) Frank Rosenblatt, « The perceptron: A probabilistic model for information storage and organization in the brain », Psychological Review, vol. 10, n o 9,‎ 1958, p. 386–408 ( DOI 10.1037/h0042519 ).
+↑ a et b « Neurone et IA: La bonne connexion? », sur France Culture, 20 avril 2024 (consulté le 20 avril 2024 ).
+↑ (en) Marvin Minsky et Seymour Papert, Perceptrons, 1969, 258 p. ( ISBN 0-262-13043-2 ).
+↑ Marvin Lee Minsky et Seymour Papert, Perceptrons: An Introduction to Computational Geometry, Cambridge, 1988, 292 p. ( ISBN 978-0-262-63111-2 ).
+↑ Bishop (2006), p. 193.
+↑ Hopfield, J. J. Proc. natn. Acad. Sci. U.S.A. 79, 2554–2558 (1982).
+↑ (en) Paul J. Werbos, The roots of backpropagation: from ordered derivatives to neural networks and political forecasting, Wiley, 1994 ( ISBN 0-471-59897-6 et 978-0-471-59897-8, OCLC 28337564, lire en ligne ) Le livre contient une republication de la thèse ainsi que des informations additionnelles.
+↑ (en) Juergen Schmidhuber, « Deep Learning », Scholarpedia, vol. 10, n o 11,‎ 2015, p. 32832 ( ISSN 1941-6016, DOI 10.4249/scholarpedia.32832, lire en ligne, consulté le 19 février 2022 ).
+↑ (en) Paul J. Werbos, « Applications of advances in nonlinear sensitivity analysis », dans System Modeling and Optimization, Springer-Verlag ( ISBN 3-540-11691-5, lire en ligne ), p. 762–770.
+↑ (en) David E. Rumelhart, Geoffrey E. Hinton et Ronald J. Williams, « Learning representations by back-propagating errors », Nature, vol. 323, n o 6088,‎ octobre 1986, p. 533–536 ( ISSN 0028-0836 et 1476-4687, DOI 10.1038/323533a0, lire en ligne, consulté le 19 février 2022 ).
+↑ (en) Yassine Mahdi et Kamel Daoud, « Microdroplet Size Prediction in Microfluidic Systems via Artificial Neural Network Modelling for Water-In-oil Emulsion Formulation », Journal of Dispersion Science and Technology, vol. 0, n o ja,‎ 11 novembre 2016, null ( ISSN 0193-2691, DOI 10.1080/01932691.2016.1257391, lire en ligne, consulté le 7 décembre 2016 ).
+↑ (en-GB) « LeNet-5 - A Classic CNN Architecture », sur engMRK, 30 septembre 2018 (consulté le 5 décembre 2020 ).
+↑ a b et c « Introduction aux réseauxde Neurones Convolutifs », sur www.college-de-france.fr (consulté le 22 janvier 2020 ).
+↑ Josef Gessler, « Sensor for Food Analysis Applying Impedance Spectroscopy and Artificial Neural Networks », RiuNet UPV, n o 1,‎ août 2021, p. 8–12 ( lire en ligne ).
+↑ a et b Appenzeller Tim (2017), The AI revolution in science, Science Niews, 7 juillet.
+↑ Mohan Mokhtari, Michel Marie ' Applications de MATLAB 5 et SIMULINK 2: Contrôle de procédés, Logique floue, Réseaux de neurones, Traitement du signal, Springer-Verlag, Paris, 1998 ( ISBN 978-2-287-59651-3 ).
+↑ https://bib.irb.hr/datoteka/244548.Paper_830.pdf.
+↑ Teuvo Kohonen, Content-addressable Memories, Springer-Verlag, 1987, ( ISBN 978-0-387-17625-3 ), 388 pages.
+↑ Pribram, Karl (1991). Brain and perception: holonomy and structure in figural processing. Hillsdale, N. J.: Lawrence Erlbaum Associates. ( ISBN 978-0-89859-995-4 ). quote of « fractal chaos » neural network.
+↑ D. Levine et al, oscillations in neural systems, publié par Lawrence Erlbaum Associates, 1999, 456 pages, ( ISBN 978-0-8058-2066-9 ).
+↑ (en) Benjamin Sanchez-Lengeling, Emily Reif, Adam Pearce et Alexander B. Wiltschko, « A Gentle Introduction to Graph Neural Networks », sur Distill, 2021 ( DOI 10.23915/distill.00033 )
+Voir aussi
+Sur les autres projets Wikimedia:
+réseau de neurones artificiels, sur le Wiktionnaire
+Réseaux de neurones, sur Wikiversity
+Bibliographie: document utilisé comme source pour la rédaction de cet article.
+François Blayo et Michel Verleysen, Les réseaux de neurones artificiels, PUF, Que Sais-je No 3042, 1 re éd., 1996.
+Léon Personnaz et Isabelle Rivals, Réseaux de neurones formels pour la modélisation, la commande et la classification, CNRS Éditions, 2003.
+Richard P. Lippman, « An Introduction to Computing with Neural Nets », IEEE ASSP Magazine, avril 1987, p. 4-22.
+Neural Networks: biological computers or electronic brains - Les entretiens de Lyon – (sous la direction de École normale supérieure de Lyon ), Springer-Verlag, 1990.
+Jean-Paul Haton, Modèles connexionnistes pour l’intelligence artificielle, 1989.
+Gérard Dreyfus, Jean-Marc Martinez, Manuel Samuelides, Mirta Gordon, Fouad Badran et Sylvie Thiria, Apprentissage statistique: réseaux de neurones, cartes topologiques, machines à vecteurs supports, Eyrolles, 2008.
+Eric Davalo, Patrick Naïm, Des Réseaux de neurones, Eyrolles, 1990.
+Simon Haykin, Neural Networks: A Comprehensive Foundation, 2 e éd., Prentice Hall, 1998.
+Christopher M. Bishop, Neural Networks for Pattern Recognition, Oxford University Press, 1995.
+(en) Christopher M. Bishop, Pattern Recognition And Machine Learning, Springer, 2006 ( ISBN 0-387-31073-8 ) [ détail des éditions ]
+(en) Richard O. Duda, Peter E. Hart, David G. Stork, Pattern Classification, Wiley-interscience, 2001 ( ISBN 0-471-05669-3 ) [ détail des éditions ]
+Ben Krose et Patrick van der Smagt, An Introduction to Neural Networks, 8 e éd., 1996.
+Claude Touzet, Les réseaux de neurones: Introduction connexionnisme, EC2, 1992, 160 p., téléchargement PDF.
+Marc Parizeau, Réseaux de neurones (Le perceptron multicouche et son algorithme de retropropagation des erreurs), Université Laval, Laval, 2004, 272 p.
+Fabien Tschirhart (dir. Alain Lioret), Réseaux de neurones formels appliqués à l'Intelligence Artificielle et au jeu, ESGI (mémoire de master de recherche en multimédia et animation numérique), Paris, 2009, 121 p. [ mémoire en ligne (page consultée le 8 novembre 2010)].
+(en) Warren Sturgis McCulloch et Walter Pitts, « A logical calculus of the ideas immanent in nervous activity », Bulletin of Mathematical Biophysics, n o 5,‎ 1943, p. 115-133.
+(en) Frank Rosenblatt, « The Perceptron: probabilistic model for information storage and organization in the brain », Psychological Review, n o 65,‎ 1958, p. 386-408.
+(en) John Joseph Hopfield, « Neural networks and physical systems with emergent collective computational abilities », Proceedings of the National Academy of Sciences, n o 79,‎ 1982, p. 2554-2558.
+Yann LeCun, « Une procédure d’apprentissage pour réseau à seuil asymétrique. », dans COGNITIVA 85, Paris, 4- 7 juin 1985.
+(en) D. E. Rumelhart et J. L. Mc Clelland, Parallel Distributed Processing: Exploration in the MicroStructure of Cognition, Cambridge, MIT Press, 1986.
+J. A. Anderson et E. Rosenfeld, Neuro Computing Foundations of Research, Cambridge, MIT Press, 1988.
+(en) Tom M. Mitchell, Machine Learning, 1997 [ détail des éditions ]
+[Gerstner 2006] Wulfram Gerstner, « Réseau de neurones artificiels - Une introduction à l'apprentissage automatique » [PDF], sur moodlearchive.epfl.ch, 2006 (consulté le 6 juillet 2016 ).
+(en) F. Scarselli, M. Gori, A.C. Tsoi, M. Hagenbuchner et G. Monfardini, « The Graph Neural Network Model », IEEE Transactions on Neural Networks, vol. 20, n o 1,‎ 2009, p. 61--80
+Articles connexes
+Algorithme émergent
+Apprentissage automatique
+Apprentissage non supervisé
+Apprentissage supervisé
+Arbre de décision
+Carte auto adaptative
+Connexionnisme
+Gaz neuronal
+Intelligence artificielle
+Machine à état liquide
+Neurone formel
+Recherche automatique d'architecture neuronale
+Réseau bayésien
+Réseau de neurones de Hopfield
+Réseau de neurones récurrents
+Réseau neuronal convolutif
+Sciences cognitives
+Statistique
+Statistique multivariée
+Théorème d'approximation universelle
+Réseau de neurones à impulsions
+Réseau neuronal à capsules
+Réseau neuronal siamois
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+v · m Informatique théorique
+Codage
+Codage de l'information
+Compression de données
+Chiffrement
+Cryptanalyse
+Cryptographie
+Théorie de l'information
+Modèles de calcul
+Calculabilité
+Décidabilité et indécidabilité
+Ensemble récursif
+Problème de l'arrêt
+Ensemble récursivement énumérable
+Machine de Turing
+Thèse de Church
+Automate cellulaire
+Réseau de neurones artificiels
+Réduction polynomiale
+Problème NP-complet
+Principe de Church-Turing-Deutsch
+Algorithmique
+Algorithmique
+Algorithme glouton
+Algorithme probabiliste
+Algorithme génétique
+Complexité algorithmique
+Analyse d'algorithme
+Diviser pour régner
+Heuristique
+Programmation dynamique
+Géométrie algorithmique
+Algorithmes de tri
+Algorithmique du texte
+Exploration de données
+Science des données
+Apprentissage profond
+Test de primalité
+Structure de données
+Arbre enraciné
+Concurrence
+Parallélisme
+Syntaxe
+Réécriture
+Compilation
+Expression régulière
+Grammaire formelle
+Langage rationnel
+Ensemble rationnel
+Théorie des langages
+Théorie des automates
+Automate fini
+Automate sur les mots infinis
+Automate d'arbres
+Automate à pile
+Hiérarchie de Chomsky
+Linguistique informatique
+Sémantique
+Interprétation abstraite
+Méthodes formelles
+Vérification de modèles
+Sémantique des langages de programmation
+Sémantique dénotationnelle
+Sémantique axiomatique
+Sémantique opérationnelle
+Logique mathématique
+Assistant de preuve
+Calcul des prédicats
+Correspondance de Curry-Howard
+Fonction récursive
+Lambda-calcul
+Théorèmes d'incomplétude de Gödel
+Théorie des types
+Mathématiques discrètes
+Combinatoire
+Algorithme du simplexe
+Optimisation combinatoire
+Théorie des graphes
+Algorithmes de la théorie des graphes
+Recherche opérationnelle
+Théorie de la décision
+Analyse numérique
+v · m Technologies émergentes
+Affichage
+Affichage sans écran
+Affichage tête haute
+Autostéréoscopie
+Diode électroluminescente organique
+Lentille de contact bionique
+Réalité virtuelle
+Agriculture
+Agriculture de précision
+Agriculture urbaine
+Aquaponie
+Ferme verticale
+Hydroponie
+Mur végétalisé
+Organisme génétiquement modifié
+Viande in vitro
+Astronomie Astrophysique
+LISA
+LIGO
+Virgo
+Interféromètre optique à longue base
+Event Horizon Telescope
+HALCA
+Hypertélescope
+Bioinformatique
+Pyroséquençage
+Séquençage de cellule unique
+Séquençage par ligation (en)
+Séquençage par ligation d'oligonucléotides (en)
+Séquençage par nanopores
+Séquençage par semiconducteur
+Biologie
+Biophotonique
+Électrophorèse capillaire par spectrométrie de masse (en)
+Électrophorèse capillaire sur silicium
+Imagerie moléculaire
+Isolation chip
+Optofluidique
+Optogénétique
+Biomédical
+Ampakine
+Bioimpression
+Biologie de synthèse
+Biostase
+Cellule souche
+Cryoconservation
+Cryonie
+Génie biomédical
+Génie génétique
+Ingénierie clinique
+Interface neuronale directe
+Interférence par ARN
+Médecine régénérative
+Nanomédecine
+Robot médical
+Strategies for Engineered Negligible Senescence
+Thérapie génique
+Thérapie photodynamique
+Chimie
+Cristallographie sérielle femtoseconde
+Laboratoire sur puce
+Microfluidique
+Spectrométrie alpha
+Spectrométrie de masse
+Stylo 3D
+Électronique
+Impression 3D
+Impression 4D
+Nez électronique
+Opto-électronique
+Spintronique
+Plastronique
+Optronique
+Textile intelligent
+Atomtronique
+Informatique
+Calculateur quantique
+Cryptographie quantique
+Ordinateur optique
+Informatique ubiquitaire
+Réseau de neurones artificiels
+CBRAM
+FRAM
+Millipede
+MRAM
+NRAM
+PRAM
+RRAM
+Jonction à effet tunnel magnétique
+Intelligence ambiante (Internet des objets)
+Physique
+Laser
+Cristallographie aux rayons X
+Diffusion des rayons X
+Spectroscopie des rayons X
+Spectroscopie électronique
+Spectrométrie gamma
+Robotique
+Domotique
+Exosquelette motorisé
+Microrobotique
+Nanorobot
+Robotique en essaim
+Robotique molle
+Cobotique
+Transport
+Hyperloop
+Lancement spatial sans fusée
+Propulsion laser
+Lanceur réutilisable
+Jetpack
+Train à sustentation magnétique
+Véhicule autonome
+Moto et Voiture volante
+Impression de voiture en 3D (Strati)
+Spacetrain
+Véhicule à hydrogène
+eCall
+Portail de l’intelligence artificielle
+Portail de l'informatique théorique
+Portail des données
+Portail des probabilités et de la statistique

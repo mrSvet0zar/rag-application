@@ -15,7 +15,9 @@ from urllib.parse import urlparse
 
 from app.errors import PayloadTooLargeError
 
-# Tags whose text is boilerplate, not content.
+# Tags whose text is boilerplate, not content. `math` is in here because
+# MathML carries a LaTeX <annotation> twin, so keeping it duplicates every
+# formula as unreadable markup.
 _STRIP_TAGS = [
     "script",
     "style",
@@ -26,6 +28,28 @@ _STRIP_TAGS = [
     "aside",
     "form",
     "svg",
+    "math",
+]
+
+# Elements that stand on their own line in the extracted text. Anything else
+# (links, emphasis, spans) is inline and must not break the sentence it sits in.
+_BLOCK_TAGS = [
+    "p",
+    "li",
+    "dd",
+    "dt",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "blockquote",
+    "pre",
+    "td",
+    "th",
+    "caption",
+    "figcaption",
 ]
 
 
@@ -66,8 +90,11 @@ def validate_public_url(url: str) -> None:
 def html_to_text(html: str) -> tuple[str | None, str]:
     """Extract (title, readable_text) from an HTML string.
 
-    Drops scripts/styles/nav/etc., then collapses whitespace so the chunker
-    gets clean prose instead of markup.
+    Drops scripts/styles/nav/etc., then rebuilds the text one *block* at a
+    time. Extracting the document as a whole with a newline separator would
+    break a line at every tag boundary, so a sentence containing links comes
+    out shredded into one-word lines — which then embeds badly. Joining inside
+    a block and separating only between blocks keeps sentences intact.
     """
     from bs4 import BeautifulSoup
 
@@ -84,10 +111,21 @@ def html_to_text(html: str) -> tuple[str | None, str]:
     for tag in soup(_STRIP_TAGS):
         tag.decompose()
 
-    text = soup.get_text(separator="\n")
-    lines = [line.strip() for line in text.splitlines()]
-    cleaned = "\n".join(line for line in lines if line)
-    return title, cleaned
+    blocks = [
+        block
+        for block in soup.find_all(_BLOCK_TAGS)
+        # Skip containers of other blocks (a <td> wrapping <p>s, say), whose
+        # text would otherwise be emitted twice.
+        if not block.find(_BLOCK_TAGS)
+    ]
+
+    if blocks:
+        lines = [block.get_text(" ", strip=True) for block in blocks]
+    else:
+        # No structure to go on (a bare fragment): fall back to the whole thing.
+        lines = [soup.get_text(" ", strip=True)]
+
+    return title, "\n".join(line for line in lines if line)
 
 
 def docx_to_text(content: bytes) -> str:

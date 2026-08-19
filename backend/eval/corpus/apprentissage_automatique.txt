@@ -1,0 +1,728 @@
+# Apprentissage automatique
+
+Source : fr.wikipedia.org, révision 238070305
+
+Pour les articles homonymes, voir Apprentissage (homonymie).
+« Machine Learning » redirige ici. Pour la revue scientifique, voir Machine Learning (revue).
+Partie de
+Intelligence artificielle
+Pratiqué par
+Ingénieur de l'apprentissage automatique ( d ), chercheur ou chercheuse en intelligence artificielle ( d )
+Champs
+Apprentissage incrémental apprentissage supervisé apprentissage non supervisé apprentissage par renforcement
+Objet
+Modèle d'apprentissage automatique ( d )
+modifier - modifier le code - modifier Wikidata
+L' apprentissage automatique, (en anglais: machine learning ( ML ), litt. « apprentissage machine, »), apprentissage artificiel ou apprentissage statistique est un champ d'étude de l' intelligence artificielle qui se fonde sur des approches mathématiques et statistiques pour donner aux ordinateurs la capacité d'« apprendre » à partir de données, c'est-à-dire d'améliorer leurs performances à résoudre des tâches sans être explicitement programmés pour chacune. Plus largement, il concerne la conception, l'analyse, l' optimisation, le développement et l'implémentation de telles méthodes. On parle d'apprentissage statistique car l'apprentissage consiste à créer un modèle dont l'erreur statistique moyenne est la plus faible possible.
+L'apprentissage automatique comporte généralement deux phases. La première,
+dite phase d'apprentissage ou d'entraînement, consiste à estimer un modèle à partir d'un jeu de données d'entraînement. Cette étape est souvent formulée comme un problème d' optimisation.
+La seconde phase consiste à utiliser le modèle entraîné afin d'effectuer des prédictions sur de nouvelles données.
+Les méthodes d' apprentissage incrémental peuvent continuer à apprendre une fois en production.
+Plusieurs critères permettent de classifier les méthodes existantes.
+Le paradigme d'apprentissage ( supervisé, non-supervisé, par renforcement …) est déterminé par la nature des données, et notamment la disponibilité ou non de données étiquetées, c'est-à-dire pour lesquelles la réponse au problème est connue.
+Par ailleurs, chaque méthode cherche à résoudre un problème d'apprentissage précis: on distingue les problèmes de régression, de classification, de partitionnement, et de réduction de dimensionnalité.
+Enfin, pour une tâche identifiée, une méthode d'apprentissage est caractérisée par le choix d'un modèle ainsi que d'algorithmes permettant d'entraîner ce modèle.
+L'apprentissage automatique peut être appliqué à divers types de données, tels des graphes, des arbres, des courbes, ou plus simplement des vecteurs de caractéristiques, qui peuvent être des variables qualitatives ou quantitatives continues ou discrètes.
+Si le modèle apprend de manière incrémentale, en fonction d'une récompense reçue par le programme pour chacune des actions entreprises, on parle d' apprentissage par renforcement.
+Historique
+La concrétisation de l'idée des « machines pensantes » est principalement due à Alan Turing (mathématicien et cryptologue britannique) et à son concept de la « machine universelle » en 1936, qui est à la base des ordinateurs d'aujourd'hui. Il continuera à poser les bases de l'apprentissage automatique, avec son article sur « L'ordinateur et l'intelligence » en 1950, dans lequel il développe, entre autres, le test de Turing.
+En 1943, le neurophysiologiste Warren McCulloch et le mathématicien Walter Pitts publient un article décrivant le fonctionnement de neurones en les représentant à l'aide de circuits électriques. Cette représentation sera la base théorique des réseaux neuronaux.
+Arthur Samuel, informaticien américain pionnier dans le secteur de l'intelligence artificielle, est le premier à faire usage de l'expression machine learning (en français, « apprentissage automatique ») en 1959 à la suite de la création de son programme pour IBM en 1952. Le programme jouait au Jeu de Dames et s'améliorait en jouant. À terme, il parvint à battre le 4 e meilleur joueur des États-Unis,.
+Une avancée majeure dans le secteur de l'intelligence machine est le succès de l'ordinateur développé par IBM, Deep Blue, qui est le premier à vaincre le champion mondial d'échecs Garry Kasparov en 1997. Le projet Deep Blue en inspirera nombre d'autres dans le cadre de l'intelligence artificielle, particulièrement un autre grand défi: IBM Watson, l'ordinateur dont le but est de gagner au jeu Jeopardy!. Ce but est atteint en 2011, quand Watson gagne à Jeopardy! en répondant aux questions par traitement de langage naturel.
+Une nette accélération a lieu à partir de 2012, avec de nombreux succès applicatifs obtenus à l'aide de réseaux de neurones profonds.
+Ces modèles ne sont pas nouveaux, mais une transformation s'opère par l'effet conjoint de plusieurs facteurs:
+l'utilisation de processeurs graphiques pour l'entraînement des modèles, l'abondance de jeux de données étiquetées, ainsi que quelques modifications des architectures existantes (notamment l'utilisation de la fonction partie positive comme non-linéarité,,, de techniques de dropout permettant de limiter le sur-apprentissage, et de nouvelles techniques d'initialisation des poids des réseaux).
+En 2012, un réseau neuronal (non-supervisé) développé par Google parvient à reconnaître des visages humains ainsi que des chats dans des vidéos YouTube,. Quelques mois plus tard, le modèle AlexNet surpasse significativement les méthodes existantes sur une tâche de classification d'image.
+En 2014, 64 ans après la prédiction d'Alan Turing, le dialogueur Eugene Goostman est le premier à réussir le test de Turing en parvenant à convaincre 33 % des juges humains au bout de cinq minutes de conversation qu'il est non pas un ordinateur, mais un garçon ukrainien de 13 ans.
+En 2015, l'ordinateur « AlphaGo » de Google gagne contre un des meilleurs joueurs au jeu de Go, jeu de plateau considéré comme le plus dur du monde.
+En 2016, le modèle LipNet parvient à lire sur les lèvres avec un grand taux de succès,.
+À partir de 2017, le développement des transformeurs, basés sur le mécanisme d' attention,
+donne lieu à la naissance des grands modèles de langage. En particulier, les transformeurs génératifs préentraînés permettent d'effectuer de la génération de texte et sont rendus accessibles au grand public dans les années suivantes. Ces modèles dépassent alors significativement les performances des méthodes pré-existantes en traitement du langage naturel.
+Principes
+L'apprentissage automatique permet à un système piloté ou assisté par ordinateur d'adapter ses réponses ou comportements aux situations rencontrées, en se fondant sur l'analyse de données empiriques passées issues de bases de données, de capteurs, ou du web.
+Modèle d'apprentissage
+Un système d'apprentissage repose sur le choix d'un modèle, c'est-à-dire d'un objet mathématique décrit le plus souvent par des paramètres, permettant de capturer et d'expliquer certaines structures ou relations dans les données étudiées. Les paramètres du modèle sont ajustés à partir des données d'entraînement afin d'en décrire au mieux la structure.
+Le choix du modèle est sujet à un compromis: un modèle simple contenant peu de paramètres est plus facile à entraîner, mais peut se révéler insuffisant si les données à modéliser sont complexes (par exemple fortement non linéaires ); à l'inverse, un modèle complexe contenant de nombreux paramètres sera typiquement plus expressif et performant, mais il sera beaucoup plus difficile et coûteux d'en ajuster les paramètres.
+Phase d'apprentissage
+Illustration de la descente de gradient pour trois points de départ différents, faisant varier deux paramètres de sorte à minimiser la fonction de coût représentée par la hauteur.
+La phase d'apprentissage consiste à rechercher la valeur des paramètres du modèle permettant d'expliquer au mieux les données observées. Elle est souvent formulée comme un problème d' optimisation.
+L'entraînement de réseaux de neurones artificiels est par exemple classiquement effectuée en utilisant la méthode de rétropropagation du gradient. Cette technique consiste à estimer, pour chaque paramètre, dans quelle mesure il a contribué à une bonne réponse ou à une erreur du modèle, et à l'ajuster en conséquence.
+Théorie
+La théorie de l'apprentissage automatique fait appel à de nombreux domaines connexes, comme les statistiques, l' analyse fonctionnelle, la théorie de l'approximation ou encore l' optimisation.
+La visée principale des travaux théoriques en apprentissage automatique est de formaliser et prouver l'idée qu'un algorithme d'apprentissage est capable d'apprendre des règles générales à partir d'un nombre limité d'exemples d'entraînement. Une fois entraîné, un modèle doit donc permettre d'effectuer de bonnes prédictions sur de nouvelles données, c'est-à-dire des données qui ne faisaient pas partie du jeu de données d'entraînement.
+Ces questions sont au cœur de la théorie de l'apprentissage statistique.
+Les données d'entraînement sont classiquement modélisées comme étant des échantillons indépendants et identiquement distribués d'une loi de probabilité sous-jacente inconnue.
+On cherche alors à contrôler l'erreur de prédiction qu'un modèle, entraîné sur un tel échantillon, commettrait en moyenne par rapport à la loi de probabilité des données (erreur de généralisation).
+Le modèle étant classiquement entraîné en minimisant l'erreur de prédiction sur les données d'entraînement ( minimisation du risque empirique ), un enjeu clé dans ce contexte est de réussir à borner l'erreur de généralisation d'un prédicteur par son erreur empirique.
+Cela peut être fait de manière uniforme par rapport à une classe de fonction, comme dans le cadre de la théorie de l' apprentissage PAC, ou en utilisant des propriétés plus spécifiques de l'algorithme d'apprentissage considéré.
+Ces résultats dépendent typiquement de la complexité de la classe de fonctions considérée, qui peut être mesurée avec des outils tels que la dimension de Vapnik-Chervonenkis, la complexité de Rademacher, ou encore des propriétés de recouvrement.
+Par ailleurs, le problème de minimisation du risque empirique ne peut pas toujours être résolu de manière exacte, et le plus souvent une solution approchée est calculée au moyen d'un algorithme itératif (par exemple un algorithme de descente de gradient stochastique ). Pour cette raison, des outils d' optimisation sont souvent utilisés afin de contrôler l'erreur d'un estimateur produit par un algorithme d'entraînement particulier.
+De nombreuses variantes du cadre classique d'apprentissage existent, dont l' apprentissage PAC-Bayésien basé sur une distribution a priori dans l'espace des prédicteurs, l'apprentissage avec des données non i.i.d., l' apprentissage actif, l' apprentissage par renforcement.
+Applications
+L'apprentissage automatique est utilisé dans un large spectre d'applications pour doter des ordinateurs ou des machines de capacité d'analyser des données d'entrée comme: perception de leur environnement ( vision, Reconnaissance de formes tels des visages, schémas, segmentation d'image, langages naturels, caractères dactylographiés ou manuscrits; moteurs de recherche, analyse et indexation d'images et de vidéo, en particulier pour la recherche d'image par le contenu; aide aux diagnostics, médical notamment, bio-informatique, chémoinformatique; interfaces cerveau-machine; détection de fraudes à la carte de crédit, cybersécurité, analyse financière, dont analyse du marché boursier; classification des séquences d'ADN; jeu; génie logiciel; adaptation de sites Web; robotique (locomotion de robots, etc. ); analyse prédictive dans de nombreux domaines (financière, médicale, juridique, judiciaire), diminution des temps de calcul pour les simulations informatiques en physique (calcul de structures, de mécanique des fluides, de neutronique, d'astrophysique, de biologie moléculaire, etc.),, optimisation de design dans l'industrie,,, modèles météorologiques ou prédictions de l'ensoleillement dans le développement des énergies solaires,etc.
+Exemples:
+un système d'apprentissage automatique peut permettre à un robot ayant la capacité de bouger ses membres, mais ne sachant initialement rien de la coordination des mouvements permettant la marche, d'apprendre à marcher. Le robot commencera par effectuer des mouvements aléatoires, puis, en sélectionnant et privilégiant les mouvements lui permettant d'avancer, mettra peu à peu en place une marche de plus en plus efficace [réf. nécessaire];
+la reconnaissance de caractères manuscrits est une tâche complexe car deux caractères similaires ne sont jamais exactement identiques. Il existe des systèmes d'apprentissage automatique qui apprennent à reconnaître des caractères en observant des « exemples », c'est-à-dire des caractères connus. Un des premiers système de ce type est celui de reconnaissance des codes postaux US manuscrits issu des travaux de recherche de Yann Le Cun, un des pionniers du domaine,, et ceux utilisés pour la reconnaissance d'écriture ou OCR.
+Paradigmes et problèmes d'apprentissage
+Les algorithmes d'apprentissage peuvent être catégorisés selon la tâche d'apprentissage qu'ils cherchent à résoudre, c'est-à-dire selon la nature de ce qu'ils cherchent à apprendre.
+Toutefois, la nature des données disponibles pour l'entraînement conditionne directement ce que l'on peut ou non apprendre à partir d'un jeu de données. Pour cette raison, les tâches d'apprentissage peuvent elles-mêmes être catégorisées, en plusieurs paradigmes d'apprentissage:
+L' apprentissage supervisé est utilisé lorsque le jeu de données décrit explicitement la sortie désirée; c'est le cas notamment des problèmes de régression de classification, où l'on cherche à apprendre un prédicteur de la forme à partir de multiples observations des variables.
+L' apprentissage non supervisé est utilisé lorsque l'on souhaite identifier une structure dans un ensemble d'observations, mais sans disposer dans le jeu de données d'entraînement d'observations d'une variable qui permettrait de décrire cette structure. C'est le cas notamment du partitionnement de données, et plus généralement de nombreuses méthodes de réduction de dimensionnalité.
+L' apprentissage par renforcement est utilisé lorsqu'un agent autonome peut interagir avec son environnement afin d'apprendre comment se comporter dans le but d'optimiser une récompense cumulée au cours du temps.
+Apprentissage supervisé
+En apprentissage supervisé, les réponses souhaitées sont connues et utilisées pour entraîner le modèle. En apprentissage non supervisé, aucune réponse n'est fournie, l'algorithme cherche à découvrir des structures dans les données.
+Si les classes sont prédéterminées et les exemples connus, le système apprend à classer selon un modèle de classification ou de classement; on parle alors d'apprentissage supervisé (ou d' analyse discriminante ). Un expert (ou oracle ) doit préalablement étiqueter des exemples. Le processus se passe en deux phases. Lors de la première phase (hors ligne, dite d' apprentissage ), il s'agit de déterminer un modèle à partir des données étiquetées. La seconde phase (en ligne, dite de test ) consiste à prédire l'étiquette d'une nouvelle donnée, connaissant le modèle préalablement appris. Parfois il est préférable d'associer une donnée non pas à une classe unique, mais une probabilité d'appartenance à chacune des classes prédéterminées; on parle alors d'apprentissage supervisé probabiliste.
+Fondamentalement, le machine learning supervisé revient à apprendre à une machine à construire une fonction f telle que Y = f(X), Y étant un ou plusieurs résultats d'intérêt calculé en fonction de données d'entrées X effectivement à la disposition de l'utilisateur. Y peut être une grandeur continue (une température par exemple), et on parle alors de régression, ou discrète (une classe, chien ou chat par exemple), et on parle alors de classification.
+Des cas d'usage typiques d'apprentissage automatique peuvent être d'estimer la météo du lendemain en fonction de celle du jour et des jours précédents, de prédire le vote d'un électeur en fonction de certaines données économiques et sociales, d'estimer la résistance d'un nouveau matériau en fonction de sa composition, de déterminer la présence ou non d'un objet dans une image. L' analyse discriminante linéaire ou les SVM en sont d'autres exemples typiques. Autre exemple, en fonction de points communs détectés avec les symptômes d'autres patients connus (les exemples ), le système peut catégoriser de nouveaux patients, au vu de leurs analyses médicales, en risque estimé de développer telle ou telle maladie.
+Apprentissage non supervisé
+Quand le système ou l'opérateur ne dispose que d'exemples, mais non d'étiquette, et que le nombre de classes et leur nature n'ont pas été prédéterminées, on parle d'apprentissage non supervisé ou clustering en anglais. Aucun expert n'est requis. L'algorithme doit découvrir par lui-même la structure plus ou moins cachée des données. Le partitionnement de données, data clustering en anglais, est un algorithme d'apprentissage non supervisé.
+Le système doit ici — dans l'espace de description (l'ensemble des données) — cibler les données selon leurs attributs disponibles, pour les classer en groupes homogènes d'exemples. La similarité est généralement calculée selon une fonction de distance entre paires d'exemples. C'est ensuite à l'opérateur d'associer ou déduire du sens pour chaque groupe et pour les motifs ( patterns en anglais) d' apparition de groupes, ou de groupes de groupes, dans leur « espace ». Divers outils mathématiques et logiciels peuvent l'aider. On parle aussi d'analyse des données en régression (ajustement d'un modèle par une procédure de type moindres carrés ou autre optimisation d'une fonction de coût ). Si l'approche est probabiliste (c'est-à-dire que chaque exemple, au lieu d'être classé dans une seule classe, est caractérisé par un jeu de probabilités d'appartenance à chacune des classes), on parle alors de « soft clustering » (par opposition au « hard clustering »).
+Cette méthode est souvent source de sérendipité. ex.: Pour un épidémiologiste qui voudrait dans un ensemble assez large de victimes de cancer du foie tenter de faire émerger des hypothèses explicatives, l'ordinateur pourrait différencier différents groupes, que l'épidémiologiste chercherait ensuite à associer à divers facteurs explicatifs, origines géographique, génétique, habitudes ou pratiques de consommation, expositions à divers agents potentiellement ou effectivement toxiques ( métaux lourds, toxines telle que l' aflatoxine, etc. ). Contrairement à l'apprentissage supervisé où l'apprentissage automatique consiste à trouver une fonction f telle que Y = f(X), où Y est un résultat connu et objectif (par exemple Y = « présence d'une tumeur » ou « absence de tumeur » en fonction de X = image radiographique), dans l'apprentissage non supervisé, on ne dispose pas de valeurs de Y, uniquement de valeurs de X (dans l'exemple précédent, on disposerait uniquement des images radiographiques sans connaissance de la présence ou non d'une tumeur. L'apprentissage non supervisé pourrait découvrir deux "clusters" ou groupes correspondant à "présence" ou "absence" de tumeur, mais les chances de réussite sont moindres que dans le cas supervisé où la machine est orientée sur ce qu'elle doit trouver).
+L'apprentissage non supervisé est généralement moins performant que l'apprentissage supervisé, il évolue dans une zone « grise » où il n'y a généralement pas de « bonne » ou de « mauvaise » réponse mais simplement des similarités mathématiques discernables ou non. L'apprentissage non supervisé présente cependant l'intérêt de pouvoir travailler sur une base de données de X sans qu'il soit nécessaire d'avoir des valeurs de Y correspondantes, or les Y sont généralement compliqués et/ou coûteux à obtenir, alors que les seuls X sont généralement plus simples et moins coûteux à obtenir (dans l'exemple des images radiographiques, il est relativement aisé d'obtenir de telles images, alors qu'obtenir les images avec le label « présence de tumeur » ou « absence de tumeur » nécessite l'intervention longue et coûteuse d'un spécialiste en imagerie médicale).
+L'apprentissage non supervisé permet potentiellement de détecter des anomalies dans une base de données, comme des valeurs singulières ou aberrantes pouvant provenir d'une erreur de saisie ou d'une singularité très particulière. Il peut donc s'agir d'un outil intéressant pour vérifier ou nettoyer une base de données.
+Apprentissage semi-supervisé
+Effectué de manière probabiliste ou non, il vise à faire apparaître la distribution sous-jacente des exemples dans leur espace de description. Il est mis en œuvre quand des données (ou « étiquettes ») manquent… Le modèle doit utiliser des exemples non étiquetés pouvant néanmoins renseigner. Par exemple, en médecine, il peut constituer une aide au diagnostic ou au choix des moyens les moins onéreux de tests de diagnostic.
+Apprentissage partiellement supervisé
+Probabiliste ou non, quand l'étiquetage des données est partiel. C'est le cas quand un modèle énonce qu'une donnée n'appartient pas à une classe A, mais peut-être à une classe B ou C ( A, B et C étant trois maladies par exemple évoquées dans le cadre d'un diagnostic différentiel ).
+Apprentissage auto-supervisé
+L' apprentissage auto-supervisé est une forme d'apprentissage non supervisé où l'on dispose de données non labellisées, à partir desquelles on fabrique des labels, se ramenant ainsi à un problème d'apprentissage supervisé.
+Pour rappel, l'apprentissage supervisé consiste à construire une fonction Y = f(X) et nécessite donc une base de données où l'on possède des labels Y pour chaque donnée X (par exemple, en fonction du texte X correspondant à la critique d'un film, retrouver la valeur du Y correspondant à la note attribuée au film), alors que dans l'apprentissage non supervisé, on dispose uniquement des valeurs de X et pas de valeurs de Y (on disposerait par exemple ici uniquement du texte X correspondant à la critique du film, et pas de la note Y attribuée au film).
+L'apprentissage auto-supervisé consiste donc à créer des labels Y à partir des données X pour se ramener à un schéma d'apprentissage supervisé, par exemple en « masquant » des X pour en faire des Y. Dans le cas d'une image, l'apprentissage auto-supervisé peut consister à reconstruire la partie manquante d'une image qui aurait été tronquée. Dans le cas du langage, lorsqu'on dispose d'un ensemble de phrases qui correspondent aux X sans cible Y particulière, l'apprentissage auto-supervisé consiste à supprimer certains X (certains mots) pour en faire des Y. L'apprentissage auto-supervisé revient alors pour la machine à essayer de reconstruire un mot ou un ensemble de mots manquants en fonction des mots précédents et/ou suivants, en une forme d'auto-complétion. Cette approche permet potentiellement à une machine de « comprendre » le langage humain, son sens sémantique et symbolique. Les modèles IA de langage comme BERT ou GPT-3 sont conçus selon ce principe. Dans le cas d'un film, l'apprentissage auto-supervisé consisterait à essayer de prédire les images suivantes en fonction des images précédentes, et donc à tenter de prédire « l'avenir » sur la base de la logique probable du monde réel.
+Certains chercheurs, comme Yann Le Cun, pensent que si l'IA générale est possible, c'est probablement par une approche de type auto-supervisé qu'elle pourrait être conçue, par exemple en étant immergée dans le monde réel pour essayer à chaque instant de prédire les images et les sons les plus probables à venir, en comprenant qu'un ballon en train de rebondir et de rouler va encore continuer à rebondir et à rouler, mais de moins en moins haut et de moins en moins vite jusqu'à s'arrêter, et qu'un obstacle est de nature à arrêter le ballon ou à modifier sa trajectoire, ou à essayer de prédire les prochains mots qu'une personne est susceptible de prononcer ou le prochain geste qu'elle pourrait accomplir. L'apprentissage auto-supervisé dans le monde réel serait une façon d'apprendre à une machine le sens commun, le bon sens, la réalité du monde physique qui l'entoure, et permettrait potentiellement d'atteindre une certaine forme de conscience. Il ne s'agit que d'une hypothèse de travail, la nature exacte de la conscience, son fonctionnement et sa définition même restant un domaine actif de recherche.
+Apprentissage par renforcement
+L'algorithme apprend un comportement étant donné une observation. L'algorithme interagit avec un environnement dynamique dans lequel il doit atteindre un certain but et apprendre à identifier le comportement le plus efficace dans l'environnement considéré.
+Par exemple, l'algorithme de Q-learning est un exemple classique.
+L'apprentissage par renforcement peut aussi être vu comme une forme d'apprentissage auto-supervisé. Dans un problème d'apprentissage par renforcement, il n'y a en effet à l'origine pas de données de sorties Y, ni même de données d'entrée X, pour construire une fonction Y = f(X). Il y a simplement un « écosystème » muni de règles qui doivent être respectées, et un « objectif » à atteindre. Par exemple, pour le football, il y a des règles du jeu à respecter et des buts à marquer. Dans l'apprentissage par renforcement, le modèle crée lui-même sa base de données en « jouant » (d'où le concept d' auto -supervisé): il teste des combinaisons de données d'entrée X et il en découle un résultat Y qui est évalué; s'il est conforme aux règles du jeu et atteint son objectif, le modèle est récompensé et sa stratégie est ainsi validée, sinon le modèle est pénalisé. Par exemple pour le football, dans une situation du type « ballon possédé, joueur adverse en face, but à 20 mètres », une stratégie peut être de « tirer » ou de « dribbler », et en fonction du résultat (« but marqué », « but raté », ou « balle toujours possédée, joueur adverse franchi »), le modèle apprend de manière incrémentale comment se comporter au mieux en fonction des situations rencontrées.
+Le « mélange d'experts » ( Mixture of Experts ), développé dans les années 2020, modifie la conception du modèle d’apprentissage automatique en y introduisant une architecture fondée sur la spécialisation interne, où plusieurs sous‑réseaux « experts » sont activés de manière sélective selon la nature de l’entrée, ce qui augmenter la capacité globale du modèle tout en limitant le coût en calcul et en énergie.
+À l'opposé des modèles monolithiques traditionnels, il favorise l’émergence de comportements modulaires et d’une organisation fonctionnelle plus proche de systèmes distribués, et permettant de développer des « agents cognitifs » capables, chacuns, de percevoir, raisonner, sélectionner des stratégies et adapter leurs actions en fonction d’objectifs. L'IA devient IA agentique. Elle décompose les tâches et peut ne sélectionner que les compétences internes nécessaire pour la gestion de sous‑objectifs, tout en ajustant mieux, et de manière autonome, ses stratégies. Ce type de modèle a par exemple été proposé pour détecter les textes écrits par IA.
+Les avancées récentes dans les architectures MoE, notamment le routage parcimonieux et les mécanismes de rééquilibrage de charge, renforcent cette modularité en rendant possible l’activation ciblée d’experts spécialisés. Cela ouvre la voie à des systèmes plus adaptatifs, plus interprétables et mieux structurés pour des environnements complexes où la coordination de compétences hétérogènes constitue un avantage fonctionnel [ réf. souhaitée].
+Apprentissage par transfert
+L'apprentissage par transfert peut être vu comme la capacité d'un système à reconnaître et à appliquer des connaissances et des compétences, apprises à partir de tâches antérieures, sur de nouvelles tâches ou domaines partageant des similitudes. Il s'agit d'identifier les similitudes entre la ou les tâche(s) cible(s) et la ou les tâche(s) source(s), puis de transférer la connaissance de la ou des tâche(s) source(s) vers la ou les tâche(s) cible(s),.
+Une application classique de l'apprentissage par transfert est l'analyse d'images. Pour une problématique de classification, l'apprentissage par transfert consiste à repartir d'un modèle existant plutôt que de repartir de zéro. Si par exemple on dispose déjà d'un modèle capable de repérer un chat parmi tout autre objet du quotidien, et que l'on souhaite classifier les chats par races, il est possible que réentraîner partiellement le modèle existant permette d'obtenir de meilleures performances et à moindre coût qu'en repartant de zéro,. Un modèle souvent utilisé pour réaliser un apprentissage par transfert de ce type est VGG-16, un réseau de neurones conçu par l' Université d'Oxford, entraîné sur ~14 millions d'images, capable de classer avec ~93 % de précision mille objets du quotidien.
+Apprentissage par curriculum
+L'apprentissage dit « par curriculum » (curriculum learning) est une stratégie d'entraînement inspirée des processus cognitifs humains et animaux (chez lesquels l'acquisition de connaissances est facilitée par une présentation ordonnée et progressive des exemples, allant des concepts les plus simples aux plus complexes). De la même manière on peut optimiser l'apprentissage des réseaux de neurones profonds, au profit d'une meilleure capacité de généralisation des modèles. Mathématiquement parlant, c'est une variante des méthodes de continuation, une technique d'optimisation globale destinée à traiter les fonctions présentant de nombreux minima locaux. En commençant l'entraînement sur une version simplifiée de la tâche, le système peut atteindre plus rapidement une région favorable de l'espace des paramètres avant d'être confronté à la complexité réelle des données. Les recherches suggèrent que ceci permet aussi d'orienter l'algorithme vers des minima locaux de meilleure qualité, optimisant ainsi les performances finales du modèle.
+Modèles
+L'application de techniques d'apprentissage sur des données réelles nécessite le plus souvent de mettre en place une chaîne de traitement constituée de plusieurs étapes, incluant par exemple le pré-traitement des données. Toutefois, le cœur d'un algorithme d'apprentissage repose sur le choix d'un modèle, et le plus souvent également d'un algorithme d' optimisation permettant d'entraîner ce modèle sur les données, c'est-à-dire de trouver la valeur des paramètres du modèle permettant de représenter ou prédire au mieux les données d'entraînement.
+Le choix d'un modèle est souvent lié à la nature de la tâche d'apprentissage à résoudre (classification, régression…), ainsi que du volume et de la nature des données. Une même famille de modèles peut toutefois servir à résoudre des problèmes d'apprentissage différents, par exemple les réseaux de neurones peuvent servir à la fois pour résoudre des problèmes de régression, de classification, ou encore pour effectuer de la réduction de dimensionnalité.
+Plusieurs modèles peuvent par ailleurs être combinés entre eux pour créer des chaînes de traitement plus complexes.
+Dans le cas de problèmes comme la classification, la régression, où l'on cherche à effectuer une prédiction de la forme, on utilise souvent le mot modèle pour désigner une classe de fonctions dans laquelle le prédicteur est choisi.
+Certaines méthodes sont au contraire basées sur des modèles statistiques, auquel cas on parle de modèle pour désigner une classe de distributions de probabilités.
+Modèles linéaires et généralisations
+Le modèle le plus simple consiste à utiliser une fonction affine. C'est le cas par exemple de la régression linéaire.
+Les modèles linéaires généralisés permettent d'obtenir un peu plus de flexibilité en couplant un modèle linéaire à une transformation non-linéaire mais fixée. C'est le cas par exemple de la régression logistique et de la régression de Poisson.
+Certains modèles, comme l' analyse discriminante linéaire, sont basés sur un modèle génératif mais donnent lieu à une règle de classement linéaire.
+Modèles paramétriques
+Certains modèles paramétriques sont construits en appliquant un modèle linéaire sur une transformation non-linéaire de l'entrée, c'est-à-dire qu'ils correspondent à des fonctions de la forme où correspond au vecteur de paramètres à apprendre, et à une transformation non-linéaire fixée de dimension finie.
+C'est par exemple le cas de la régression polynomiale.
+Réseaux de neurones
+Les réseaux de neurones artificiels, dont les méthodes d' apprentissage profond ( deep learning en anglais), sont des modèles paramétriques constitués d'une succession de couches de transformation linéaires (apprises) et non-linéaires (fixées).
+Ils peuvent à la fois être utilisés pour l'apprentissage supervisé et non-supervisé.
+Ils engendrent des classes de fonctions particulièrement riches, mais comportent le plus souvent un nombre élevé de paramètres, ce qui rend leur entraînement plus coûteux.
+Un réseau convolutif est un type particulier de réseau de neurones reposant sur l'utilisation d'opérations de convolution.
+Les réseaux de neurones récurrents sont pensés pour le traitement de données séquentielles.
+Réseaux profonds
+L'apprentissage profond est le terme utilisé pour désigner les réseaux de neurones constitués d'un nombre important de couches de transformation.
+Transformeurs et grands modèles de langage
+Les transformeurs sont les modèles à la base notamment des grands modèles de langage.
+Ils appartiennent à la famille des réseaux de neurones profonds, mais
+sont conçus pour traiter des données séquentielles, et disposent pour cette raison d'une structure plus complexe.
+Ils reposent en particulier sur l'utilisation du mécanisme d' attention, qui est combiné à d'autres blocs de couches à action directe.
+Modèles non-paramétriques
+Les modèles non-paramétriques sont des modèles qui ne peuvent pas être décrits par un nombre de paramètres fixé à l'avance. Intuitivement, on peut se les représenter comme une généralisation des modèles paramétriques, mais dont le nombre de paramètres est autorisé à croître avec la taille du jeu de données d'entrée.
+Méthodes locales
+On compte notamment dans cette catégorie toutes les méthodes de régression locale, qui reposent sur un modèle défini de manière locale dans l'espace d'entrée, par exemple au moyen de splines.
+Méthodes à noyau
+Les méthodes à noyaux sont des méthodes qui utilisent comme espace de fonctions un espace de Hilbert à noyau reproduisant.
+Parmi ces méthodes, les plus connues sont les machines à vecteur de support pour la classification, et la régression de Tikhonov à noyau.
+Les processus gaussiens sont un modèle statistique couramment utilisé en inférence bayésienne, et qui repose sur les mêmes espaces fonctionnels.
+Méthodes locales
+Certaines méthodes permettent d'effectuer une prédiction en se concentrant uniquement sur le voisinage du point auquel la prédiction doit être effectuée.
+C'est le cas notamment de la méthode des k plus proches voisins pour l'apprentissage supervisé.
+Ces méthodes ne doivent pas être confondues avec les modèles non-paramétriques locaux décrits ci-dessus, qui reposent typiquement sur une partition de l'espace et une définition locale du modèle au sein de chaque partition.
+Modèles génératifs
+De nombreux modèles d'apprentissage reposent sur l'utilisation de modèles statistiques génératifs. L'apprentissage des paramètres de ces modèles peut alors s'interpréter comme une étape d' inférence statistique, et dans certains cas d' inférence bayésienne.
+Le modèle de mixture gaussienne est largement utilisé pour la modélisation de densité.
+Parmi les classifieurs basés sur des modèles génératifs, on peut citer la classification naïve bayésienne, ainsi que l' analyse discriminante linéaire et quadratique.
+Les modèles de Markov cachés pour les données séquentielles, et l' allocation de Dirichlet latente, rentrent également dans cette catégorie.
+Algorithmes évolutionnistes
+Les algorithmes génétiques et la programmation génétique, sont des algorithmes inspirés de la théorie de l'évolution.
+Arbres de décision
+Les arbres de décision sont des modèles basés sur l'application successives de règles simples portant par exemple sur une unique variable. Ils ont l'avantage d'être facilement interpretables.
+Ces méthodes sont à l'origine des forêts d'arbres décisionnels, et par extension également du boosting (notamment XGBoost ).
+Méthodes ensemblistes
+Les méthodes ensemblistes reposent sur la combinaison de plusieurs modèles simples qui, ensemble, constituent un modèle plus puissant. Les méthodes de boosting et de bagging rentrent dans cette catégorie.
+Une forêt d'arbres décisionnels est un cas particulier de bagging reposant sur la combinaison de multiples arbres de décision.
+Facteurs de pertinence et d'efficacité
+La qualité de l'apprentissage et de l'analyse dépendent du besoin en amont et a priori de la compétence de l'opérateur pour préparer l'analyse. Elle dépend aussi de la complexité du modèle (spécifique ou généraliste), de son adéquation et de son adaptation au sujet à traiter. In fine, la qualité du travail dépendra aussi du mode (de mise en évidence visuelle) des résultats pour l'utilisateur final (un résultat pertinent pourrait être caché dans un schéma trop complexe, ou mal mis en évidence par une représentation graphique inappropriée).
+Avant cela, la qualité du travail dépendra de facteurs initiaux contraignants, liées à la base de données:
+nombre d'exemples (moins il y en a, plus l'analyse est difficile, mais plus il y en a, plus le besoin de mémoire informatique est élevé et plus longue est l'analyse);
+nombre et qualité des attributs décrivant ces exemples. La distance entre deux « exemples » numériques (prix, taille, poids, intensité lumineuse, intensité de bruit, etc. ) est facile à établir, celle entre deux attributs catégoriels (couleur, beauté, utilité…) est plus délicate;
+pourcentage de données renseignées et manquantes;
+bruit: le nombre et la « localisation » des valeurs douteuses (erreurs potentielles, valeurs aberrantes…) ou naturellement non-conformes au pattern de distribution générale des « exemples » sur leur espace de distribution impacteront sur la qualité de l'analyse.
+Étapes d'un projet d'apprentissage automatique
+L'apprentissage automatique ne se résume pas à un ensemble d'algorithmes, mais suit une succession d'étapes,.
+Définir le problème à résoudre.
+Acquérir des données: l'algorithme se nourrissant des données en entrée, c'est une étape importante. Il y va de la réussite du projet, de récolter des données pertinentes et en quantité et qualité suffisantes, et en évitant tout biais dans leur représentativité.
+Analyser et explorer les données. L'exploration des données peut révéler des données d'entrée ou de sortie déséquilibrées pouvant nécessiter un rééquilibrage, le machine learning non supervisé peut révéler des clusters qu'il pourrait être utile de traiter séparément ou encore détecter des anomalies qu'il pourrait être utile de supprimer.
+Préparer et nettoyer les données: les données recueillies doivent être retouchées avant utilisation. En effet, certains attributs sont inutiles, d'autre doivent être modifiés afin d'être compris par l'algorithme (les variables qualitatives doivent être encodées-binarisées), et certains éléments sont inutilisables car leurs données sont incomplètes (les valeurs manquantes doivent être gérées, par exemple par simple suppression des exemples comportant des variables manquantes, ou par remplissage par la médiane, voire par apprentissage automatique). Plusieurs techniques telles que la visualisation de données, la transformation de données (en) ou encore la normalisation (variables projetées entre 0 et 1) ou la standardisation (variables centrées - réduites) sont employées afin d'homogénéiser les variables entre elles, notamment pour aider la phase de descente de gradient nécessaire à l'apprentissage.
+Ingénierie ou extraction de caractéristiques: les attributs peuvent être combinés entre eux pour en créer de nouveaux plus pertinents et efficaces pour l'entraînement du modèle. Ainsi, en physique, de la construction de nombres adimensionnels adaptés au problème, de solutions analytiques approchées, de statistiques pertinentes, de corrélations empiriques ou l'extraction de spectres par transformée de Fourier,. Il s'agit d'ajouter l'expertise humaine au préalable de l'apprentissage machine pour favoriser celui-ci.
+Choisir ou construire un modèle d'apprentissage: un large choix d'algorithmes existe, et il faut en choisir un adapté au problème et aux données. La métrique optimisée doit être choisie judicieusement (erreur absolue moyenne, erreur relative moyenne, précision, rappel, etc. )
+Entraîner, évaluer et optimiser: l'algorithme d'apprentissage automatique est entraîné et validé sur un premier jeu de données pour optimiser ses hyperparamètres.
+Test: puis il est évalué sur un deuxième ensemble de données de test afin de vérifier qu'il est efficace avec un jeu de donnée indépendant des données d'entraînement, et pour vérifier qu'il ne fasse pas de surapprentissage.
+Déployer: le modèle est alors déployé en production pour faire des prédictions, et potentiellement utiliser les nouvelles données en entrée pour se ré-entraîner et être amélioré.
+Expliquer: déterminer quelles sont les variables importantes et comment elles affectent les prédictions du modèle en général et au cas par cas
+La plupart de ces étapes se retrouvent dans les méthodes et processus de projet KDD, CRISP-DM et SEMMA, qui concernent les projets d'exploration de données.
+Toutes ces étapes sont complexes et requièrent du temps et de l'expertise, mais il existe des outils permettant de les automatiser au maximum pour "démocratiser" l'accès à l'apprentissage automatique. Ces approches sont dites " Auto ML " (pour machine learning automatique ) ou "No Code " (pour illustrer que ces approches ne nécessitent pas ou très peu de programmation informatique ), elles permettent d'automatiser la construction de modèles d'apprentissage automatique pour limiter au maximum le besoin d'intervention humaine. Parmi ces outils, commerciaux ou non, on peut citer Caret, PyCaret, pSeven, Jarvis, Knime, MLBox ou DataRobot.
+Application à la voiture autonome
+La voiture autonome paraît en 2016 réalisable grâce à l'apprentissage automatique et les énormes quantités de données générées par la flotte automobile, de plus en plus connectée. Contrairement aux algorithmes classiques (qui suivent un ensemble de règles prédéterminées), l'apprentissage automatique apprend ses propres règles.
+Les principaux innovateurs dans le domaine insistent sur le fait que le progrès provient de l'automatisation des processus. Ceci présente le défaut que le processus d'apprentissage automatique devient privatisé et obscur. Privatisé, car les algorithmes d'AA constituent des gigantesques opportunités économiques, et obscurs car leur compréhension passe derrière leur optimisation. Cette évolution peut potentiellement nuire à la confiance du public envers l'apprentissage automatique, mais surtout au potentiel à long terme de techniques très prometteuses.
+La voiture autonome présente un cadre test pour confronter l'apprentissage automatique à la société. En effet, ce n'est pas seulement l'algorithme qui se forme à la circulation routière et ses règles, mais aussi l'inverse. Le principe de responsabilité est remis en cause par l'apprentissage automatique, car l'algorithme n'est plus écrit mais apprend et développe une sorte d'intuition numérique. Les créateurs d'algorithmes ne sont plus en mesure de comprendre les « décisions » prises par leurs algorithmes, ceci par construction mathématique même de l'algorithme d'apprentissage automatique.
+Dans le cas de l'AA et les voitures autonomes, la question de la responsabilité en cas d'accident se pose. La société doit apporter une réponse à cette question, avec différentes approches possibles. Aux États-Unis, il existe la tendance à juger une technologie par la qualité du résultat qu'elle produit, alors qu'en Europe le principe de précaution est appliqué, et on y a plus tendance à juger une nouvelle technologie par rapport aux précédentes, en évaluant les différences par rapport à ce qui est déjà connu. Des processus d'évaluation de risques sont en cours en Europe et aux États-Unis.
+La question de responsabilité est d'autant plus compliquée que la priorité chez les concepteurs réside en la conception d'un algorithme optimal, et non pas de le comprendre. L'interprétabilité des algorithmes est nécessaire pour en comprendre les décisions, notamment lorsque ces décisions ont un impact profond sur la vie des individus. Cette notion d'interprétabilité, c'est-à-dire de la capacité de comprendre pourquoi et comment un algorithme agit, est aussi sujette à interprétation.
+La question de l'accessibilité des données est sujette à controverse: dans le cas des voitures autonomes, certains défendent l'accès public aux données, ce qui permettrait un meilleur apprentissage aux algorithmes et ne concentrerait pas cet « or numérique » dans les mains d'une poignée d'individus, de plus d'autres militent pour la privatisation des données au nom du libre marché, sans négliger le fait que des bonnes données constituent un avantage compétitif et donc économique,.
+La question des choix moraux liés aux décisions laissées aux algorithmes d'AA et aux voitures autonomes en cas de situations dangereuses ou mortelles se pose aussi. Par exemple en cas de défaillance des freins du véhicule, et d'accident inévitable, quelles vies sont à sauver en priorité: celle des passagers ou bien celle des piétons traversant la rue?
+Prospective
+Dans les années 2000-2010, l'apprentissage automatique est encore une technologie émergente, mais polyvalente, qui est par nature théoriquement capable d'accélérer le rythme de l'automatisation et de l'autoapprentissage lui-même. Combiné à l'apparition de nouveaux moyens de produire, stocker et faire circuler l'énergie, ainsi qu'à l'informatique ubiquiste, il pourrait bouleverser les technologies et la société comme l'ont fait la machine à vapeur et l' électricité, puis le pétrole et l' informatique lors des révolutions industrielles précédentes.
+L'apprentissage automatique pourrait générer des innovations et des capacités inattendues, mais avec un risque selon certains observateurs de perte de maîtrise de la part des humains sur de nombreuses tâches qu'ils ne pourront plus comprendre et qui seront faites en routine par des entités informatiques et robotisées. Ceci laisse envisager des impacts spécifiques complexes et encore impossibles à évaluer sur l'emploi, le travail et plus largement l'économie et les inégalités. Selon le journal Science fin 2017: « Les effets sur l'emploi sont plus complexes que la simple question du remplacement et des substitutions soulignées par certains. Bien que les effets économiques du BA soient relativement limités aujourd'hui et que nous ne soyons pas confrontés à une « fin du travail » imminente comme cela est parfois proclamé, les implications pour l'économie et la main-d'œuvre sont profondes ».
+Il est tentant de s'inspirer des êtres vivants sans les copier naïvement pour concevoir des machines capables d'apprendre. Les notions de percept et de concept comme phénomènes neuronaux physiques ont d'ailleurs été popularisés dans le monde francophone par Jean-Pierre Changeux. L'apprentissage automatique reste avant tout un sous-domaine de l' informatique, mais il est étroitement lié opérationnellement aux sciences cognitives, aux neurosciences, à la biologie et à la psychologie, et pourrait à la croisée de ces domaines, nanotechnologies, biotechnologies, informatique et sciences cognitives, aboutir à des systèmes d'intelligence artificielle ayant une assise plus vaste. Il est déjà très utilisé dans le domaine de la santé (diagnostic, thérapie numérique...) Des enseignements publics ont notamment été dispensés au Collège de France, l'un par Stanislas Dehaene orienté sur l'aspect bayésien des neurosciences, et l'autre par Yann Le Cun sur les aspects théoriques et pratiques de l' apprentissage profond.
+Enjeux et limites
+Quantité et qualité des données
+L'apprentissage automatique demande de grandes quantités de données pour fonctionner correctement. Il est impossible de savoir a priori quelle taille la base de données doit avoir pour que l'apprentissage automatique fonctionne correctement, en fonction de la complexité de la problématique étudiée et de la qualité des données, mais un ordre de grandeur assez usuel est que, pour une problématique de régression ou de classification basée sur des données tabulaires, il faut dix fois plus d'exemples dans la base de données que de variables d'entrées du problème ( degrés de liberté ),. Pour des problématiques complexes, il est possible qu'il faille plutôt cent à mille fois plus d'exemples que de degrés de liberté. Pour de la classification d'images, en partant de zéro, il est usuellement nécessaire d'avoir ~1000 images par classe, ou ~100 images par classe si on réalise de l'apprentissage par transfert depuis un modèle existant plutôt que de partir de zéro,.
+La qualité des données se traduit par leur richesse et leur équilibre statistique, leur complétude (pas de valeurs manquantes), ainsi que leur précision (incertitudes faibles).
+Il peut s'avérer difficile de contrôler l'intégrité des jeux de données, notamment dans le cas de données générées par les réseaux sociaux.
+La qualité des « décisions » prises par un algorithme d'AA dépend non seulement de la qualité (donc de leur homogénéité, fiabilité, etc. ) des données utilisées pour l’entraînement mais surtout de leur quantité. Donc, pour un jeu de données sociales collecté sans attention particulière à la représentation des minorités, l'AA est statistiquement injuste vis-à-vis de celles-ci. En effet, la capacité à prendre de « bonnes » décisions dépend de la taille des données, or celle-ci sera proportionnellement inférieure pour les minorités. Il convient donc de réaliser l'apprentissage automatique avec des données les plus équilibrées possibles, quitte à passer par un pré-traitement des données afin de rétablir l'équilibre ou par une modification/pénalisation de la fonction objectif.
+L'AA ne distingue actuellement pas cause et corrélation de par sa construction mathématique: usuellement, ce sont des causalités qui sont recherchées par l'utilisateur, mais l'AA ne peut trouver que des corrélations. Il incombe à l'utilisateur de vérifier la nature du lien mis en lumière par l'AA, causal ou non. Plusieurs variables corrélées peuvent être liées causalement à une autre variable cachée qu'il peut être utile d'identifier.
+Mathématiquement, certaines méthodes d'AA, notamment les méthodes à base d'arbres comme les arbres de décision, les forêts aléatoires ou les méthodes de boosting, sont incapables d'extrapoler (produire des résultats en dehors du domaine connu). D'autres méthodes d'AA, comme les modèles polynomiaux ou les réseaux de neurones, sont mathématiquement tout à fait capables de produire des résultats en extrapolation. Ces résultats en extrapolation peuvent ne pas être fiables du tout (c'est typiquement le cas pour les modèles polynomiaux) mais peuvent également être relativement corrects, au moins qualitativement, si l'extrapolation n'est pas exagérément grande (réseaux de neurones notamment). En « grandes » dimensions (à partir de ~100 variables), toute nouvelle prédiction doit de toute façon très probablement être considérée comme de l'extrapolation.
+L'utilisation d'algorithmes d'apprentissage automatique demande donc d'avoir conscience du cadre de données que l'on a utilisé pour l'apprentissage lors de leur utilisation. Il est donc prétentieux d'attribuer des vertus trop grandes aux algorithmes d'apprentissage automatique.
+Biais des algorithmes et des données
+Un algorithme peut être biaisé lorsque son résultat dévie par rapport à un résultat neutre, loyal ou équitable. Dans certains cas, les biais algorithmiques peuvent conduire à des situations de discrimination.
+Les données peuvent aussi être biaisées, si l'échantillon de données utilisées pour l'apprentissage du modèle n'est pas neutre et représentatif de la réalité ou déséquilibré. Ce biais est alors appris et reproduit par le modèle,.
+Cette notion de biais est si importante qu'elle est traitée clairement depuis 2018 dans quatre des sept exigences clefs sur l' intelligence artificielle digne de confiance (« Respect de la vie privée et gouvernance des données », « Transparence », « Diversité, non-discrimination et équité » et « Responsabilité ») issues des travaux de référence des experts de la Commission européenne, qui préludent à la future réglementation européenne, l' IA Act.
+Explicabilité et explications des décisions
+Les algorithmes d'apprentissage automatique posent des problèmes d'explicabilité globale du système. Si certains modèles comme la régression linéaire ou la régression logistique ont un nombre de paramètres limité et peuvent être interprétés, d'autres types de modèle comme les réseaux de neurones artificiels n'ont pas d'interprétation évidente, ce qui fait avancer à de nombreux auteurs que l'apprentissage automatique serait une « boîte noire » et poserait ainsi un problème de confiance. À ce titre, les experts de la Commission européenne prennent pour position que l'explicabilité est l'un des quatre grands principes fondateurs de leurs lignes directrices en matière d'éthique pour une intelligence artificielle digne de confiance. En cas d'arbitrage, parce qu'intimement liée aux droits relatifs à la justice, l'explicabilité fait ainsi écho aux notions de traçabilité, d'auditabilité et de responsabilité d'un système d'IA de confiance. Historiquement, d'autre types de modèles d'apprentissage ont été étudiés pour pallier ce problème. Par exemple, les machines d'apprentissage logique, qui sont aujourd’hui employées dans des secteurs ou la compréhension et/ou la traçabilité des décisions prises est primordiale: la médecine, les services financiers et la logistique.
+Des outils mathématiques permettent d'« auditer » un modèle d'apprentissage automatique afin de voir ce qu'il a « compris » et comment il fonctionne.
+La feature importance ou « importance des variables » permet de quantifier comment, en moyenne, chacune des variables d'entrée du modèle affecte chacune de ses variables de sortie et permet de révéler que, par exemple, une variable est majoritaire, ou que certaines variables n'ont aucun impact sur la « décision » du modèle. L'importance des variables n'est cependant accessible que pour un ensemble restreint de modèles, comme les modèles linéaires, la régression logistique ou les méthodes à base d'arbres comme les arbres de décision, les forêts aléatoires ou les méthodes de boosting.
+Pour les modèles plus complexes comme les réseaux de neurones, on peut recourir à l' analyse de la variance par plan d'expérience numérique par Monte Carlo pour calculer les indices de Sobol du modèle, qui jouent alors un rôle similaire à celui de l'importance des variables. L'importance des variables et les indices de Sobol ne renseignent néanmoins que sur l'importance moyenne des variables et ne permettent donc pas aisément d'analyser la « décision » du modèle au cas par cas. Ces indicateurs ne renseignent pas non plus sur le poids qualitatif des variables (« telle variable d'entrée à la hausse entraîne t-elle telle variable de sortie à la hausse, à la baisse, en « cloche », linéairement, avec effet seuil? »). Pour pallier ces problèmes, on peut recourir à la théorie des jeux pour calculer et visualiser les valeurs et les graphes de Shapley, qui permettent d'accéder à une grandeur similaire à l'importance des variables au cas par cas, ainsi que de tracer la réponse d'une variable de sortie en fonction d'une variable d'entrée pour voir comment évolue qualitativement la réponse du modèle. Enfin, les graphes de dépendances partielles permettent également de voir comment évolue la réponse moyenne du modèle en fonction des variables d'entrée (allure qualitative), et permettent également de tester le modèle en extrapolation pour vérifier que son comportement reste un minimum plausible (pas de rupture de pente ou d'effet de seuil, par exemple).
+Ces concepts permettent à Christoph Molnar, scientifique des données spécialisé dans l'explicabilité, d'avancer que l'apprentissage automatique n'est pas réellement une boîte noire, mais plutôt une « boîte grise »: il est possible d'avoir une bonne compréhension de ce que fait l'apprentissage automatique, sans que cette compréhension ne puisse cependant être totalement exhaustive, ni dénuée de potentiels effets de bords.
+Apprentissage profond
+L' apprentissage profond ( réseaux de neurones profonds) est une méthode d'apprentissage automatique. En pratique, depuis l'amélioration significative des performances de l'apprentissage profond depuis le début des années 2010, on distingue communément l'apprentissage automatique « classique » (tout type d'apprentissage automatique comme les modèles linéaires, les méthodes à base d'arbres comme le bagging ou le boosting, les processus gaussiens, les machines à vecteur de support ou les splines ) de l'apprentissage profond.
+Un réseau de neurones comporte toujours au moins trois couches de neurones: couche d'entrée, couche « cachée » et couche de sortie. Usuellement, un réseau de neurones n'est considéré réellement « profond » que lorsqu'il comporte au moins trois couches cachées, mais cette définition est quelque peu arbitraire et, par abus de langage, on parle souvent d'apprentissage profond même si un réseau de neurones comporte moins de trois couchées cachées.
+Il est généralement admis que l'apprentissage profond domine l'apprentissage automatique dans certains domaines d'application comme l'analyse d'images, de sons ou de textes.
+Dans d'autres domaines, où les bases de données sont plus « simples » que des images, des sons ou des corpus de textes, et généralement « tabulaires », l'apprentissage automatique se révèle généralement plus performant que l'apprentissage profond lorsque les bases de données sont relativement petites (moins de 10 000 exemples); au-delà, la supériorité de l'apprentissage automatique se rétablit généralement. (Des données tabulaires sont des informations formatées en tableaux de données [pas clair] regroupant par exemple des indicateurs socio-économiques relatifs à l'emploi, des indicateurs sur les données immobilières à Paris, des marqueurs bio-médicaux relatifs au diabète, des variables sur la composition chimique et la résistance du béton, des données décrivant la morphologie de fleurs, etc. Des tableaux de données de ce type, qui se prêtent bien à l'apprentissage automatique, peuvent par exemple être trouvés sur le Machine Learning Repository de l'Université de Californie). Certains chercheurs expliquent cette supériorité de l'apprentissage automatique sur l'apprentissage profond dans le cas des « petites » bases de données par le fait que les réseaux de neurones sont surtout performants pour trouver des fonctions continues, or beaucoup de fonctions rencontrées avec ces petites bases de données tabulaires sont apparemment irrégulières ou discontinues. Une autre explication serait la moins grande robustesse des réseaux de neurones aux variables « non importantes », or il arrive que dans les bases de données tabulaires il y ait des dizaines voire des centaines de variables qui n'affectent pas le résultat recherché et que les réseaux de neurones auraient du mal à discriminer. Enfin, une autre explication serait la très grande force du réseau de neurones qui est sa capacité à rechercher des informations invariantes par position, rotation et échelle (cruciales en analyse d'images), qui deviendrait une faiblesse sur ces petites bases de données tabulaires, cette capacité ne présentant alors pas d'utilité. La supériorité de l'apprentissage automatique sur l'apprentissage profond pour ces cas d'usage semble statistiquement avérée, mais n'est néanmoins pas absolue, notamment si les bases de données ne contiennent pas ou peu de variables non importantes et si les fonctions recherchées sont continues; c'est notamment le cas pour les modèles de substitution (en) ( surrogate model ) en simulation numérique en physique, [source insuffisante]. Il convient donc, pour rechercher la méthode la plus performante, de tester sans a priori un large éventail d'algorithmes disponibles.
+Le temps de calcul pour l'apprentissage des modèles est aussi généralement très différenciant entre les apprentissages automatique et profond. L'apprentissage automatique est usuellement beaucoup plus rapide à entraîner que l'apprentissage profond (des facteurs 10, 100 ou 1 000 sont possibles), mais lorsque les bases de données sont petites, cet avantage n'est plus toujours significatif, les temps de traitement restant raisonnables. Par ailleurs, l'apprentissage automatique est généralement beaucoup moins capable de tirer parti du calcul sur GPU que l'apprentissage profond, or celui-ci a considérablement progressé depuis les années 2000 et peut être 10 ou 100 fois plus rapide que le calcul « classique » sur CPU, ce qui peut permettre, avec un matériel adapté, de combler une large part de l'écart de temps de calcul entre les deux méthodes,.
+La supériorité du GPU sur le CPU dans ce contexte s'explique par le fait qu'un GPU est constitué de centaines voire de milliers d'unités de calcul parallèle (à comparer aux quelques unités de calcul parallèle seulement qui équipent les CPU) [réf. nécessaire], or le calcul matriciel, fondement des réseaux de neurones, est massivement parallélisable. Les GPU sont également capables d'atteindre des bandes passantes (quantité de données traitées par seconde) bien supérieures à celles des CPU. Une autre raison tient à la capacité des GPU à réaliser des calculs en simple précision ( nombre flottant, floating point, sur 32 bits, notés FP32 ) plus efficacement que les CPU, dont les fonctions sont très générales et ne sont pas spécifiquement optimisées pour un type de précision donné. Certains GPU peuvent être très performants en demi-précision ( FP16 ). Or, l'entraînement des réseaux de neurones peut recourir principalement à la simple précision (FP32) voire la demi-précision (FP16), voire une précision mixte (FP32-FP16); peu d'applications de calcul scientifique permettent cela, comme la mécanique des fluides numérique, qui requiert généralement de la double précision ( FP64 ).
+Dans la littérature
+Il existe de nombreuses œuvres de science-fiction sur le sujet de l' intelligence artificielle en général et de l'apprentissage automatique en particulier. Le traitement scientifique est généralement peu détaillé et quelque peu fantaisiste, mais des auteurs comme Peter Watts approchent le sujet avec un semblant de réalisme. Ainsi, dans la trilogie de romans Rifteurs, Peter Watts détaille l'architecture des réseaux de neurones et leurs modes de « raisonnement » et de fonctionnement basés sur l'optimisation de métriques mathématiques et, dans le roman Eriophora, il détaille le fonctionnement d'une IA en parlant de fonctions d'activation sigmoïdes, d' arbres de décision, de cycles d'apprentissage et d'effet de seuil de convergence.
+Notes et références
+↑ a b et c « apprentissage automatique », Grand Dictionnaire terminologique, Office québécois de la langue française (consulté le 28 janvier 2020 ).
+↑ a et b Commission d'enrichissement de la langue française, « Vocabulaire de l'intelligence artificielle (liste de termes, expressions et définitions adoptés) », Journal officiel de la République française n o 0285 du 9 décembre 2018 [ lire en ligne ] [PDF].
+↑ (en) Alan Turing, « On computable numbers, with an application to the entscheidungsproblem », Proceedings of the London Mathematical Society, s2-42,‎ 12 novembre 1936, p. 230-265 ( DOI 10.1112/plms/s2-42.1.230, lire en ligne [PDF], consulté le 23 septembre 2022 ).
+↑ (en) Alan Turing, « Computing machinery and intelligence », Mind, Oxford University Press, vol. 59, n o 236,‎ octobre 1950 ( DOI 10.1093/mind/LIX.236.433 ).
+↑ (en) « Neural Networks », sur standford.edu (consulté le 11 mai 2018 ).
+↑ (en) « Arthur Lee Samuel », sur history.computer.org (consulté le 11 mai 2018 ).
+↑ (en) « Arthur Samuel: Pioneer in Machine Learning », sur standford.edu (consulté le 11 mai 2018 ).
+↑ (en-US) « IBM100 - Deep Blue », sur www-03.ibm.com, 7 mars 2012 (consulté le 11 mai 2018 ).
+↑ (en-US) John Markoff, « On ‘Jeopardy!’ Watson Win Is All but Trivial », The New York Times,‎ 16 février 2011 ( ISSN 0362-4331, lire en ligne, consulté le 11 mai 2018 ).
+↑ K. Jarrett, K. Kavukcuoglu, M. Ranzato, Y. LeCun, « What is the best multi-stage architecture for object recognition? », 2009 IEEE 12th International Conference on Computer Vision,‎ 2009 ( ISSN 2380-7504, DOI 10.1109/ICCV.2009.5459469, lire en ligne )
+↑ V. Nair, G. E. Hinton, « Rectified linear units improve restricted boltzmann machines », Proceedings of the 27th international conference on machine learning (ICML-10),‎ 2010 ( lire en ligne )
+↑ X. Glorot, A. Bordes, Y. Bengio, « Deep sparse rectifier neural networks », Proceedings of the fourteenth international conference on artificial intelligence and statistics, JMLR Workshop and Conference Proceedings,‎ 2011 ( lire en ligne )
+↑ N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, R. Salakhutdinov, « Dropout: a simple way to prevent neural networks from overfitting », The journal of machine learning research, JMLR. org, vol. 15, t. 1,‎ 2014
+↑ (en) « Google's Artificial Brain Learns to Find Cat Videos », sur wired.com, 20 juin 2012 (consulté le 11 mai 2018 ).
+↑ (en) Jamie Condliffe, « Google's Artificial Brain Loves to Watch Cat Videos », sur gizmodo.com, 26 juin 2012 (consulté le 11 mai 2018 ).
+↑ A. Krizhevsky, I. Sutskever, G. E. Hinton, « Imagenet classification with deep convolutional neural networks », Advances in neural information processing systems, vol. 25,‎ 2012 ( lire en ligne )
+↑ (en) Doug Aamoth, « Interview with Eugene Goostman, the Fake Kid Who Passed the Turing Test », sur time.com, 9 juin 2014 (consulté le 11 mai 2018 ).
+↑ (en) Christof Koch, « How the Computer Beat the Go Master », sur scientificamerican.com, 19 mars 2016 (consulté le 11 mai 2018 ).
+↑ (en) Jamie Condliffe, « AI Has Beaten Humans at Lip-reading », sur technologyreview.com, 21 novembre 2016 (consulté le 11 mai 2018 ).
+↑ (en) « A history of machine learning », sur cloud.withgoogle.com (consulté le 11 mai 2018 ).
+↑ A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, I. Polosukhin, « Attention Is All You Need », arXiv:1706.03762 [cs],‎ 2017 ( lire en ligne )
+↑ Daniel Nelson, « Qu'est-ce que la rétropropagation? », sur Unite.AI, 10 janvier 2020 (consulté le 12 octobre 2024 ).
+↑ S. Shalev-Shwartz, S. Ben-David, Understanding machine learning: From theory to algorithms, Cambridge university press, 2014
+↑ A. R. Mohri Mehryar, A. Talwalkar, Foundations of machine learning, The MIT Press, coll. « Adaptive computation and machine learning », 2018, Second edition éd. ( ISBN 0-262-03940-0 )
+↑ (en) Guo, S., « An introduction to Surrogate modeling, Part I: fundamentals », sur Towards Data Science, 2020
+↑ (en) Hutson, M., « Supercomputer Emulator: AI's New Role in Science », sur IEEE.org, 2022
+↑ (en) Jiang, P., Surrogate Model-Based Engineering Design and Optimization, Springer, 2020 ( ISBN 978-981-15-0731-1 )
+↑ a et b (en) Rukavina, T., « Structural design optimization of reinforced concrete slabs using a machine learning approach », sur Research Gate - World Congresses on Computational Mechanics, 2021
+↑ (en) Macqueron, C., « Engineering Applications of Artificial Intelligence », sur Research Gate, World Nuclear Exhibition - WNE 2021, 2021 ( DOI 10.13140/RG.2.2.32067.53280 )
+↑ (en) Wassila Tercha, Sid Ahmed Tadjer, Fathia Chekired et Laurent Canale, « Machine Learning-Based Forecasting of Temperature and Solar Irradiance for Photovoltaic Systems », Energies, vol. 17, n o 5,‎ janvier 2024, p. 1124 ( ISSN 1996-1073, DOI 10.3390/en17051124, lire en ligne, consulté le 17 novembre 2024 )
+↑ « Retour d'expérience sur l'étude de la base MNIST pour la reconnaissance de chiffres manuscrits | Connect - Editions Diamond », sur connect.ed-diamond.com (consulté le 10 avril 2021 ).
+↑ Y. LeCun, B. Boser, J. S. Denker et D. Henderson, « Backpropagation Applied to Handwritten Zip Code Recognition », Neural Computation, vol. 1, n o 4,‎ 1 er décembre 1989, p. 541–551 ( ISSN 0899-7667, DOI 10.1162/neco.1989.1.4.541, lire en ligne, consulté le 10 avril 2021 ).
+↑ S. Shalev-Shwartz, S. Ben-David, Understanding machine learning: From theory to algorithms, Cambridge university press, 2014, Section 1.3
+↑ « Choosing the right estimator — scikit-learn 0.24.2 documentation », sur scikit-learn.org (consulté le 9 juin 2021 )
+↑ Kariappa Bheemaiah et Mark Esposito, « Vous avez dit « machine learning »? Quand l'ordinateur apprend à apprendre », sur The Conversation, 1 er mai 2017 (consulté le 12 octobre 2024 )
+↑ Ambroise et Govaert, 2000.
+↑ (en) Zisserman, A., « Self-Supervised Learning », sur Inria
+↑ (en) Causevic, S., « Self-supervised Transformer Language Models — BERT, GPT3, MUM and PaML », sur Towards Data Science, 2022
+↑ (en) Dickson, B., « Meta's Yann LeCun is betting on self-supervised learning to unlock human-compatible AI », sur The Next Web, 2022
+↑ Voir Machine Learning, chap. 13 Reinforcement Learning, p. 367-390.
+↑ Peter Norvig, Fabrice Popineau et Stuart J. Traduction de: Russell, Intelligence artificielle, 2010 ( ISBN 978-2-7440-7455-4 et 2-7440-7455-1, OCLC 708384789 ), chap. 21 (« Apprentissage par renforcement »).
+↑ Voir Machine Learning, p. 373-380.
+↑ Matthieu Dubois, Pablo Piantanida et François Yvon, « MOSAIC: Mélange d'experts pour la détection de textes artificiels », Actes des 32ème Conférence sur le Traitement Automatique des Langues Naturelles (TALN), volume 1: articles scientifiques originaux, ATALA \textbackslash\textbackslash& ARIA,‎ juin 2025, p. 502–525 ( lire en ligne, consulté le 17 avril 2026 )
+↑ (en) Sinno Jialin Pan et Qiang Yang, « A Survey on Transfer Learning », IEEE Transactions on Knowledge and Data Engineering, vol. 22, n o 10,‎ octobre 2010, p. 1345-1359 ( ISSN 1041-4347, e-ISSN 1558-2191, DOI 10.1109/TKDE.2009.191, lire en ligne [PDF] ).
+↑ a et b (en) Brownlee, J., « How to Classify Photos of Dogs and Cats (with 97% accuracy) », sur Machine Learning Mastery
+↑ (en) Chollet, F., « Transfer learning & fine-tuning », sur Keras.io
+↑ (en) Chollet, F., « Transfer learning & fine-tuning », sur Keras
+↑ (en) K. Simonyan et A. Zisserman, « Very Deep Concvolutional Networks for Large-Scale image Recognition », International Conference on Learning Representations (ICLR),‎ 2015 ( lire en ligne ).
+↑ (en) Yoshua Bengio, Jérôme Louradour, Ronan Collobert et Jason Weston « Curriculum learning » ( 14 juin 2009 ) ( DOI 10.1145/1553374.1553380, consulté le 22 avril 2026 ). — « ( ibid. ) », dans ICML '09: Proceedings of the 26th Annual International Conference on Machine Learning, Montréal, ACM ( ISBN 978-1-60558-516-1 ), p. 41-48..
+↑ Voir Machine Learning, chap. 4 Artificial Neural Networks, p. 81-127.
+↑ C. E. Rasmussen, C. K. I. Williams, Gaussian processes in machine learning, vol. 2, MIT press Cambridge, MA, 2006
+↑ Voir Machine Learning, chap. 9 Genetic Algorithms, p. 249-273.
+↑ Voir Machine Learning, chap. 3 Decision Tree Learning, p. 52-80.
+↑ « Machine Learning: retour aux sources », sur Nexworld, 2 octobre 2017 (consulté le 3 février 2020 ).
+↑ « Les étapes à réaliser pour mener à bien un projet de Machine Learning », Intelligence artificielle vulgarisée, sur editions-eni.fr (consulté le 8 avril 2021 ).
+↑ (en) Huan Liu et Hiroshi Motoda, Feature Extraction, Construction and Selection: A Data Mining Perspective, Springer, 1998 ( ISBN 978-1-4615-5725-8 ).
+↑ (en) Montanez-Barrera, J. A., « Correlated-informed neural networks: A new machine learning framework to predict pressure drop in micro-channels », International Journal of Heat and Mass Transfer,‎ 2022 ( DOI 10.1016/j.ijheatmasstransfer.2022.123017, lire en ligne )
+↑ (en) Bikmukhametov, T., « Combining machine learning and process engineering physics towards enhanced accuracy and explainability of data-driven models », Computers & Chemical Engineering,‎ 2020 ( DOI https://doi.org/10.1016/j.compchemeng.2020.106834 )
+↑ (en) Dash, T., « A review of some techniques for inclusion of domain-knowledge into deep neural networks », Scientific Reports,‎ 2022 ( lire en ligne ).
+↑ (en) « A Comparative Study of Data Mining Process Models (KDD, CRISP-DM and SEMMA) » [PDF], sur CiteSeerX (consulté le 21 avril 2021 ).
+↑ (en) Hod Lipson et Melba Kurman, Driverless: Intelligent Cars and the Road Ahead, MIT Press, 2016.
+↑ a b et c (en) Jack Stilgoe, « Machine learning, social learning and the governance of self-driving cars », Social Studies of Science,‎ 2018 ( lire en ligne ).
+↑ (en) Ed Finn, What algorithms want: imagination in the age of computing, Cambridge, Massachusetts, The MIT press, 257 p. ( ISBN 978-0-262-03592-7 et 0262035928, OCLC 958795990, BNF 45476175 ).
+↑ (en) Andrew J. Hawkins, « Self-driving car makers don't sound super excited to share data with the federal government », The Verge,‎ 20 septembre 2016 ( lire en ligne, consulté le 11 mai 2018 ).
+↑ « Moral Machine », sur Moral Machine (consulté le 10 avril 2021 ).
+↑ (en) Erik Brynjolfsson et Tom Mitchell, « What can machine learning do? Workforce implications », Science, 22 décembre 2017, vol. 358, n o 6370, p. 1530-1534, DOI 10.1126/science.aap8062 résumé.
+↑ Computer Science Colloquium - March 28, 2013, Anne Menendez & Guy Paillet].
+↑ Stanislas Dehaene, « Psychologie cognitive expérimentale », sur Collège de France, 11 avril 2022 (consulté le 13 avril 2023 ).
+↑ Yann LeCun, « Informatique et sciences numériques », sur Collège de France, 11 avril 2022 (consulté le 13 avril 2023 ).
+↑ (en) Maloof, M. A., Machine Learning and Data Mining for Computer Security, Springer, 2006 ( ISBN 978-1-84628-029-0 )
+↑ (en) Brownlee, J., « How Much Training Data is Required for Machine Learning? », sur Machine Learning Mastery, 2017.
+↑ (en) Mitsa, T., « How Do You Know You Have Enough Training Data? », sur Towards Data Science, 2019
+↑ (en) Warden, P., « How many images do you need to train a neural network? », sur Pete Warden's Blog, 2017
+↑ (en) Danah Boyd et Kate Crawford, « Critical Questions for Big Data: Provocations for a cultural, technological, and scholarly phenomenon », Information, Communication & Society,‎ 2011.
+↑ (en) Thompson, B., « A limitation of Random Forest Regression », sur Towards Data Science, 2019.
+↑ (en) Lohninger, H., Teach/Me Data Analysis, Springer, 1999 ( ISBN 3-540-14743-8, lire en ligne ).
+↑ (en) Xu, K., « How neural networks extrapolate: from feedforward to graph neural networks », Proceedings of ICLR 2021,‎ 2021 ( lire en ligne [PDF] ).
+↑ (en) R. Balestriero, « Learning in High Dimension Always Amounts to Extrapolation », Facebook AI Research - NYU,‎ 2021 ( lire en ligne [PDF] )
+↑ (en) Gary Marcus, Deep Learning, a Critical Appraisal, New York University ( lire en ligne [PDF] ).
+↑ Patrice Bertail, David Bounie, Stephan Clémençon et Patrick Waelbroeck, « Algorithmes: biais, discrimination et équité », sur Télécom Paris (consulté le 14 juillet 2020 ).
+↑ James J. Heckman, « Sample Selection Bias as a Specification Error », Econometrica, vol. 47, n o 1,‎ 1979, p. 153–161 ( ISSN 0012-9682, DOI 10.2307/1912352, lire en ligne, consulté le 9 avril 2021 ).
+↑ Byungju Kim, Hyunwoo Kim, Kyungsu Kim et Sungjin Kim, « Learning Not to Learn: Training Deep Neural Networks With Biased Data », IEEE/CVF Conference on Computer Vision and Pattern Recognition (conférence),‎ 2019, p. 9012–9020 ( lire en ligne, consulté le 9 avril 2021 ).
+↑ Groupe d'experts indépendants de haut niveau sur l'intelligence artificielle mandatés par la Commission européenne (GEHN IA), Lignes directrices en matière d'éthique pour une IA digne de confiance, Bruxelles, Commission européenne, 8 avril 2019, 56 p. ( lire en ligne ), p. 15 (52) « Le principe de l'équité », p.22 (73) « Qualité et intégrité des données », p.23 (80) « Absence de biais injustes », p.35 §2. « Robustesse technique et sécurité / Précision », p.37 §4. « Transparence / Communication », p.38 §5. « Diversité, non-discrimination et équité » / « Éviter les biais injustes », p.41 §7. « Responsabilité / Auditabilité / Minimisation et documentation des incidences négatives ».
+↑ Johanna Diaz, « La Commission européenne dévoile l'European AI Alliance et les 52 experts de son comité consultatif sur l'IA », introduction du futur groupe d'experts indépendants de haut niveau sur l'intelligence artificielle (GEHN IA) mandatés par la Commission européenne, 15 juin 2018 (consulté le 4 mai 2023 ).
+↑ Proposition de règlement établissant des règles harmonisées en matière d'intelligence artificielle, aka "IA Act", Bruxelles, Commission européenne, 21 avril 2021, 108 p. ( lire en ligne ).
+↑ (en) Tim Miller, « Explanation in Artificial Intelligence: Insights from the Social Sciences », arxiv.org,‎ 2017 ( arXiv abs/1706.07269 ).
+↑ Groupe d'experts indépendants de haut niveau sur l'intelligence artificielle mandatés par la Commission européenne (GEHN IA), Lignes directrices en matière d'éthique pour une IA digne de confiance, Bruxelles, Commission européenne, 8 avril 2019, 56 p. ( lire en ligne ), p.14 (48) §2 2.2 « Principes éthiques dans le contexte des systèmes d'IA », p.16 (53) « Le principe de l'explicabilité », p.22 (77) « Transparence / Explicabilité ».
+↑ "feature importance" ou "importance des variables".
+↑ graphes de dépendances partielles
+↑ (en) Christoph Molnar, Interpretable Machine Learning.
+↑ a et b (en) F. Chollet, Deep Learning with Python, Manning, 2021 ( ISBN 9781617296864 ).
+↑ (en) « Neural network models (supervised) ».
+↑ (en) C. Nicholson, « A Beginner's Guide to Neural Networks and Deep Learning », sur Pathmind.
+↑ (en) C. Janiesch, « Machine learning and deep learning », Electronic Markets, Springer,‎ 2021 ( DOI 10.1007/s12525-021-00475-2, lire en ligne [PDF] ).
+↑ (en) L. Grinsztajn, « Why do tree-based models still outperform deep learning on tabular data? », Proceedings of NeurIPS,‎ 2022 ( lire en ligne ).
+↑ (en) Siddharth, S. P., « Machine learning based surrogate modeling with SVD enabled training for nonlinear civil structures subject to dynamic loading » [PDF], sur arXiv, 2022.
+↑ (en) Dahey, « How To Chart Your Machine Learning Roadmap And Land An AI Role », sur Answerlyst, 2022
+↑ (en) M. Pandey, « The transformational role of GPU computing and deep learning in drug discovery », Nature Machine Intelligence,‎ 2022 ( DOI 10.1038/s42256-022-00463-x ).
+↑ (en) Danka, T., « How GPUs accelerate deep learning », sur Towards Data Science, 2020
+↑ « Précision Mixte », sur TensorFlow.org, 2022.
+↑ (en) « Machine Learning in Contemporary Science Fiction », sur SFRA Review, 26 janvier 2024 (consulté le 23 décembre 2025 ).
+↑ Addictic, « Interview Peter Watts (VO) - 2012 », sur ActuSF (consulté le 23 décembre 2025 ).
+Voir aussi
+Sur les autres projets Wikimedia:
+apprentissage automatique, sur le Wiktionnaire
+Bibliographie
+(en) Trevor Hastie, Robert Tibshirani et Jerome Friedman, The Elements of Statistical Learning: Data Mining, Inference, and Prediction, 2009, 2 e éd. ( lire en ligne )
+(en) Christopher M. Bishop, Neural Networks for Pattern Recognition, Oxford University Press, 1995 ( ISBN 0-19853-864-2 ).
+(en) Richard O. Duda, Peter E. Hart, David G. Stork, Pattern Classification, Wiley-interscience, 2001 ( ISBN 0-471-05669-3 ) [ détail des éditions ]
+Vincent Barra, Antoine Cornuéjols, Laurent Miclet, Apprentissage Artificiel: Concepts et algorithmes, Eyrolles, 2021 ( ISBN 978-2-416-001-04-8 ) [ détail des éditions ]
+(en) David MacKay, Information Theory, Inference, and Learning Algorithms, Cambridge University Press, 2003 ( ISBN 0-521-64298-1 ) [ détail des éditions ]
+(en) Tom M. Mitchell, Machine Learning, 1997 [ détail des éditions ]
+(en) Christopher M. Bishop, Pattern Recognition And Machine Learning, Springer, 2006 ( ISBN 0-387-31073-8 ) [ détail des éditions ]
+(en) T.-M. Huang, V. Kecman, I. Kopriva (2006), Kernel Based Algorithms for Mining Huge Data Sets, Supervised, Semi-supervised, and Unsupervised Learning, Springer-Verlag, Berlin, Heidelberg, 260 p. 96 illus., Hardcover, ( ISBN 3-54031-681-7 ) ( learning-from-data.com )
+(en) Vojislav Kecman (2001), Learning and Soft Computing, Support Vector Machines, Neural Networks and Fuzzy Logic Models, The MIT Press, Cambridge, MA, 608 pp., 268 illus., ( ISBN 0-26211-255-8 ) ( support-vector.ws )
+(en) Sholom Weiss, Casimir Kulikowski (1991). Computer Systems That Learn, Morgan Kaufmann. ( ISBN 1-55860-065-5 )
+(en) Krzysztof Wołk, Machine learning in translation corpora processing, Boca Raton, FL, Taylor & Francis, 2019, 264 p. ( ISBN 978-0-367-18673-9 )
+Articles connexes
+Algorithme
+Algorithme espérance-maximisation
+Analyse en composantes principales
+Apprentissage profond
+Apprentissage par renforcement
+Apprentissage par renforcement inverse
+Apprentissage par renforcement profond
+Apprentissage supervisé
+Apprentissage fédéré
+Biais algorithmique
+Carte auto-adaptative
+Extraction de connaissances
+Intelligence artificielle
+Intelligence artificielle digne de confiance
+Intelligence artificielle dans la santé
+Intelligence artificielle dans la santé mentale
+Thérapie numérique
+John Giannandrea
+Méthode des nuées dynamiques
+MLOps
+Partitionnement de données
+Réduction de la dimensionnalité
+Régression logistique
+Regroupement hiérarchique
+Réseau de neurones
+Science des données
+Théorème de Cox-Jaynes
+Théorie de l'apprentissage statistique
+Liens externes
+Medical Subject Headings
+France 24
+Britannica
+Enciclopedia De Agostini
+Store norske leksikon
+Treccani
+BnF ( données )
+LCCN
+GND
+Japon
+Espagne
+Israël
+Tchéquie
+Alain Clapaud, Machine learning: décryptage d'une technologie qui monte, Le Journal du Net, 10 avril 2015
+Pirmin Lemberger, Le « machine learning » – quand les données remplacent les algorithmes, Le Journal du Net, 28 mars 2014.
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+v · m Domaines de l' informatique
+Remarque: cette liste s'inspire du système de classification informatique de l'ACM édité en 2012
+Matériel
+Circuit imprimé
+Périphérique
+Circuit intégré
+Intégration à très grande échelle
+Circuit logique programmable
+Informatique durable
+Conception assistée par ordinateur pour l'électronique
+Appareil et organisation d'un système
+Architecture matérielle
+Architecture de processeur
+Machine à calculer
+Mécanographie
+Calculateur analogique
+Calculatrice
+Calculateur quantique
+Ordinateur
+Système embarqué
+Système temps réel
+Sûreté de fonctionnement
+Réseau
+Architecture de réseau
+Protocole de communication
+Équipement d'interconnexion de réseau informatique
+Planificateur de réseau (en)
+Rendement du réseau (en)
+Service réseau
+Organisation du logiciel
+Interprète
+Middleware
+Machine virtuelle
+Système d'exploitation
+Qualité logicielle
+Théorie et outil de programmation
+Paradigme de programmation
+Langage de programmation
+Compilateur
+Langage dédié
+Langage de modélisation
+Cadriciel
+Environnement de développement
+Gestion de configuration logicielle
+Bibliothèque logicielle
+Dépôt
+Développement de logiciel
+Software development process
+Analyse des exigences
+Conception de logiciel
+Assemblage de logiciel (en)
+Déploiement de logiciel (en)
+Maintenance du logiciel
+Équipe de programmation (en)
+Open source
+Théorie du calcul
+Modèle de calcul
+Langage formel
+Théorie des automates
+Théorie de la complexité
+Logique (en)
+Sémantique
+Algorithmique
+Algorithme
+Conception d'algorithme
+Analyse de la complexité des algorithmes
+Algorithme évolutionniste
+Algorithme probabiliste
+Géométrie algorithmique
+Génération procédurale
+Mathématiques de l'informatique
+Mathématiques discrètes
+Probabilité
+Statistique
+Logiciel mathématique (en)
+Théorie de l'information
+Analyse
+Analyse numérique
+Système d'information
+Base de données
+Mémoire (informatique)
+Progiciel
+Logiciel social
+Système d'information géographique
+Système d'aide à la décision
+Supervision
+Base de données multimédia
+Exploration de données
+Bibliothèque numérique
+Plateforme
+Marketing électronique
+World Wide Web
+Recherche d'information
+Sécurité
+Cryptographie
+Méthode formelle
+Service de sécurité (en)
+Système de détection d'intrusion
+Sécurité matérielle (en)
+Sécurité du réseau
+Sécurité de l'information
+Sécurité de l'application (en)
+Interactions humain-machine
+Design numérique
+Informatique sociale (en)
+Informatique ubiquitaire
+Visualisation (en)
+Accessibilité numérique
+Concurrence (en)
+Programmation concurrente
+Parallélisme
+Calcul distribué
+Multithreading
+Multiprocesseur
+Intelligence artificielle
+Traitement automatique des langues
+Représentation des connaissances
+Vision par ordinateur
+Planification
+Optimisation
+Philosophie de l'intelligence artificielle
+Intelligence artificielle distribuée
+Apprentissage automatique
+Apprentissage supervisé
+Apprentissage non supervisé
+Apprentissage par renforcement
+Apprentissage multi-tâches (en)
+Validation croisée
+Infographie
+Animation par ordinateur
+Animation 2D numérique
+Animation 3D
+Rendu photoréaliste
+Retouche d'image
+Processeur graphique
+Réalité mixte
+Réalité virtuelle
+Compression d'image
+Conception paramétrique
+Audio informatique
+Générateur de son programmable
+Processeur de signal numérique
+Synthétiseur analogique
+échantillonnage
+Séquenceur musical
+Tracker (musique)
+Musique assistée par ordinateur
+Informatique appliquée
+Commerce en ligne
+Logiciel d'entreprise
+Mathématiques computationnelles
+Physique numérique
+Chimie numérique
+Biologie numérique
+Sciences sociales numérique (en)
+Ingénierie numérique
+Informatique médicale
+Art numérique
+Édition électronique
+Cyberguerre
+Vote électronique
+Jeu vidéo
+Traitement de texte
+Recherche opérationnelle
+Technologies éducatives
+Gestion électronique des documents
+v · m Intelligence artificielle (IA)
+Concepts
+IA agentique
+Effet IA
+Grand modèle de langage
+Hallucination
+IA générative
+Test de Turing
+Techniques
+Analyse prédictive
+Apprentissage automatique
+Apprentissage non supervisé
+Apprentissage profond
+Apprentissage supervisé
+Génération à enrichissement contextuel
+Machine d'apprentissage logique
+Modèle de fondation
+Modèle des croyances transférables
+IA symbolique
+Réseau bayésien
+Réseau de neurones récurrents
+Réseau neuronal convolutif
+Transformeur
+Transformeur génératif préentraîné
+Système expert
+Apprentissage par renforcement à partir de rétroaction humaine
+Applications
+Art créé par IA
+Apple Intelligence
+ChatGPT
+Conséquences économiques de l'intelligence artificielle
+DeepL
+Diagnostic
+Écriture assistée par IA
+IA dans la santé
+IA dans le jeu vidéo
+Modèle texte-image
+Modèle texte-vidéo
+Perception artificielle
+Planification
+Robotique
+Synthèse vocale
+Traduction automatique
+Traitement automatique des langues
+Véhicule autonome
+Vision par ordinateur
+Enjeux et philosophie
+Alignement des intelligences artificielles
+Chambre chinoise
+Conscience artificielle
+Contrôle des capacités de l'IA
+Détection de contenu généré par IA
+Éthique de l'IA
+IA digne de confiance
+Philosophie de l'IA
+Sûreté des IA
+Histoire et événements
+Logic Theorist (1955)
+Perceptron (1957)
+General Problem Solver (1959)
+Prolog (1972)
+Matchs Deep Blue contre Kasparov (1996-1997)
+Match AlphaGo - Lee Sedol (2016)
+Sommet pour l'action sur l'IA (2025)
+Concepts prospectifs
+Anticipation
+IA-complet
+IA générale
+Risque existentiel posé par l'IA
+Superintelligence
+Règlementation
+Réglementation de l'IA
+Règlement sur l'IA
+Organisations
+Agence francophone pour l'IA
+Anthropic
+Google DeepMind
+Hugging Face
+OpenAI
+Partenariat sur l'IA
+Ouvrages
+Déclaration de Montréal pour un développement responsable de l'IA
+I.A. La Plus Grande Mutation de l'Histoire
+Intelligence artificielle: une approche moderne
+Lettre ouverte sur l'IA
+Power and Progress
+Superintelligence: Paths, Dangers, Strategies
+Portail de l’intelligence artificielle
+Portail de l’informatique
+Portail de l'informatique théorique
+Portail des probabilités et de la statistique

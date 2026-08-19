@@ -1,0 +1,39 @@
+# Précision et rappel
+
+Source : fr.wikipedia.org, révision 231342967
+
+Précision et rappel (« recall »). La précision compte la proportion d'items pertinents parmi les items sélectionnés alors que le rappel compte la proportion d'items pertinents sélectionnés parmi tous les items pertinents sélectionnables.
+Dans les domaines de la reconnaissance de formes, de la recherche d'information et de la classification automatique, la précision (ou valeur prédictive positive ) est la proportion des items pertinents parmi l'ensemble des items proposés; le rappel (ou sensibilité ) est la proportion des items pertinents proposés parmi l'ensemble des items pertinents. Ces deux notions correspondent ainsi à une conception et à une mesure de la pertinence.
+Lorsqu'un moteur de recherche, par exemple, retourne 30 pages web dont seulement 20 sont pertinentes (les vrais positifs ) et 10 ne le sont pas (les faux positifs ), mais qu'il omet 40 autres pages pertinentes (les faux négatifs ), sa précision est de 20/(20+10) = 2/3 et son rappel vaut 20/(20+40) = 1/3.
+La précision peut ainsi être comprise comme une mesure de l'exactitude ou de la qualité, tandis que le rappel est une mesure de l' exhaustivité ou de la quantité.
+Calcul
+Le calcul de ces mesures peut s'établir à partir de la matrice de confusion du système considéré.
+Précision
+La précision est le nombre de documents pertinents retrouvés rapporté au nombre de documents total proposé pour une requête donnée.
+Le principe est le suivant: quand un utilisateur interroge une base de données, il souhaite que les documents proposés en réponse à son interrogation correspondent à son attente. Tous les documents retournés superflus ou non pertinents constituent du bruit. La précision s’oppose à ce bruit documentaire. Si elle est élevée, cela signifie que peu de documents inutiles sont proposés par le système et que ce dernier peut être considéré comme « précis ». On calcule la précision avec la formule suivante:
+En statistique, la précision est appelée valeur prédictive positive.
+Rappel
+Le rappel est défini par le nombre de documents pertinents retrouvés au regard du nombre de documents pertinents que possède la base de données.
+Cela signifie que lorsque l’utilisateur interroge la base, il souhaite voir apparaître tous les documents qui pourraient répondre à son besoin d'information. Si cette adéquation entre le questionnement de l’utilisateur et le nombre de documents présentés est importante alors le taux de rappel est élevé. À l’inverse, si le système possède de nombreux documents intéressants mais que ceux-ci n’apparaissent pas dans la liste des réponses, on parle de silence. Le silence s’oppose au rappel. Le rappel est donc calculé comme suit:
+En statistique, le rappel est appelé sensibilité.
+Interprétation des résultats
+Un système de recherche documentaire parfait fournira des réponses dont la précision et le rappel sont égaux à 1 (l'algorithme trouve la totalité des documents pertinents - rappel - et ne fait aucune erreur - précision). Dans la réalité, les algorithmes de recherche sont plus ou moins précis et plus ou moins pertinents. Il est possible d'obtenir un système très précis (par exemple un score de précision de 0,99), mais peu sensible (par exemple avec un rappel de 0,10, qui signifiera qu'il n'a trouvé que 10 % des réponses possibles). De même, un algorithme dont le rappel est fort (par exemple 0,99, soit la quasi-totalité des documents pertinents), mais la précision faible (par exemple 0,10) fournira en guise de réponse de nombreux documents erronés en plus de ceux pertinents: il sera donc difficilement exploitable.
+Ainsi, dans les cas limites, un système de recherche documentaire qui renvoie la totalité des documents de sa base aura un rappel de 1 mais une mauvaise précision, tandis qu'un système de recherche qui renvoie uniquement la requête de l'utilisateur [pas clair] aura une précision de 1 pour un rappel très faible. La valeur d'un classifieur ne se réduit donc pas à un bon score en précision ou en rappel.
+Cadre multi-classe
+Dans le cadre multi-classes (où le nombre n de classes de données est supérieur à 1), les moyennes globales de la précision et du rappel sur l'ensemble des classes i peuvent être évaluées par la macro-moyenne qui calcule d'abord la précision et le rappel sur chaque classe i suivie d'un calcul de la moyenne des précisions et des rappels sur les n classes:
+F-mesure
+Une mesure qui combine la précision et le rappel est leur moyenne harmonique, nommée F-mesure ou F-score:
+Elle est également connue sous le nom de mesure, car précision et rappel sont pondérés de façon égale. Il s'agit d'un cas particulier de la mesure générale (pour des valeurs réelles positives de ):
+Exemples
+Si une personne recherche « chat siamois » sur l'interface d'une base de données, les documents qui ont été indexés avec pour seul terme le mot « chat » n’apparaîtront pas. Or, certains de ces documents pourraient être pertinents. Cela va donc produire un silence documentaire et la valeur du rappel diminuera d’autant.
+Inversement, si pour pallier ce risque la personne tape seulement « chat », alors qu’elle s’intéresse seulement aux chats siamois, le système lui présentera des documents dans lesquels les chats siamois ne sont pas mentionnés (ce pourra être les momies de chat en Égypte, voire la vie du poisson-chat ). La précision sera faible et le bruit important.
+Articles connexes
+faux négatif
+faux positif
+Sensibilité et spécificité
+Matrice de confusion
+Notes et références
+↑ a et b « La précision, le rappel et de la matrice de confusion dans l'apprentissage automatique », sur Bigdata.ma (version du 16 mai 2021 sur archive.org ).
+Sciences de l’information et bibliothèques
+Portail de l’informatique
+Portail des probabilités et de la statistique

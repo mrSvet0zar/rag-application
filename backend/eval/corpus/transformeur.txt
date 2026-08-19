@@ -1,0 +1,251 @@
+# Transformeur
+
+Source : fr.wikipedia.org, révision 236964427
+
+Pour les articles homonymes, voir transformer.
+Type
+Architecture logicielle, réseau de neurones artificiels, modèle d'apprentissage profond ( d )
+Date d'invention
+12 juin 2017
+Décrit par
+Attention Is All You Need ( en )
+modifier - modifier le code - modifier Wikidata
+Un transformeur (ou modèle auto-attentif ) est une architecture d' apprentissage profond introduite en 2017. Elle est principalement utilisée dans le domaine du traitement automatique des langues en servant de base aux grands modèles de langage, mais peut aussi servir à traiter d'autres modalités comme les images, les vidéos ou le son, parfois simultanément.
+À l'instar des réseaux de neurones récurrents (RNN pour recurrent neural network en anglais), les transformeurs sont conçus pour gérer des données séquentielles, notamment du texte, pour des tâches telles que la traduction et la génération de texte. Cependant, contrairement aux RNN, les transformeurs ne nécessitent pas un traitement séquentiel des données. Ainsi, pour une phrase en entrée, un transformeur peut analyser simultanément différentes parties du texte, sans devoir commencer par le début. Cette caractéristique permet aux transformeurs d'offrir une parallélisation supérieure à celle des RNN, réduisant ainsi le temps d'entraînement des modèles.
+Les transformeurs sont devenus le modèle de choix pour les problèmes de traitement automatique des langues, remplaçant les anciens modèles de réseaux de neurones récurrents tels que le LSTM. Étant donné que le modèle transformeur facilite davantage la parallélisation pendant l'entraînement, celui-ci peut s'effectuer sur des ensembles de données plus volumineux. Cela a conduit au développement de systèmes pré-entraînés tels que BERT ( Bidirectional Encoder Representations from Transformers ) et GPT ( Generative Pre-Trained Transformer ), qui ont été entraînés sur d'énormes ensembles de données textuelles, incluant des sources diverses telles que Wikipédia, et peuvent être affinés pour réaliser des tâches linguistiques spécifiques.
+Contexte
+Avant l'introduction des transformeurs, la majorité des systèmes de traitement automatique des langues reposaient sur des réseaux de neurones récurrents (RNN) chainés, tels que les LSTMs et les GRUs ( Gated recurrent units en anglais), enrichis avec des mécanismes d'attention. Le transformeur s'appuie sur ces techniques d'attention sans utiliser de structure RNN, mettant ainsi en évidence que les mécanismes d'attention seuls sont suffisamment puissants pour réaliser les performances des RNN avec attention.
+Réseaux de neurones récurrents
+Les RNN chainés traitent les lexèmes ( tokens en anglais) séquentiellement, en maintenant un vecteur d'état qui contient une représentation des données vues après chaque lexème. Pour traiter le n-ième lexème, le modèle combine l'état représentant la séquence d'entrée jusqu'au (n-1)-ième lexème avec l'information du nouveau lexème pour créer un nouvel état représentant la séquence d'entrée jusqu'au n-ième lexème. Théoriquement, l'information d'un lexème peut se propager loin vers le début de la séquence d'entrée, si à chaque point l'état continue à encoder de l'information relative au lexème. Mais en pratique, ce mécanisme est imparfait: à cause du problème de l'évanescence du gradient (en), l'état du modèle à la fin du traitement d'une longue séquence d'entrée n'arrive pas à se rappeler une information précise à propos des premiers lexèmes.
+Mécanisme d'attention
+Ce problème a été résolu par l'introduction des mécanismes d' attention. Ces mécanismes permettent à un modèle de regarder directement et d'extraire l'état de n'importe quel lexème précédent dans la séquence. La couche d'attention peut accéder à tous les précédents états et leur donner un poids selon leur pertinence par rapport au lexème courant, fournissant ainsi une information saillante sur les lexèmes éloignés.
+L'attention est par exemple utilisée en traduction. Dans un système de traduction d'une phrase en anglais vers une phrase équivalente en français, le premier mot français de la séquence de sortie dépend le plus probablement du début de la séquence d'entrée. Cependant, dans un modèle classique d'encodeur-décodeur à base de LSTMs, dans le but de produire le premier mot de la séquence de mots en français, le modèle reçoit seulement le vecteur d'état du dernier mot en anglais. Théoriquement, ce vecteur peut encoder l'information de toute la phrase en anglais, donnant ainsi au modèle toute la connaissance nécessaire, mais en pratique cette information n'est souvent pas bien préservée. En introduisant un mécanisme d'attention, le modèle peut à la place apprendre des états liés aux lexèmes anglais précédents lorsqu'il produit le début d'une sortie en français, donnant ainsi une meilleure compréhension de ce qu'il traduit.
+Garder l'attention en se débarrassant des RNN
+Ajoutés aux RNN, les mécanismes d'attention ont amené de larges gains de performance. L'introduction du transformeur a mis en lumière le fait que les mécanismes d'attention étaient suffisamment puissants pour se suffire à eux-mêmes, sans nécessiter de RNN. Le fait que les transformeurs ne s'appuient pas sur un traitement séquentiel, et qu'ils permettent de mettre facilement en œuvre de la parallélisation, permet aux transformeurs d'être entraînés plus efficacement sur de grands jeux de données.
+Architectures
+L'architecture "encodeur-décodeur" du transformeur original
+Vaswani et al., 2017 décrivent dans l'article « Attention is all you need » une architecture encodeur-décodeur conçue pour convertir une séquence d'entrée en une séquence de sortie, toutes deux de tailles variables. L'encodeur analyse la séquence en entrée à travers une série de couches successives, tandis que le décodeur génère la séquence de sortie en s'appuyant sur les informations encodées. Les auteurs montrent que cette architecture est particulièrement performante pour la traduction automatique.
+La fonction de chaque encodeur est de traiter sa séquence d'entrée pour générer des encodages contenant de l'information sur les entrées qui sont pertinentes entre elles. Il passe son ensemble d'encodages à l'encodeur suivant. Chaque décodeur réalise l'opération inverse, en prenant et traitant tous les encodages, puis en utilisant l'information contextuelle qui y est présente pour générer la séquence de sortie. A cette fin, chaque encodeur et décodeur utilisent un mécanisme d'attention, qui, pondère la pertinence de chaque lexème de l'entrée par rapport à chaque autre lexème de l'entrée et en élabore de l'information en conséquence pour produire la sortie. Chaque couche du décodeur met aussi en œuvre un mécanisme d'attention qui extrait de l'information des sorties des précédents décodeurs, avant que la couche du décodeur n'extraie de l'information des flux encodés. L'encodeur et le décodeur contiennent tous les deux un réseau de neurones à propagation avant pour un traitement additionnel des sorties, des connexions résiduelles, ainsi qu'une couche de normalisation.
+L'architecture "décodeur-seul"
+L'architecture "décodeur-seul" ( decoder-only ) est progressivement devenue dominante. À la différence de l’architecture encodeur–décodeur, qui dissocie le traitement de l’entrée (module encodeur) et la production de la sortie (module décodeur), un modèle décodeur-seul repose sur un unique bloc de type décodeur pour conditionner la génération sur l’entrée et produire la sortie.
+De nombreux chatbots (ex. GPT-2, GPT-3, LLaMA, etc.) qualifiés de " transformeurs génératifs préentraînés " sont basés sur une architecture decodeur-seul et pré-entraînés de manière auto-supervisée sur de très grands corpus de texte afin d’apprendre à modéliser une distribution sur les séquences, en vue de générer du texte.
+Selon Zhang et al. (2025), si l'architecture "decoder-seul" permet "d'unifier les processus de compréhension et de génération", simplifiant ainsi l'apprentissage, un modèle basé sur l'architecture "encodeur-decodeur" peut atteindre des performances équivalentes tout en étant beaucoup plus économique lors de l'inférence.
+L'opération matricielle d'attention
+Les modules élémentaires d'un transformeur sont les unités d'un produit matriciel pondéré. Lorsqu'une séquence est fournie au modèle transformeur, les poids d'attention sont calculés entre eux simultanément. L'unité d'attention fournit des plongements lexicaux ( embeddings ) pour chaque lexème qui contiennent non seulement de l'information sur le lexème courant lui-même, mais aussi une information pondérée des autres lexèmes pertinents.
+Concrètement, pour chaque unité d'attention, le transformeur apprend trois matrices de poids; les poids de la requête ( query ), les poids de la clé ( key ), et les poids de la valeur ( value ). Pour chaque lexème de la séquence d'entrée, le vecteur de plongement du mot ( word embedding ) est multiplié avec chacune des trois matrices,, pour produire respectivement un vecteur de requête, un vecteur de clé, et un vecteur de valeur.
+Les poids d'attention sont calculés en utilisant les vecteurs de requête et de clé: le poids d'attention du lexème sur le lexème est la résultante du produit scalaire de et. Les poids d'attention sont divisés par la racine carrée de la dimension des vecteurs clé,, ce qui permet d'obtenir des vecteurs de variance 1, puis passent à travers une fonction softmax qui normalise les poids de manière qu'ils correspondent à une distribution de probabilité — positifs et de somme. Le fait que et soient des matrices différentes permet à l'attention d'être non symétrique: si un lexème affecte un autre lexème (i.e. que soit grand), cela n'implique pas forcément que le lexème affecte le lexème (i.e. est grand). La sortie de l'unité d'attention pour le lexème est la somme pondérée des vecteurs de valeurs de tous les lexèmes, pondérée par, l'attention du lexème sur chaque autre lexème.
+Le calcul d'attention pour l'ensemble des lexèmes peut être exprimé comme un produit matriciel, opération réalisable rapidement par les cartes graphiques, à l'aide de shaders.
+Le calcul ci-avant peut alors s'écrire comme suit:
+où le vecteur est transposé afin de rendre les dimensions compatibles.
+L'attention multi-tête
+Un ensemble composé des matrices est appelé une tête d'attention. L'initialisation de la valeur des poids de ces matrices étant aléatoire, certaines valeurs initiales peuvent déstabiliser le processus d'apprentissage. D'où l'utilisation de plusieurs têtes d'attention dans chaque couche d'un transformeur pour rendre plus robuste l'apprentissage.
+Étant donné que les transformeurs possèdent plusieurs têtes d'attention, ils ont la possibilité d'être traités en parallèle, ce qui rend le traitement de la séquence d'entrée rapide. Les multiples sorties de l'attention multi-tête sont ensuite concaténées pour être passées aux couches de réseaux de neurones à propagation avant.
+Multi-Head Latent Attention
+Une évolution de l'architecture des transformeurs est le Multi-Head Latent Attention (MHLA), cette architecture a pour but l'amélioration de l’efficacité des modèles d'attention. Introduite en 2024, cette approche repose sur l’idée d’introduire un espace latent intermédiaire, partagé par plusieurs têtes d’attention. Au lieu que chaque tête projette directement les clés, requêtes et valeurs depuis les entrées, celles-ci interagissent via un ensemble réduit de vecteurs latents, agissant comme une mémoire intermédiaire. Cette structure permet de décorréler l’espace des entrées de l’espace de traitement, réduisant la complexité computationnelle. Cette architecture est notamment utilisée dans le modèle DeepSeek-V2.
+Pré-entraînement
+La grande majorité des transformeurs performants sont pré-entraînés sur de grands ensembles de données, avant d'être affinés sur le problème visé ( fine-tuning ). Ce pré-entraînement est ainsi en général effectué sur des problèmes d' apprentissage auto-supervisé pour ne pas être limité par le besoin de données labellisées.
+En vision, la première proposition à démontrer ce que peuvent apporter les transformeurs par rapport aux réseaux de neurones convolutifs, est une application directe de l'encodeur d'un transformeur classique sur une séquence de morceaux des images. [pas clair] Ce réseau, baptisé ViT, a pu dépasser la performance atteinte par les réseaux de neurones convolutifs de l'époque. Il a été pré-entraîné avec un jeu de données propriétaire de Google, JFT-3B, contenant quelque 3 milliards d'images.
+Implémentations
+Les modèles Transformeur peuvent être implémentés en Python avec TensorFlow ou PyTorch. La bibliothèque "Transformers" produite par HuggingFace fournit des modèles transformeurs pré-entraînés.
+Notes et références
+↑ (en) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser et Illia Polosukhin, « Attention is All you Need », Advances in Neural Information Processing Systems 30,‎ 12 juin 2017 ( arXiv 1706.03762, lire en ligne ).
+↑ a et b (en) Ashish Vaswani, « Attention Is All You Need », 2017
+↑ (en) Margaret Rouse, « Large Language Model (LLM) », Techopedia,‎ 28 juillet 2023 ( lire en ligne )
+↑ (en) Yugesh Verma, « Hands-on guide to using Vision transformer for Image classification », sur Analytics India Magazine, 29 janvier 2022 (consulté le 12 décembre 2023 )
+↑ (en) Aayush Mittal, « Google's Multimodal AI Gemini - A Technical Deep Dive », sur Unite.AI, 11 décembre 2023 (consulté le 13 décembre 2023 )
+↑ (en) Dzmitry Bahdanau, « A Neural Machine Translation by Jointly Learning to Align and Translate », 2014
+↑ Jay Alammar, « Le Transformer illustré », 2020
+« (...) unifying understanding and generation and simplifying the learning »
+↑ Fanxu Meng, Zengwei Yao et Muhan Zhang, TransMLA: Multi-Head Latent Attention Is All You Need, 2025 ( DOI 10.48550/ARXIV.2502.07864, lire en ligne )
+↑ DeepSeek-AI, Aixin Liu, Bei Feng et Bin Wang, DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model, 2024 ( DOI 10.48550/ARXIV.2405.04434, lire en ligne )
+↑ (en) Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov et Dirk Weissenborn, « An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale », arXiv:2010.11929 [cs],‎ 3 juin 2021 ( lire en ligne, consulté le 29 mai 2022 ).
+↑ (en) Thomas Wolf, « Transformers: State-of-the-Art Natural Language Processing », Association for Computational Linguistics,‎ 2020 ( DOI 10.18653/v1/2020.emnlp-demos.6, lire en ligne [PDF] )
+Voir aussi
+Sur les autres projets Wikimedia:
+transformeur, sur le Wiktionnaire
+Réseaux de neurones, sur Wikiversity
+Articles connexes
+Réseau de neurones artificiels
+Réseau de neurones récurrents
+Transformeur génératif pré-entraîné (GPT)
+v · m Intelligence artificielle (IA)
+Concepts
+IA agentique
+Effet IA
+Grand modèle de langage
+Hallucination
+IA générative
+Test de Turing
+Techniques
+Analyse prédictive
+Apprentissage automatique
+Apprentissage non supervisé
+Apprentissage profond
+Apprentissage supervisé
+Génération à enrichissement contextuel
+Machine d'apprentissage logique
+Modèle de fondation
+Modèle des croyances transférables
+IA symbolique
+Réseau bayésien
+Réseau de neurones récurrents
+Réseau neuronal convolutif
+Transformeur
+Transformeur génératif préentraîné
+Système expert
+Apprentissage par renforcement à partir de rétroaction humaine
+Applications
+Art créé par IA
+Apple Intelligence
+ChatGPT
+Conséquences économiques de l'intelligence artificielle
+DeepL
+Diagnostic
+Écriture assistée par IA
+IA dans la santé
+IA dans le jeu vidéo
+Modèle texte-image
+Modèle texte-vidéo
+Perception artificielle
+Planification
+Robotique
+Synthèse vocale
+Traduction automatique
+Traitement automatique des langues
+Véhicule autonome
+Vision par ordinateur
+Enjeux et philosophie
+Alignement des intelligences artificielles
+Chambre chinoise
+Conscience artificielle
+Contrôle des capacités de l'IA
+Détection de contenu généré par IA
+Éthique de l'IA
+IA digne de confiance
+Philosophie de l'IA
+Sûreté des IA
+Histoire et événements
+Logic Theorist (1955)
+Perceptron (1957)
+General Problem Solver (1959)
+Prolog (1972)
+Matchs Deep Blue contre Kasparov (1996-1997)
+Match AlphaGo - Lee Sedol (2016)
+Sommet pour l'action sur l'IA (2025)
+Concepts prospectifs
+Anticipation
+IA-complet
+IA générale
+Risque existentiel posé par l'IA
+Superintelligence
+Règlementation
+Réglementation de l'IA
+Règlement sur l'IA
+Organisations
+Agence francophone pour l'IA
+Anthropic
+Google DeepMind
+Hugging Face
+OpenAI
+Partenariat sur l'IA
+Ouvrages
+Déclaration de Montréal pour un développement responsable de l'IA
+I.A. La Plus Grande Mutation de l'Histoire
+Intelligence artificielle: une approche moderne
+Lettre ouverte sur l'IA
+Power and Progress
+Superintelligence: Paths, Dangers, Strategies
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+Portail de l’intelligence artificielle

@@ -1,0 +1,166 @@
+# Réseau de neurones récurrents
+
+Source : fr.wikipedia.org, révision 233572155
+
+Type
+Réseau de neurones artificiels
+Nom court
+(en) RNN
+Inventeur
+Shun'ichi Amari
+modifier - modifier le code - modifier Wikidata
+Schéma d'un réseau de neurones récurrents à une unité reliant l'entrée et la sortie du réseau. A droite la version dépliée de la structure.
+Un réseau de neurones récurrents ( RNN pour recurrent neural network en anglais ) est un réseau de neurones artificiels présentant des connexions récurrentes. Un réseau de neurones récurrents est constitué d'unités ( neurones ) interconnectées interagissant non-linéairement et pour lequel il existe au moins un cycle dans la structure. Les unités sont reliées par des arcs (synapses) qui possèdent un poids. La sortie d'un neurone est une combinaison non linéaire de ses entrées.
+Les réseaux de neurones récurrents sont adaptés pour des données d'entrée de taille variable. Ils conviennent en particulier pour l'analyse de séries temporelles. Ils sont utilisés en reconnaissance automatique de la parole ou de l'écriture manuscrite - plus généralement en reconnaissance de formes - ou encore en traduction automatique. Dépliés, ils sont comparables à des réseaux de neurones classiques avec des contraintes d'égalité entre les poids du réseau (voir schéma). Les techniques d'entraînement du réseau sont les mêmes que pour les réseaux classiques ( rétropropagation du gradient ), néanmoins les réseaux de neurones récurrents se heurtent au problème de disparition du gradient pour apprendre à mémoriser des évènements passés. Des architectures particulières répondent à ce dernier problème, on peut citer en particulier les réseaux Long short-term memory. On peut étudier les comportements des réseaux de neurones récurrents avec la théorie des bifurcations, mais la complexité de cette étude augmente très rapidement avec le nombre de neurones.
+Réseaux Elman et réseaux Jordan
+Le réseau Elman
+Un réseau Elman est un réseau de 3 couches ( x, y, et z dans l'illustration) complété d'un ensemble d'unités de contexte ( u dans l'illustration). La couche y du milieu (cachée) est connectée à ces unités de contexte, et a des poids. A chaque étape, l'entrée est retransmise et une règle d'apprentissage est appliquée. Les connexions finales fixées enregistrent une copie des valeurs précédentes des unités cachées dans les unités de contexte (puisqu'elles propagent les connexions avant que la règle d'apprentissage soit appliquée). Donc le réseau peut maintenir une sorte d'état, lui permettant d'exécuter des tâches telles que la prédiction séquentielle qui est au-delà de la puissance d'un perceptron multicouche standard.
+Les réseaux Jordan sont similaires aux réseaux Elman. Les unités de contexte sont alimentées par la couche de sortie à la place de la couche cachée. Les unités de contexte dans un réseau Jordan mentionnent aussi la couche d'état. Elles ont une connexion récurrente à elles-mêmes.
+Les réseaux Elman et Jordan sont aussi connus sous le nom de réseaux récurrents simples (SRN pour simple recurrent networks ). Voici les équations pour deux types de réseaux:
+Réseau Elman
+est le vecteur d'entrée à l'instant t
+est le vecteur de la couche cachée à l'instant t
+est le vecteur de sortie à l'instant t
+est la matrice entre la couche d'entrée et la couche cachée, est la matrice entre la couche cachée et elle-même, est la matrice entre la couche cachée et la couche de sortie, et est le vecteur de biais (,,, et sont les paramètres)
+et sont les fonctions d'activation respectivement au niveau de la couche cachée et de la couche de sortie.
+Réseau Jordan
+où les notations sont les mêmes sauf que est ici la matrice entre la couche de sortie et la couche cachée.
+Problème de disparition du gradient
+Les réseaux de neurones récurrents classiques sont exposés au problème de disparition de gradient qui les empêche de modifier leurs poids en fonction d'évènements trop anciens. Lors de l'entraînement, le réseau essaie de minimiser une fonction d'erreur dépendant en particulier de la sortie [pas clair]. Pour l'exemple donné ci-dessus, suivant la règle de dérivation en chaîne, la contribution au gradient de l'entrée est
+où représente la matrice tel que le seul terme non nul est le terme égal à 1. Pour des valeurs standard de la fonction d'activation et des poids du réseau le produit décroît exponentiellement en fonction de. Par conséquent la correction de l'erreur si cela doit faire intervenir un évènement lointain diminuera exponentiellement avec l'intervalle de temps entre cet évènement et le présent. Le réseau sera incapable de prendre en compte les entrées passées.
+Types
+Long short-term memory
+Un réseau Long short-term memory (LSTM), en français réseau récurrent à mémoire court et long terme ou plus explicitement réseau de neurones récurrents à mémoire court-terme et long terme, est l'architecture de réseau de neurones récurrents la plus utilisée en pratique qui permet de répondre au problème de disparition de gradient. Le réseau LSTM a été proposé par Sepp Hochreiter et Jürgen Schmidhuber en 1997. L'idée d'un LSTM est que chaque unité computationnelle est liée non seulement à un état caché mais également à un état de la cellule qui joue le rôle de mémoire. Le passage de à se fait par transfert à gain constant et égal à 1. De cette façon les erreurs se propagent aux pas antérieurs (jusqu'à 1 000 étapes dans le passé) sans phénomène de disparition de gradient. L'état de la cellule peut être modifié à travers une porte qui autorise ou bloque la mise à jour ( input gate ). De même une porte contrôle si l'état de cellule est communiqué en sortie de l'unité LSTM ( output gate ). La version la plus répandue des LSTM utilise aussi une porte permettant la remise à zéro de l'état de la cellule ( forget gate ).
+Équations
+Le schéma suivant indique grossièrement comment on calcule les différentes valeurs.
+Les symboles et représentent respectivement la fonction sigmoïde et la fonction tangente hyperbolique, bien que d'autres fonctions d'activation soient possibles. Chaque boîte et applique la fonction à l'entrée qui est une combinaison affine (les poids ne sont pas indiqués sur le schéma).
+Chaque porte + correspond à l'addition de vecteurs
+Chaque porte X correspond au produit matriciel de Hadamard (produit terme à terme).
+Schéma d'un réseau LSTM à une unité. Le graphe des opérations est détaillé pour l'étape. Les poids ne sont pas indiqués.
+Les valeurs initiales sont et. Dans les équations suivantes, l'opérateur symbolise le produit matriciel de Hadamard (produit terme à terme). Les équations suivantes décrivent précisément les calculs présentés dans le schéma ci-dessus:
+Les vecteurs, et pour respectivement les portes d'oubli, d'entrée et de sortie à l'instant t s'obtiennent de la même façon: l'application de la fonction sigmoïde à des combinaisons affines à partir du vecteur d'entrée à l'instant t et du vecteur pour la couche cachée à l'instant t - 1. Ces vecteurs permettent alors de calculer le vecteur et le vecteur de la couche cachée à l'instant t.
+Variantes
+Il existe des variantes de LSTM tel:
+Peephole LSTM
+Bi-LSTM (bi-directional LSTM),, permettant de tenir compte dans une séquence de l'influence de la suite sur ce qu'il précède, en plus de l'habituelle influence du précédant sur ce qui suit.
+Gated Recurrent Unit
+Un réseau Gated Recurrent Unit (GRU) (en français, réseau récurrent à portes ou plus explicitement réseau de neurones récurrents à portes ) est une variante des LSTM introduite en 2014 par Kyunghyun Cho et al. Les réseaux GRU ont des performances comparables aux LSTM pour la prédiction de séries temporelles (ex: partitions musicales, données de parole ). Une unité requiert moins de paramètres à apprendre qu'une unité LSTM. Un neurone n'est associé plus qu'à un état caché (plus de cell state ) et les portes d'entrée et d'oubli de l'état caché sont fusionnées ( update gate ). La porte de sortie est remplacée par une porte de réinitialisation ( reset gate ).
+Équations
+Schéma d'un réseau GRU à une unité.
+Valeur initiale:.
+Applications industrielles
+Ces réseaux sont utiles sur des processus temporels (prise en compte du passé d'une séquence):
+Prévision de processus industriels (électricité)
+Intégration de contrôle/commande
+Outils de traitement du langage naturel et processus de traduction. A noter que ces modèles ont donné naissance aux architectures à base de Transformers qui sont à la base des Large Language Models mis en production à partir de 2022 et 2023.
+Notes et références
+↑ (en) Moskolai, Rose, Abdou, Wahabou, Dipanda, Albert et Kolyang, « Application of Deep Learning Architectures for Satellite Image Time Series Prediction: A Review », Remote Sensing, vol. 13, n o 23,‎ 2021, p. 4822 ( lire en ligne ).
+↑ a et b Cruse, Holk; Neural Networks as Cybernetic Systems, 2nd and revised edition
+↑ Jeffrey L. Elman, « Finding Structure in Time », Cognitive Science, vol. 14, n o 2,‎ 1990, p. 179–211 ( DOI 10.1016/0364-0213(90)90002-E )
+↑ Michael I. Jordan, « Serial Order: A Parallel Distributed Processing Approach », Advances in Psychology, vol. 121,‎ 1 er janvier 1997, p. 471–495 ( ISBN 9780444819314, DOI 10.1016/s0166-4115(97)80111-2 )
+↑ (en) Hochreiter, Sepp, Bengio, Yoshua, Frasconi, Paolo et Schmidhuber, Jürgen, « Gradient Flow in Recurrent Nets: The Difficulty of Learning Long-Term Dependencies », A Field Guide to Dynamical Recurrent Networks, IEEE,‎ 2001
+↑ (en) Hochreiter, Sepp et Schmidhuber, Jürgen, « Long Short-Term Memory », Neural Computation, vol. 9, n o 8,‎ 1997, p. 1735-1780
+↑ (en) Gers, Felix, Schraudolph, Nicol et Schmidhuber, Jürgen, « Learning Precise Timing with LSTM Recurrent Networks », Journal of Machine Learning Research, vol. 3,‎ 2002, p. 115-143
+↑ Alex Graves, Santiago Fernández, Marcus Liwicki et Horst Bunke, « Unconstrained online handwriting recognition with recurrent neural networks », Proceedings of the 20th International Conference on Neural Information Processing Systems, Curran Associates Inc., nIPS'07,‎ 3 décembre 2007, p. 577–584 ( ISBN 978-1-60560-352-0, lire en ligne, consulté le 18 avril 2024 )
+↑ (en) Schmidhuber, Juergen, « Deep Learning: Our Miraculous Year 1990-1991 », 10 mai 2021.
+↑ (en) Kyunghyun Cho, Bart van Merrienboer, DZmitry Bahdanau et Yoshua Bengio, « On the Properties of Neural Machine Translation: Encoder-Decoder Approaches », arXiv,‎ 2014 ( arXiv 1409.1259, lire en ligne )
+↑ (en) Chung, Junyoung, Gulcehre, Caglar, Cho, KyungHyun et Bengio, Yoshua, « Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling », arXiv preprint arXiv:1412.3555,‎ 2014
+Annexes
+Liens externes
+(en) Understanding LSTM Networks, Blog de Christopher Olah
+Bibliographie
+(en) Ian Goodfellow, Yoshua Bengio et Aaron Courville, Deep Learning, MIT Press, 2016 ( ISBN 0262035618, lire en ligne ) [ détail des éditions ]
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+Portail de l'informatique théorique

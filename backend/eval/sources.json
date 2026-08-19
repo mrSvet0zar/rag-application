@@ -1,0 +1,115 @@
+{
+  "_comment": "Corpus d'évaluation. `revision` fige la version exacte de chaque article : tant qu'elle est renseignée, `python -m eval.fetch_corpus` reproduit octet pour octet le même corpus. Laisser `revision` à null pour épingler la révision courante au prochain fetch.",
+  "license": "CC BY-SA 4.0",
+  "source": "fr.wikipedia.org",
+  "articles": [
+    {
+      "title": "Intelligence artificielle",
+      "revision": 238719624
+    },
+    {
+      "title": "Apprentissage automatique",
+      "revision": 238070305
+    },
+    {
+      "title": "Apprentissage profond",
+      "revision": 238676225
+    },
+    {
+      "title": "Réseau de neurones artificiels",
+      "revision": 238233610
+    },
+    {
+      "title": "Transformeur",
+      "revision": 236964427
+    },
+    {
+      "title": "Attention (apprentissage automatique)",
+      "revision": 232445582
+    },
+    {
+      "title": "Traitement automatique des langues",
+      "revision": 236995932
+    },
+    {
+      "title": "Grand modèle de langage",
+      "revision": 238586790
+    },
+    {
+      "title": "Plongement lexical",
+      "revision": 235153616
+    },
+    {
+      "title": "Recherche d'information",
+      "revision": 236766491
+    },
+    {
+      "title": "Moteur de recherche",
+      "revision": 238179907
+    },
+    {
+      "title": "TF-IDF",
+      "revision": 222230514
+    },
+    {
+      "title": "Okapi BM25",
+      "revision": 232608659
+    },
+    {
+      "title": "Similarité cosinus",
+      "revision": 226021671
+    },
+    {
+      "title": "Précision et rappel",
+      "revision": 231342967
+    },
+    {
+      "title": "Méthode des k plus proches voisins",
+      "revision": 233253368
+    },
+    {
+      "title": "Réduction de la dimensionnalité",
+      "revision": 237356297
+    },
+    {
+      "title": "Analyse en composantes principales",
+      "revision": 235819609
+    },
+    {
+      "title": "Apprentissage supervisé",
+      "revision": 233572133
+    },
+    {
+      "title": "Réseau neuronal convolutif",
+      "revision": 238561970
+    },
+    {
+      "title": "Réseau de neurones récurrents",
+      "revision": 233572155
+    },
+    {
+      "title": "Validation croisée",
+      "revision": 214276325
+    },
+    {
+      "title": "Base de données",
+      "revision": 236300238
+    },
+    {
+      "title": "PostgreSQL",
+      "revision": 237862050
+    },
+    {
+      "title": "Structured Query Language",
+      "revision": 236319421
+    },
+    {
+      "title": "Python (langage)",
+      "revision": 237337117
+    },
+    {
+      "title": "Docker (logiciel)",
+      "revision": 238550846
+    }
+  ]
+}

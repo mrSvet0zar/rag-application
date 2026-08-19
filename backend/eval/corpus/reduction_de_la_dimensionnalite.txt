@@ -1,0 +1,146 @@
+# Réduction de la dimensionnalité
+
+Source : fr.wikipedia.org, révision 237356297
+
+Animation présentant la projection de points en deux dimensions sur les axes obtenus par analyse en composantes principales, une méthode populaire de réduction de la dimensionnalité
+La réduction de la dimensionnalité (ou réduction de (la) dimension ) est un processus étudié en mathématiques et en informatique, qui consiste à prendre des données dans un espace de grande dimension, et à les remplacer par des données dans un espace de plus petite dimension. Pour que l'opération soit utile il faut que les données en sortie représentent bien les données d'entrée.
+Définition et buts
+La réduction de dimensionnalité consiste à prendre des données dans un espace de grande dimension, et à les remplacer par des données dans un espace de plus petite dimension,.
+La raison pour laquelle une telle opération est utile est que les données de plus petites dimension peuvent être traitées plus rapidement. Cette opération est cruciale en apprentissage automatique par exemple, pour lutter contre le fléau de la dimension.
+Approches
+Les méthodes de réduction de la dimensionnalité peuvent être classifiées selon plusieurs critères, dont notamment:
+le type de fonction utilisée pour effectuer la réduction: l' extraction de caractéristiques consiste à créer de nouvelles variables, en appliquant aux variables d'entrée une transformation qui peut être linéaire ou non linéaire; la sélection de caractéristiques consiste à conserver un sous-ensemble des variables d'entrée, et peut donc s'interpréter comme un cas particulier de transformation linéaire;
+l'objectif recherché: certaines techniques cherchent à préserver les distances entre les données d'entrée, d'autres à approcher des propriétés globales des données d'entrée (préservation de la variance ); de nombreuses méthodes non linéaires reposent sur l'estimation d'une variété latente des données; enfin, certaines techniques cherchent à optimiser un critère qui ne dépend pas uniquement des données d'entrée, mais également d'un problème spécifique que l'on souhaite résoudre en utilisant les données réduites (prédiction d'une autre variable, approximation de modèle, etc.).
+Méthodes linéaires agnostiques aux données
+Un moyen simple pour réduire la dimension de données dans un espace euclidien est de les multiplier par une matrice aléatoire. Le lemme de Johnson-Lindenstrauss garantit pour tout entier, et tout entier,
+qu'il est possible de plonger tout ensemble de points en dimension tout en préservant les distances à une précision près.
+La dimension du plongement ne dépend ici pas de la dimension de l'espace initial.
+En pratique, cette propriété de préservation des distances peut être obtenue avec forte probabilité en considérant un plongement de la forme, où est une matrice aléatoire, par exemple avec des entrées gaussiennes i.i.d.
+Méthodes linéaires
+Sélection de caractéristique
+La sélection de caractéristique consiste à préserver un sous-ensemble des variables d'entrée. Il s'agit d'un cas particulier de transformation linéaire.
+Lorsque cette réduction est effectuée dans le but d'approcher ou d'étudier la variabilité d'une fonction cible, on parle d' analyse de sensibilité.
+Analyse en composantes principales
+L' analyse en composantes principales (ACP) est une méthode de réduction de la dimensionalité transformant des variables corrélées entre elles en nouvelles variables décorrelées entre elles. Les différentes composantes principales sont choisies successivement en maximisant la projection du nuage de points sur la composante, tout en étant orthogonales aux composantes précédentes. On calcule un taux de variance expliquée (en anglais, "explained variance ratio") pour chaque composante principale. On représente en général les résultats de la variance expliquée à l'aide d'un diagramme en barres, ou en projetant les variables sur un cercle de corrélation.
+Méthodes non linéaires
+Algorithme t-SNE
+L' algorithme t-SNE (anglais pour t-distributed stochastic neighbor embedding ) est une méthode de réduction de la dimensionalité modélisant les similarités entre les paires de points dans chaque dimension par des lois de probabilité. Cette méthode est basée sur SNE, une méthode antérieure de réduction de la dimensionalité. Le « t » de la méthode tire son nom de la loi de Student utilisée pour modéliser les similarités entre les points en petite dimension. t-SNE a obtenu de bons résultats sur des espaces de grande dimension comme MNIST.
+UMAP
+UMAP (anglais pour Uniform Manifold Approximation and Projection ) est une autre méthode de réduction de la dimensionalité similaire à t-SNE, mais qui base sa théorie sur la géométrie riemannienne (l'étude des variétés riemanniennes).
+Analyse en composantes principales à noyau
+L'analyse en composantes principales à noyau consiste à effectuer une analyse en composantes principales après avoir appliqué une transformation non linéaire aux données, permettant de les plonger dans un espace de Hilbert à noyau reproduisant.
+Auto-encodeur
+Un auto-encodeur est un réseau de neurones artificiels permettant de représenter des fonctions de la forme où et sont tous les deux des perceptrons multicouches. Le réseau est entraîné afin de minimiser une fonction de perte de la forme, ainsi après entraînement le vecteur peut s'interpréter comme une représentation de faible dimension contenant l'information la plus pertinente afin de reconstruire l'entrée.
+Processus de diffusion
+Des méthodes plus récentes, qui se basent sur un processus de diffusion, permettent de réduire la dimension des données tout en préservant leurs structures locales et globales.
+Méthodes supervisées
+Régression inverse par tranches
+La régression inverse par tranches consiste à effectuer une régression d'une variable expliquée à partir d'une variable explicative en utilisant un modèle de la forme où avec et une fonction non linéaire.
+L'opération est donc une transformation linéaire réduisant la dimension de la variable explicative, mais la différence avec les approches présentées ci-dessus est que le paramètre est choisi en utilisant des observations jointes des deux variables.
+Notes et références
+↑ a b et c Christian Gagné, « Réduction de la dimensionnalité », sur Université de Laval
+↑ Hassan Chouaib, Sélection de caractéristiques: méthodes et applications (thèse de doctorat), 2011 ( lire en ligne ).
+↑ W. B. Johnson, J. Lindenstrauss, « Extensions of Lipschitz mappings into a Hilbert space », Contemporary mathematics, vol. 26, t. 189‑206,‎ 1984
+↑ (en) Laurens van der Maaten, « Visualising data using t-SNE », Journal of Machine Learning Research, vol. 9,‎ 2008, p. 2579-2605 ( lire en ligne [PDF] )
+↑ (en) Leland McInnes, « UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction », arXiv,‎ 2020 ( lire en ligne [PDF] )
+↑ (en) Kevin R. Moon, David van Dijk, Zheng Wang, Scott Gigante et al., « Visualizing structure and transitions in high-dimensional biological data », Nature Biotechnology, vol. 37, n o 12,‎ décembre 2019, p. 1482–1492 ( ISSN 1546-1696, PMID 31796933, PMCID PMC7073148, DOI 10.1038/s41587-019-0336-3, lire en ligne, consulté le 15 avril 2022 )
+Articles connexes
+Réduction non linéaire de la dimensionnalité
+Analyse de sensibilité
+Lemme de Johnson-Lindenstrauss
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+Portail de l'informatique théorique
+Portail des probabilités et de la statistique
+Portail des données

@@ -1,0 +1,207 @@
+# Recherche d'information
+
+Source : fr.wikipedia.org, révision 236766491
+
+Si ce bandeau n'est plus pertinent, retirez-le. Cliquez ici pour en savoir plus.
+Cet article ne cite pas suffisamment ses sources ( mars 2010 ).
+Si vous disposez d'ouvrages ou d'articles de référence ou si vous connaissez des sites web de qualité traitant du thème abordé ici, merci de compléter l'article en donnant les références utiles à sa vérifiabilité et en les liant à la section « Notes et références ».
+La recherche d' information ( RI ) est le domaine qui étudie la manière de retrouver des informations dans un corpus. Celui-ci est composé de documents d'une ou plusieurs bases de données, qui sont décrits par un contenu ou les métadonnées associées. Les bases de données peuvent être relationnelles ou non structurées, telles celles mises en réseau par des liens hypertexte comme dans le World Wide Web, l' internet et les intranets. Le contenu des documents peut être du texte, des sons, des images ou des données.
+La recherche d'information est historiquement liée aux sciences de l'information et à la bibliothéconomie qui visent à représenter des documents dans le but d'en récupérer des informations, au moyen de la construction d’ index. L’ informatique a permis le développement d’outils pour traiter l’information et établir la représentation des documents au moment de leur indexation, ainsi que pour rechercher l’information. La recherche d'information est aujourd'hui un champ pluridisciplinaire, intéressant même les sciences cognitives.
+La recherche d'information sur le web à l'aide d'un moteur de recherche est une technique de l'information et de la communication, désormais massivement adoptée par les usagers. Précédemment, durant l’ Antiquité, des historiens connus tels que Thucydide et Hérodote ne pouvaient utiliser ce genre de méthode de recherche. Pour Hérodote, le plus important était de se rendre sur place, utiliser ses sens tels que l’ouïe et la vue. Puis, il commençait à mener son enquête en s’informant et se renseignant auprès du peuple. À l’inverse, Thucydide avait pour méthode d’écouter les rumeurs. Il consignait par écrit ces faits et avait pour but de les faire perdurer dans le temps pour en faire profiter les générations futures.
+Introduction
+Recherche d'information sans ordinateur.
+Avec l'apparition des premiers ordinateurs est née l'idée d'utiliser des machines pour automatiser la recherche d'information dans les bibliothèques. Celle-ci a notamment été popularisée en 1945 par Vannevar Bush dans son célèbre article « As We May Think ».
+Les premiers systèmes utilisés par des bibliothèques permettent d'effectuer des recherches booléennes, c’est-à-dire des recherches où la présence ou l'absence d'un terme dans un document conduit à la sélection du document. Ces recherches nécessitent plusieurs intermédiaires et surtout de gros moyens: il faut tout d'abord créer une nomenclature permettant de décrire l'ensemble des documents puis sélectionner, pour chaque document du corpus, les mots-clés permettant de le décrire. Une telle description par mots-clés ( indexation matière ) nécessite une grande expertise de la part du bibliothécaire, ses connaissances devant être suffisantes pour non seulement choisir les mots-clés reflétant au mieux le contenu d'un document, mais aussi pour choisir les termes permettant de le distinguer au sein du fonds complet. Cette même connaissance est, de plus, partiellement nécessaire au moment de la recherche, lorsqu'il s'agit de « traduire » une question, plus ou moins précise, en un ensemble de mots-clés. Ce processus d'indexation, essentiellement manuel, est de plus insuffisamment exhaustif et précis. Il se peut par exemple que pour des problèmes de synonymie, certains documents répondant à la question d'un utilisateur puissent ne pas être retrouvés.
+La description manuelle étant un processus lent ne garantissant pas de bons résultats, des recherches ont été menées pour extraire automatiquement la description d'un document à partir de son contenu. Dès les années 1970, des expériences ont montré que les techniques automatiques pouvaient fonctionner correctement sur des corpus de quelques milliers de documents. L'utilisation grandissante des logiciels de traitement de texte, et par là même la mise à disposition de quantités de plus en plus importantes de textes directement interprétables par l'ordinateur va alors entraîner le développement rapide des modèles de RI. Ces deux aspects, l'indexation et la recherche sont au cœur des problèmes abordés par la RI. L'indexation et la recherche ont très rapidement évolué d'une modélisation booléenne de la recherche (un terme représente ou ne représente pas le document dans le cas de l'indexation, un document
+répond ou ne répond pas à la question) à des modèles vectoriels ou probabilistes.
+La pertinence d'un document pour une question dans des modèles qui sont basés sur une représentation imprécise des documents et des questions s'exprime dans ce type de modèles de RI sous la forme d'un score. Ce score ne permet plus une validation automatique des systèmes de RI.
+En effet, pour la question « le document doit contenir le mot chèvre et élevage », un document contenant les mots « chèvre » et « élevage » est une bonne réponse, contrairement à un document qui ne les contient pas.
+Lorsque la question devient « le document doit avoir pour thème l'élevage des chèvres », un document qui parle de soin des chèvres sans utiliser le mot « élevage » sera une bonne réponse, mais aura un score moins important qu'un document qui parle directement de l'élevage des chèvres.
+Il est donc impossible de prouver qu'un système de RI est performant puisque le score rend vague la notion de bonne réponse: un document répond plus ou moins bien à une question.
+La notion de pertinence d'un document pour une question émerge donc en même temps que les premiers systèmes de RI, avec les premières mesures permettant de comparer les différents résultats renvoyés par les systèmes de RI. Les premières mesures, encore largement employées aujourd'hui, sont
+la précision, le rappel, le bruit et le silence:
+un système de RI est très précis si presque tous les documents renvoyés sont pertinents;
+un système de RI a un bon rappel s'il renvoie la plupart des documents pertinents du corpus pour une question;
+un système de RI est bruyant s'il renvoie trop de documents dont peu sont pertinents;
+un système de RI est silencieux s'il ne renvoie pas assez de documents pertinents.
+En général, les systèmes de recherche d'informations s'appuient sur ces différentes mesures et effectuent un équilibre entre eux. Il est possible, par exemple, d'affiner les requêtes à l'aide d'opérateurs de recherche complexes.
+Des problématiques connexes se sont aussi greffées autour de la RI. Parmi les plus courantes et les plus utiles, l'interaction avec l'utilisateur permet d'obtenir progressivement des documents de plus en plus pertinents. Certains se sont ensuite essayés à simuler cette interaction, ou au moins une partie, en proposant des techniques permettant « d'enrichir » la question — en ajoutant par exemple des termes qui n'étaient pas dans la question originale. Cette technique est connue sous le nom d'expansion de requête.
+De la recherche documentaire proprement dite, le domaine évolue vers des tâches proches, comme la classification qui permet de regrouper entre eux des documents ayant des thématiques proches, le classement qui a pour but de classer les documents dans un ensemble de catégories prédéfinies. Puis, à mesure que la notion de document et d'unité d'information devient plus floue, les tâches d'extraction d'information et de résumé automatique apparaissent. Actuellement, le domaine regroupe plusieurs thématiques de recherche et évolue avec l'apparition de nouveaux types de corpus, de documents et de besoins d'utilisateurs. Les conférences TREC et SIGIR donnent un aperçu de la diversité des recherches menées aujourd'hui dans le domaine général de la RI.
+Précision de vocabulaire
+Rayonnage de bibliothèque.
+Le Vocabulaire de la documentation (Paris, ADBS, 2004) distingue la recherche d'information de la recherche de l'information:
+recherche d'information: « Ensemble des méthodes, procédures et techniques permettant, en fonction de critères de recherche propres à l’ usager, de sélectionner l’information dans un ou plusieurs fonds de documents plus ou moins structurés »;
+recherche de l'information: « Ensemble des méthodes, procédures et techniques ayant pour objet d’extraire d’un document ou d’un ensemble de documents les informations pertinentes ».
+Au sens large, la recherche d'information inclut deux aspects:
+l' indexation des corpus;
+l'interrogation du fonds documentaire ainsi constitué.
+Ces deux aspects sont néanmoins très intimement liés en pratique, la manière d'indexer limitant ou influençant les possibilités de rechercher.
+Composantes
+Prétraitements
+La première phase en recherche d'information est d'établir ces techniques permettant de passer d'un document textuel à une représentation exploitable par un modèle de RI. Cette transformation est scindée en deux étapes, constituant l' indexation des documents:
+il faut extraire d'un texte un ensemble de descripteurs. Ceux-ci sont la plupart du temps (après suppression des mots grammaticaux par exemple, reconnaissance des entités nommées ) l'ensemble des termes qui apparaissent dans un document, souvent transformés ( lemmatisation,...);
+à l'aide de ce jeu de descripteurs, il est possible de représenter le document par un vecteur dans l'espace des termes. Il est également possible d'utiliser des connaissances a priori sur la façon dont les termes sont répartis dans les documents suivant leur importance.
+Recherche
+Une fois les documents transformés, il est possible de rechercher ceux qui répondent le mieux à une question d'un utilisateur et d'utiliser des modèles capables d'interagir avec l'utilisateur afin d'améliorer petit à petit les réponses du système de RI au cours d'une session — l'utilisateur indiquant à chaque fois les documents pertinents pour sa question. Ces indications peuvent aussi servir à améliorer globalement le fonctionnement du système de RI.
+Il est également important de noter que la recherche documentaire n'est pas un acte isolé dans le temps. En effet, une session de recherche documentaire peut être assimilée à une situation d'apprentissage « spiralaire », qui permet l'accès à de nouvelles connaissances au fur et à mesure de la RI. [ réf. souhaitée]
+Mesures
+En RI, la mise au point des modèles passe par une phase expérimentale qui suppose l'utilisation de métriques qui ont pour but de permettre la comparaison des modèles entre eux ou la mise au point de leurs paramètres. Ces mesures supposent connus un jeu de questions et les réponses pertinentes dans un corpus donné.
+Deux concepts simples, à savoir le rappel (proportion de documents pertinents renvoyés par le système parmi tous ceux qui sont pertinents) et la précision (proportion des documents pertinents parmi l'ensemble de ceux renvoyés par le système), ont été étendus pour permettre
+une analyse fine des performances de système de RI.
+Prise en compte de l'utilisateur
+L'utilisateur étant à l'origine du besoin en information, il est apparu nécessaire de compléter la simple requête par des informations supplémentaires en provenance de l'utilisateur. Le retour de pertinence est une approche qui peut par exemple prendre en compte un jugement de pertinence sur les documents présentés à l'utilisateur à l'issue de sa recherche. L'objectif est donc pour le système de savoir quels sont, parmi les documents présentés, ceux qui répondent vraiment au besoin de l'utilisateur.
+La pertinence dans la recherche d'information
+La pertinence système
+À la fin des années 1950 dans les pays anglo-saxons, les chercheurs s'inscrivant dans le courant de l’ information retrieval utilisent le concept de pertinence pour évaluer la performance des systèmes informatiques d'enregistrement, de stockage et de recherche automatisée.
+Calvin Mooers est le fondateur de ce courant de recherche. Alors qu'auparavant les concepts véhiculés en bibliothèque s'apparentaient plus à la reproduction de gestes professionnels ( bibliothéconomie ), il introduit le travail sur les mots-clés en s'appuyant sur les travaux de Vannevar Bush et Ranganathan. Il parle alors d'« utilité » de l'information.
+Hans Peter Luhn réfléchit également à la mécanisation de la recherche d'information et met au point l'indexation automatique et les résumés automatisés. Le système doit rechercher le nombre d'occurrences des mots dans un texte, mais aussi prendre compte de la structure générale du document (en supposant que la place des mots corresponde à leur importance) ou encore la mise en forme du texte. Ce processus voit très vite ses limites être atteintes et la pertinence des documents proposés après une requête n'est pas forcément satisfaisante.
+Allen Kent et son équipe de chercheurs ont employé le terme pertinent interest pour la première fois en 1955. Ce terme désigne les documents vers lesquels diriger l'attention des usagers.
+A cette époque, le terme de relevance est préféré à celui de pertinence, semblant plus adapté pour un contexte de recherche informatisée. Cependant, on note la tentative d'introduction de l'humain avec les premiers questionnements sur le concept de « jugement de pertinence ».
+Brigitte Simonnot, enseignante chercheuse en SIC au CREM (Centre de Recherche sur les Médiations) de l'Université de Lorraine, affirme que la théorie de la pertinence admet une hiérarchie de contextes d'interprétations avec pour chacun plusieurs hypothèses. Elle définit la pertinence comme « une relation entre une hypothèse et un contexte » qui sont ordonnés selon deux dimensions: l'effet de l'hypothèse (croyances et connaissances d'un sujet) et l'effort que doit fournir un individu pour intégrer l'hypothèse dans ses connaissances.
+Avec la recherche sur le web, on voit une légère amélioration de la pertinence avec l'apparition du Dublin Core et la mise en place de métadonnées pour décrire un document à l'aide de méta-descripteurs. Cependant la pratique de référencement abusif ( spamdexing ) détourne l'utilisation des métadonnées de leur fonction initiale et permet d'augmenter l'audience d'un site.
+La mesure de la pertinence système correspond au taux de rappel, qui évalue la proportion de documents pertinents dans l'ensemble des ressources présentes dans une collection, et au taux de précision, qui estime la proportion de documents pertinents dans les documents retrouvés.
+La pertinence usager
+Au bout de quelques décennies, le concept de pertinence a connu des avancées. Avec l information seeking ou l information searching, la grande entreprise d'identification des critères du début des années 1990 a relancé l'intérêt vers la pertinence usager. Nicole Boubée, docteure en SIC et spécialiste des pratiques informationnelles et médiatiques, présente particulièrement pour cette période les travaux de Schamber qui aboutissent à deux postulats: la pertinence est de nature subjective et elle est un processus dynamique. Ce travail innovant met en avant l' empirie [Quoi?] et l'approche qualitative. Schamber et ses collègues déclinent plusieurs critères de pertinence comme la validité, l'émotion que l'information suscite, la clarté...
+La pertinence est définie ici comme un jugement porté par l'utilisateur sur l'information qu'il trouve au regard de ses besoins. Pour être jugée pertinente, l’information doit lui être utile pour la production qu'il vise, lui apporter des connaissances nouvelles et, enfin, être facile à comprendre et à exploiter.
+Depuis les années 1980, la démarche documentaire a fait l'objet de nombreuses études qui adoptaient une approche cognitiviste. Selon Carol Kuhlthau, six phases se succèdent dans un processus de recherche:
+L'initialisation: durant laquelle un individu prend conscience de ses lacunes, ce qui le pousse à entamer un processus de recherche d'information.
+La sélection: l'individu commence à cerner le sujet avec un questionnement lui permettant de définir une problématique.
+L'exploration: l'individu essaye de trouver des informations sur son sujet.
+La formulation: l'individu se focalise sur certaines des informations trouvées lors de la phase précédente, ce qui lui permet de clarifier ses pensées et de se focaliser sur l'objet de sa recherche.
+La collecte: cette étape correspond à la recherche et la sélection des informations les plus pertinentes.
+La présentation: consiste en la mise en forme des informations recueillies afin de conclure la recherche.
+La qualité d'une recherche dépend essentiellement de la formulation de la requête. Cette étape n'est pas forcément maîtrisée par la majorité des utilisateurs du web qui ne connaissent pas toutes les fonctions de recherche ou les opérateurs booléens.
+La pertinence dans le paradigme orienté usages
+Avec l'essor de la recherche d'information sur le web, se sont développées de nouvelles pratiques évaluatives. D'autres critères de pertinence ont vu le jour notamment grâce aux travaux interdisciplinaires des chercheurs en sciences de l'information et en psychologie cognitive. C'est ainsi que Nicole Boubée et André Tricot placent de nouveaux concepts cognitivistes dans la recherche d'information pour dépasser le clivage pertinence subjective / pertinence objective: critères de déduction logique, d'induction, de sérendipité mais aussi critères se rapportant au contexte de recherche de l'usager (adéquation avec la tâche, réponses émotionnelles... ).
+Pour un individu, la pertinence d'une information est instable. Elle varie selon les étapes de la recherche, selon la reformulation possible de la problématique et des questions, puis des requêtes. De même, une information peut devenir pertinente quand le seul critère d'intelligibilité n'est pas respecté dans un premier temps, mais qu'il le devient après la lecture d'informations pertinentes qui permettent des améliorations dans la compréhension. Le contexte est donc un élément important pour cette notion.
+Stefano Mizzaro quant à lui, met en avant la complexité et la diversité des types de pertinence. Il la définit comme une relation entre deux entités: collection de documents et utilisateurs. Il distingue trois dimensions de la pertinence:
+Le domaine du sujet, qui renvoie au champ disciplinaire auquel il appartient.
+La tâche, qui correspond à l'activité réalisée par l'utilisateur avec les documents trouvés.
+Le contexte, définit comme tout ce qui n'est pas lié au domaine du sujet ou à la tâche (comme les connaissances de l'utilisateur ou le temps et l'argent disponible pour la recherche).
+Brigitte Simonnot conteste l’idée que la pertinence d’un document dépend seulement du besoin de l’utilisateur. Il doit prendre en compte l’état des connaissances sur le sujet de sa recherche, mobiliser ses savoirs faire en termes de lecture par exemple mais aussi le temps dont il dispose. Tous ces éléments impacteront le choix des documents. Quand l’utilisateur fait une recherche sur le Web, son niveau de lecture et de connaissances n’est pas demandé. Ce problème est en partie pallié par l’avènement de portails regroupant un grand nombre de ressources ciblées pour des publics particuliers (exemple des portails numériques.)
+La pertinence dans l'ère numérique
+Avec l'avènement du numérique, la définition concrète de la pertinence arrive à épuisement. On parle plutôt désormais de l'influence plus ou moins forte de tel ou tel critère. Le concept de pertinence est également utilisé par les industries du contenu et des services du web (Google, Facebook...).
+Niels Kressens parle du pouvoir de contrôle que ces industries exercent: il ne s'agit plus d'amplifier le contrôle évaluatif des usagers mais bien de contrôler leur pouvoir de sélection. La pertinence se définit alors selon des critères techniques objectivés: l'occurrence des mots-clés de la requête dans les pages web, par exemple, avec un traitement algorithmique spécifique à chaque moteur de recherche qui renvoie à des critères subjectifs et/ou économiques (habitudes de navigation de l'individu, placement de résultats par une entreprise, etc.).
+Van Couvering, professeure et spécialiste en médias et communications, affirme que ces industries du contenu ont pris pour base des travaux académiques sur la pertinence issus des sciences de l'information. La pertinence de l'information laisse place à la pertinence du service lui-même: c'est l'adhésion du service qui importe.
+Brigitte Simonnot met en avant la pertinence du choix de l'outil, avec l’idée qu’il existe un grand nombre de moteurs de recherche sur le web. L'utilisateur doit donc choisir le bon outil lors d’une démarche de recherche documentaire, cependant dans la plupart des cas il choisit l'outil qu'il connait le mieux sans nécessairement prendre en compte ses besoins et les spécificités du moteur de recherche.
+Finalement, les industries du web procèdent de la même manière que l'information retrieval en réduisant le travail et l'effort de l'usager dans ses pratiques informationnelles. Ainsi, il n'a plus besoin de comprendre comment les systèmes fonctionnent pour les utiliser efficacement. Certains chercheurs orientent désormais leurs travaux vers des critères de crédibilité Web qui supplanteraient le concept de pertinence.
+Le terme de jugement de pertinence
+C'est dans un contexte de recherches informationnelles automatisées que le concept de jugement de pertinence voit le jour. Cette introduction subjective pourrait surprendre mais elle s'explique, selon Tefko Saracevic (scientifique de l'information), par le fait que le jugement par l'humain est nécessaire pour améliorer ou concevoir un objet dans une science de nature ingénieure où le test est indispensable. L’expérience a prouvé aussi que pour améliorer un système d'information, la méthode la plus appropriée est de faire juger celui-ci par l'humain.
+Nicole Boubée émet des critiques sur ce concept qu'elle estime encore trop associé aux systèmes calculatoires. Elle reprend les différents critères de jugement de pertinence et leur composition et remarque que l'idée d'apporter de l'humain dans un concept forgé par les sciences exactes n'a pas véritablement abouti puisqu'on continue de raisonner en termes de "degré de pertinence", de "poids de chaque critère". Or juger de la pertinence d'une information ne peut pas se résoudre à l'application de simples règles en appliquant des critères sous forme de procédure codifiée.
+Un autre problème réside dans la proximité de certains termes avec celui de pertinence: crédibilité, utilité, fiabilité, confiance...
+On assiste actuellement à la naissance d'un troisième type de jugement qui suspend toute perspective humaine: le jugement algorithmique imposé par les industries de contenu. Il nécessite désormais d'analyser les travaux alliant médias, technologies et pratiques sociales sous l'angle de l'éthique dans le sens de "favoriser la capacité émancipatrice des publics et usagers".
+Groupes sur la recherche d'information
+Historiquement, la recherche d'information était faite dans les bibliothèques avec le protocole Z39.50 qui était maintenu par la bibliothèque du Congrès. Ces travaux se poursuivent avec les protocoles SRW ( Search / Retrieve via Web Services ) et SRU ( Search / Retrieve via URL ).
+Il existe un important groupe de travail (SIGIR, Special Interest Group for Information Retrieval ) dans l'association internationale ACM (Association for Computing Machinery), ainsi qu'une série de conférences et de campagnes d'évaluation organisées à ce sujet par le NIST: TREC (Text REtrieval Conference), qui ont traité, au fil des années, aussi bien des aspects multimédia de la recherche d'information que des problématiques liées au peuplement de bases de connaissances à partir du Web, de la recherche d'information en domaine de spécialité ou sur des plateformes de micro-blogging. Au niveau francophone, la communauté scientifique est notamment représentée par l'ARIA (Association Francophone de Recherche d'Information et Applications) et les conférences annuelles CORIA.
+Modèles mathématiques de RI
+Categorisation des modèles de RI (depuis l'entrée allemande, source originale ).
+Les modèles de RI peuvent être classés selon deux aspects. La première dimension est le modèle mathématique considéré:
+l' approche ensembliste qui considère que l'ensemble des documents s'obtient par une série d'opérations (intersection, union et le passage au complémentaire). Le langage de requête SQL1 correspond à cette approche dite aussi de logique de premier niveau;
+l' approche algébrique (ou vectorielle) qui considère que les documents et les questions font partie d'un même espace vectoriel;
+l' approche probabiliste qui essaie de modéliser la notion de pertinence.
+La seconde dimension prend en compte les liens pouvant exister entre les termes.
+Modèles cognitifs de RI
+Rechercher de l’information met en jeu pour l’usager toute une série de processus cognitifs ( lecture, résolution de problème, savoirs procéduraux et savoirs déclaratifs, etc.) [réf. nécessaire]. Pour exposer le plus clairement possible ce qui se passe lors d’une RI, plusieurs chercheurs spécialisés (soit dans le domaine de l’information, soit dans le domaine des sciences cognitives) dans la recherche d’information ont proposé des modèles. Ceux-ci sont censés rendre compte de ce qui se passe concrètement et, pour certains, permettre de tirer des hypothèses sur l’origine cognitive des actes perceptibles.
+Modèle de recherche d'information
+Alors que la recherche d’information est une activité humaine ancienne, son étude s’est développée surtout avec l’apparition des systèmes de recherches documentaires informatisés [réf. nécessaire].
+Un premier modèle est celui de l’Information Retrieval.
+Dans ce modèle, on trouve trois éléments: l’usager, l’ensemble de documents et, entre les deux, le spécialiste de l’information ( bibliothécaire ou documentaliste ) qui peut interroger la base de données. Ce modèle a été conçu alors que les usagers n’avaient pas encore accès à des catalogues informatisés. Le bibliothécaire utilisait pour indexer les documents un langage fermé, de type thesaurus, et interrogeait le système en réutilisant ce même langage. Ainsi, l’usager ayant un besoin d’information, il l’exprime sous forme de question et le bibliothécaire transcrit celle-ci en requête pour interroger un système documentaire. Les documents, de l’autre côté, ont été représentés, c’est-à-dire transcrits en notices bibliographiques et indexés. Entre la requête et l’ index du système s’opère alors un appariement qui fournira une réponse.
+Critiques
+Ce modèle a été critiqué pour deux raisons majeures. La première est le flou de certains termes utilisés (surtout la notion de besoin d’information) et le manque d’explication sur les connexions qui se font (comment passe-t-on d’un besoin à une question puis à une requête?)
+La seconde tient à l’idée que le besoin d’information reste le même durant tout le travail. Or, toutes les études prouvent que la question initiale évolue très souvent lors d’une recherche.
+Toutefois, ces critiques, même si elles sont valables dans l’absolu, sont amoindries par le fait qu’elles portent sur des points qui ne sont pas primordiaux dans ce système. Le but de ce modèle est de décrire concrètement ce qui se passe. L’aspect cognitif (et en l’occurrence, le besoin d’information), même s’il apparaît, n’est pas essentiel. C’est pour cela que les termes sont flous. De plus, même si le questionnement de l’usager va évoluer en même temps que son travail progresse, lorsqu’il interroge le bibliothécaire, à chaque fois il commence un nouveau cycle de recherche. Dès lors, la critique la plus forte serait de dire que ce modèle est maintenant obsolète, car l’intermédiaire entre le sujet et les documents n’existe plus.
+Représentation en pivot
+Plutôt que de voir la RI comme une confrontation entre un usager et un système de recherche d’information, des chercheurs et en premier lieu Marchionini, ont proposé une représentation de la RI en insistant sur ce qui leur semble le cœur de celle-ci, à savoir la définition du problème selon quatre étapes:
+l’ énonciation du problème;
+le choix de la source d’information;
+l’extraction de l’information;
+l’examen des résultats.
+Chacune de ses actions entraîne des modifications dans la définition du problème. L’interaction entre l’usager et le système de recherche puis les documents entraîne une réévaluation des besoins et des savoirs. Dans cette représentation, la recherche n’est pas linéaire.
+Évolution de cette représentation
+Depuis les premiers travaux de Marchionini et sa première modélisation, les données ont changé, surtout avec le développement de l’accès à internet. Une reformulation de cette représentation met au centre le sujet. Celui-ci a un besoin d’information qui est flou, mais qui est perçu. Ceci va donc entraîner une série d’actions, dont l’interrogation d’une base de données. Cette interrogation se fonde sur la représentation du fonctionnement de l’interface. Les résultats vont faire évoluer la représentation du problème et entraîner d’autres actions.
+Représentations basées sur l’exploration
+Une bibliothèque à explorer.
+Le postulat de base de ces représentations est que l’usager n’a pas une idée claire de ce qu’il cherche [réf. nécessaire]. Ce sont les réponses apportées par le système et les lectures de documents qui vont permettre à l’individu de préciser son besoin d’information. Bates a qualifié ce modèle de « berrypicking ». L’usager va cueillir des informations dans les documents comme on cueille des baies. Il passe d’un document à l’autre, se laisse mener par ce qu’il trouve et réfléchit, limite sa recherche au fur et à mesure, selon ce qu’il trouve.
+Critiques
+La critique principale [réf. nécessaire] insiste sur le fait que même si une recherche d’information est erratique, le sujet a malgré tout une idée de ce qu’il cherche. Cette question première sera peut-être profondément modifiée par la suite, mais il n’en demeure pas moins qu’une recherche part toujours de l’expression, plus ou moins claire, d’un manque.
+O’Day et Jeffries font évoluer la comparaison de la RI et la cueillette de baies et préfèrent voir la RI comme une course d’orientation. L’usager ne sait pas vraiment ce qu’il cherche, mais il est en mesure de juger de ce qui est intéressant pour lui au regard des résultats. De plus, chaque document trouvé mène à une décision concernant la suite du travail. Enfin, si des représentations partielles apparaissent lors de la recherche, une représentation générale du but à atteindre perdure.
+À côté de ces travaux qui visent plus à décrire la suite des actions qui constituent une recherche d’information, d’autres, issus de la psychologie cognitive, considèrent la RI comme une forme particulière de résolution de problèmes. La psychologie cognitive s’est intéressée à ce sujet et certaines théories ont été transférées dans l’étude de la RI.
+Construction d’un espace de recherche
+Lors d’une résolution de problème, le sujet doit élaborer une représentation de la situation de départ, une représentation du but et une représentation des actions licites. Dans une RI, cela correspondrait à l’écriture d’une question dans un système donné (situation de départ), à l’affichage de notices (situation-but), et à une liste des actions qui doivent être entreprises pour passer du besoin à la satisfaction. Ces trois représentations individuelles constituent l’espace de recherche. Ce dernier est à distinguer de l’espace de la tâche qui est virtuel et correspond à une résolution parfaite du problème.
+Critiques
+Ce modèle a été critiqué pour plusieurs raisons [réf. nécessaire]. À l’origine, la notion de résolution de problème s’appuyait sur des problèmes simples (ex. la tour de Hanoï). La situation de départ, la situation-but et les opérations licites étaient facilement exprimables. Dès que les problèmes sont des problèmes complexes et ouverts, la situation de départ et la situation-but ne sont plus aussi apparentes. La RI tient de ce type de tâche, ouverte et complexe. Au moment où commence une recherche, il est difficile de décrire complètement tous les éléments qui vont constituer la situation de départ. En effet, définir son besoin d’information est déjà une tâche complexe. La situation-but est encore plus malaisée à présenter. Selon Chen et Dhar [réf. nécessaire] « la situation-but est constituée par l’affichage de notices de documents se rapportant à la question posée et adaptés à l’usager destinataire de l’information. », mais cela ne dit pas comment se fait le lien entre la question et l’affichage de notices (est-ce que cet affichage est valable?) ni surtout comment on peut affirmer que ces documents sont adaptés.
+Enfin, La liste des actions autorisées est peu maîtrisée par les utilisateurs [ réf. souhaitée] d’un système de recherches. Plus l’usager est novice, moins il sait ce que le système accepte comme interrogation ou quelles sont les méthodes pour écrire une équation de recherche permettant de limiter le bruit et le silence. Or, ce respect des actions autorisées est une nécessité dans la présentation canonique de la résolution de problèmes.
+Outils de recherche d'information
+DataparkSearch
+Lucene
+Mnogosearch
+Xapian
+Zettair
+Weblab intégrant Apache Solr
+Reportlinker
+Notes et références
+↑ En anglais information retrieval, IR.
+↑ B. François, Cours d’initiation à la culture antique, 5ème secondaire générale, Athénée Royal Vauban, Charleroi, 2019, p. 3-5.
+↑ a et b (en) Amit Singhal, « Modern Information Retrieval: A Brief Overview », Bulletin of the IEEE Computer Society Technical Committee on Data Engineering, vol. 24, n o 4,‎ 2001, p. 35–43 ( lire en ligne )
+↑ Aurélie Picton, Cécile Fabre, Didier Bourigault, « Méthodes linguistiques pour l’expansion de requêtes », sur cairn.info, 2008.
+↑ (en) Kent Allen, Berry M., Luehrs F. U. et Perry J. W., Machine Literature searching: VIII. Operational criteria for designing information retrieval systems. Journal of the Association for Information Science and Technology, 1955, p. 93-101, vol. 6, n°2
+↑ a b c d e et f Boubée, Nicole, « Épistémologie des concepts de jugements de pertinence et de jugements de "crédibilité web". », Les cahiers du numérique [en ligne],,‎ 2018 ( lire en ligne [P. 113-138])
+↑ a b c d et e SIMMONOT, Brigitte, « De la pertinence à l'utilité en recherche d'information: le cas du Web », Recherches récentes en sciences de l'information - convergences et dynamiques, actes du colloque international MICS-LERASS; ADBS Éditions, collection Sciences de l'information, série Recherches et Documents,‎ mars 2002, p. 393-410 (< Https://www.researchgate.net/publication/37759528_De_la_pertinence_a_l'utilite_en_recherche_d'information_le_cas_du_Web > )
+↑ a et b (en) Schamber L, Eisenberg M. B. et Nilan M. S., « A re-examination of relevance: toward a dynamic, situational definition », Information processing and management,‎ 1990, vol. 26, n°6, p. 755-776
+↑ a b et c A.P.D.E.N. (ensemble d'associations académiques des collèges, lycées et établissements d'enseignement supérieur publics), « Pertinence sur Wikinotions », sur Wikinotions infodoc (consulté le 22 novembre 2022 ).
+↑ (en) Kuhlthau C. C., « Accomodating the User's information search process: challenges for information retrieval system designers, », Bulletin of the American Society for Information Science, vol. 25, n° 3.,‎ 1999 ( lire en ligne )
+↑ Boubée Nicole et Tricot André, Qu'est-ce que rechercher l'information?, Villeurbanne, Presse de l'ENSSIB, 2010
+↑ (en) Mizzaro S., « Relevance: the whole history », Journal of the American Society for Information Science,
+vol. 48, n°9,‎ 1997, p.810-832. ( lire en ligne )
+↑ (en) Kerssens Niels, « When search engines stopped being human: menu interfaces and the rise of the ideological nature of algorithmic search », Internet Histories,‎ 2017, vol. 1, n°3, p.219-237
+↑ (en) Warner Julian, Human information retrieval, Cambridge, MIT Presse, 2010
+↑ (en) Rieh Soo Young et Danielson D.R., « Credibility: A multidisciplinary framework », Annual review of information science and technology,‎ 2007, vol. 41, n° 1, p. 307-364
+↑ (en) Saracevic Tefko, The Notion of Relevance in Information Science: Everybody knows what relevance is. But, what is it really?, Morgan & Claypool Publishers, 2017
+↑ (en) Hillis Ken, Petit M. et Jarrett K., Google and the Culture of Search, Routledge, 2012
+↑ Dominik Kuropka, Modelle zur Repräsentation natürlichsprachlicher Dokumente: Ontologie-basiertes Information-Filtering-und-Retrieval mit relationalen Datenbanken, Logos Verlag Berlin, 2004 ( ISBN 3-8325-0514-8 et 978-3-8325-0514-1, OCLC 57729599, présentation en ligne, lire en ligne )
+↑ M.-R. Amini, É. Gaussier, Recherche d'Information - Applications, modèles et algorithmes, Eyrolles, 2013, pp. I-XIX, 1-233, Paris
+↑ Yves CHIARAMELLA, Philippe MULHEM, La recherche d'information. De la documentation automatique à la recherche d'information en contexte, Paris, Lavoisier, Document numérique, vol. 10, no. 1, 2007, 152 p. ( ISBN 9782746219694, lire en ligne ), p. 11-38
+↑ a et b (en) M. Agosti et P. G. Marchetti, « User navigation in the IRS conceptual structure through a semantic association function. », The Computer Journal, vol. 35, n o 3,‎ juin 1992, p. 194–199 ( DOI 10.1093/comjnl/35.3.194 )
+↑ Gary Marchionini, Information seeking in electronic environments, Cambridge University Press, 1995 ( ISBN 0-521-44372-5 ) [ détail des éditions ]
+↑ Zhang, J. and Marchionini, G. 2004. Coupling browse and search in highly interactive user interfaces: a study of the relation browser++. In Proceedings of the 4th ACM/IEEE-CS Joint Conference on Digital Libraries (Tucson, AZ, USA, June 7–11, 2004). JCDL '04. ACM, New York, NY, 384-384.
+↑ Nicole Boubée, « La recherche d’information à travers les publics », dans Nicole Boubée, André Tricot, Qu'est-ce que rechercher de l'information?, Villeurbanne, Presses de l’enssib, 2010 ( ISBN 9782375460412, < http://books.openedition.org/pressesenssib/806 )
+↑ O’Day, V. L., and Jeffries, R. (1993). Orienteering in an information landscape: How information seekers get from here to there. In Proceedings of ACM/InterCHI ’93
+Voir aussi
+Articles connexes
+Moteur de recherche
+Système de recherche d'information
+Optimisation pour les moteurs de recherche
+Bibliothèque numérique
+Système d'information géographique
+Modèles cognitifs de la recherche d'information
+Bruit et silence
+Fouille de textes
+Humanités numériques
+Infolisme
+Évaluation de l'information
+Liens externes
+BnF ( données )
+LCCN
+GND
+Japon
+Espagne
+Israël
+Tchéquie
+Medical Subject Headings
+Britannica
+Den Store Danske Encyklopædi
+Store norske leksikon
+M.-R. Amini, É. Gaussier, Recherche d'Information - Applications, modèles et algorithmes, Eyrolles, 2013, pp. I-XIX, 1-233, Paris
+M.Ihadjadene, Les systèmes de recherche d'informations: modèles conceptuels, 2004, Hermes, Paris
+M.Ihadjadene, Méthodes avancées pour les SRI, Hermes, 2004, Paris
+B. Grau, J.P. Chevallet, La recherche d'informations précises, Hermes, 2007, Paris
+M. Boughanem et J. Savoy, Recherche d'information: état des lieux et perspectives, Hermes, 2008, Paris
+P. Bellot, Recherche d'information contextuelle, assistée et personnalisée, 2011, Hermes, Paris
+T. Joachims, Information Retrieval and Language Technology (vidéos), 2003, Cornell University
+R. Ferber, Information Retrieval - Suchmodelle und Data-Mining-Verfahren für Textsammlungen und das Web, 2003, dpunkt.verlag, ( ISBN 3-89864-213-5 )
+C. J. Van Rijsbergen, Information Retrieval (2d edition), 1979, ( ISBN 0-408-70929-4 ),
+Baeza-Yates, Ricardo A. and Ribeiro-Neto, Berthier, "Modern Information Retrieval", 1999, ( ISBN 0-201-39829-X )
+Christopher D. Manning and Raghavan Prabhakar and Hinrich Schütze, An introduction to information retrieval, 2008
+Salaün, Jean-Michel. et Arsenault, Clément, 1962-, Introduction aux sciences de l'information, Presses de l'Université de Montréal, 2009, 235 p. ( ISBN 978-2-7606-2114-5 et 2760621146, OCLC 320584406, lire en ligne ), p. 101-158
+Sciences de l’information et bibliothèques
+Portail de l’informatique

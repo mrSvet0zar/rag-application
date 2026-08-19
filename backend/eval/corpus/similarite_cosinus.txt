@@ -1,0 +1,21 @@
+# Similarité cosinus
+
+Source : fr.wikipedia.org, révision 226021671
+
+Pour les articles homonymes, voir Similarité et Cosinus.
+La similarité cosinus donne la similarité de deux vecteurs à n dimensions en déterminant le cosinus de leur angle. Ce score est fréquemment utilisé en fouille de textes.
+Soit deux vecteurs A et B, le cosinus de leur angle θ s'obtient en prenant leur produit scalaire divisé par le produit de leur norme:.
+La valeur d'un cosinus, donc celle calculée ici pour cos θ, est comprise dans l'intervalle [-1,1]. La valeur de -1 indique des vecteurs opposés, la valeur de 0 des vecteurs indépendants (orthogonaux) et la valeur de 1 des vecteurs colinéaires de coefficient positif. Les valeurs intermédiaires permettent d'évaluer le degré de similarité.
+Dans le cas d'une comparaison de documents textuels
+La similarité cosinus est fréquemment utilisée en tant que mesure de ressemblance entre deux documents. Il pourra s'agir de comparer les textes issus d'un corpus dans une optique de classification (regrouper tous les documents relatifs à une thématique particulière), ou de recherche d'information (dans ce cas, un document vectorisé est constitué par les mots de la requête et est comparé par mesure de cosinus de l'angle avec des vecteurs correspondant à tous les documents présents dans le corpus. On évalue ainsi lesquels sont les plus proches).
+La mesure d'angle entre deux vecteurs ne pouvant être réalisée qu'avec des valeurs numériques, il faut imaginer un moyen de convertir les mots d'un document en nombres. On partira d'un index correspondant aux mots présents dans les documents puis on attribuera à ces mots des valeurs. La forme la plus simple pourrait être de compter le nombre d'occurrences des mots dans les documents.
+En règle générale, pour mesurer finement la similarité entre des séquences de texte, les vecteurs sont construits d'après un calcul de type TF-IDF ( term frequency–inverse document frequency ) qui permet d'estimer l'importance d'un mot par rapport au document qui le contient, en tenant compte du poids de ce mot dans le corpus complet.
+Indice de Tanimoto
+L'indice de Tanimoto reprend cette idée dans le cas des attributs binaires. Il se définit comme suit:.
+Voir aussi
+Indice et distance de Jaccard
+Références
+↑ Singhal, Amit (2001). "Modern Information Retrieval: A Brief Overview". Bulletin of the IEEE Computer Society Technical Committee on Data Engineering 24 (4): 35–43.
+↑ Elsa Negre, Comparaison de textes: quelques approches..., avril 2013 ( lire en ligne )
+↑ Dávid Bajusz, Anita Rácz et Károly Héberger, « Why is Tanimoto index an appropriate choice for fingerprint-based similarity calculations? », Journal of Cheminformatics, vol. 7,‎ 20 mai 2015 ( ISSN 1758-2946, PMID 26052348, PMCID 4456712, DOI 10.1186/s13321-015-0069-3, lire en ligne, consulté le 20 février 2020 )
+Portail des probabilités et de la statistique

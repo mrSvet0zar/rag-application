@@ -1,0 +1,749 @@
+# Apprentissage profond
+
+Source : fr.wikipedia.org, révision 238676225
+
+Partie de
+Méthode d'apprentissage automatique ( d )
+Personne clé
+Michal Valko ( d )
+modifier - modifier le code - modifier Wikidata
+L' apprentissage profond ou apprentissage en profondeur (en anglais: deep learning ) est un sous-domaine de l’ intelligence artificielle qui utilise des réseaux neuronaux artificiels composés de nombreuses couches pour résoudre des tâches complexes. Cette méthode permet à la machine d'apprendre des représentations hiérarchisées directement à partir des données, sans qu'un expert humain n'ait à expliciter les règles.
+Bien que ses fondations théoriques remontent aux années 1940, son développement a connu plusieurs cycles de désillusion, appelés « hivers de l'IA ». Il connaît un essor fulgurant à partir des années 2010 grâce au développement de la puissance de calcul des cartes graphiques, à l'abondance des données ( Big Data ) et des investissements privés et publics importants, notamment de la part des géants du Web.
+Cette technologie est à l'origine d'avancées majeures dans des domaines variés comme la vision par ordinateur ou le traitement automatique du langage naturel. Cependant son déploiement présente des défis techniques et sociétaux, les modèles profonds souffrent souvent d'un manque d'explicabilité (modèle « boîte noire ») et nécessitent des ressources énergétiques colossales pour l'entraînement et le déploiement des modèles les plus massifs. Leur développement pose aujourd'hui des questions éthiques et juridiques allant de litiges relatifs à la propriété intellectuelle à la prolifération de la désinformation ( hypertrucage ).
+Définition
+Pour créer un modèle informatique prédictif de manière classique, on modélise les données par extraction de caractéristiques, cette dernière étant souvent effectuée au moyen d'un algorithme. Selon la méthode de l'apprentissage profond, (ou apprentissage en profondeur ), l'extraction de caractéristiques résulte elle-même d'un processus d'apprentissage: on parle donc d' apprentissage de représentations. En pratique, la machine apprend des représentations hiérarchisées, souvent dans les couches cachées de réseaux de neurones artificiels, chacune étant définie à partir de représentations plus simples [ DLB2016 1 ]. Ces représentations étant apprises directement à partir des données, cela évite que les humains aient à expliciter la manière de les construire au moyen d'un algorithme. Si l'on représente la manière dont ces représentations sont construites les unes à partir des autres au moyen d'un graphe, celui-ci contiendra de multiples couches, justifiant ainsi la qualification de « profond ».
+Un exemple de réseau de neurones avec une seule couche cachée (en bleu) entre les couches d'entrée (en vert) et de sortie (en jaune).
+Les premières couches d'un réseau neuronal convolutif identifient des motifs relativement simples, comme des contours, et les couches suivantes identifient des motifs de plus en plus complexes.
+Histoire
+Le développement de l'apprentissage profond s'inscrit dans l'histoire de l'intelligence artificielle, marquée par des cycles d'enthousiasme et de désillusion, souvent appelés « hivers de l'IA » [ DLB2016 2 ],. Dès les années 1940, les travaux fondateurs de la cybernétique posent les bases de la modélisation du cerveau comme système de traitement de l'information. Dans la continuité de cette approche émergent, dans les années 1980, les modèles connexionnistes ne reposant pas sur des règles logiques explicites, mais sur des réseaux de neurones artificiels capables d'apprendre à partir de données.
+L'apprentissage profond constitue « la troisième vague » de ce courant. Il se distingue par l'utilisation de réseaux comportant de nombreuses couches cachées capables d'apprendre des représentations hiérarchisées de l'information, des plus simples aux plus abstraites. Ce développement est rendu possible par la convergence de trois facteurs: les avancées algorithmiques, la disponibilité massive de données et la puissance de calcul accrue. À partir des années 2010, le domaine est radicalement transformé par cette approche et son impact dépasse aujourd'hui le seul champ de la recherche académique.
+Les fondations (des années 1940 aux années 1980)
+La modélisation mathématique du fonctionnement d'un neurone est proposée en 1943 par Warren McCulloch et Walter Pitts. Cette modélisation n'explique pas comment entraîner un neurone à accomplir une tâche particulière mais pose les bases du perceptron de Frank Rosenblatt, inventé en 1957. Le perceptron reprend le fonctionnement du neurone McCulloch-Pitts en le dotant d'une règle d'apprentissage qui lui permet de déterminer automatiquement les poids synaptiques pour une tâche de classification supervisée; ce dernier permet de trouver une solution lorsque le problème est linéairement séparable.
+Beaucoup de problèmes courants ne sont pas linéairement séparables, ainsi le perceptron est incapable de déterminer si deux entrées binaires sont différentes ou non (problème du XOR ). Cette limite est explicitée en 1969 par Seymour Papert et Marvin Minsky. Cette démonstration décourage les financements et marque le début du premier hiver de l'intelligence artificielle qui durera une décennie.
+Malgré le désintérêt pour la discipline, le chercheur japonais Kunihiko Fukushima invente en 1975 le cognitron et cinq ans plus tard le néocognitron. Ce dernier, inspiré des neurosciences et du fonctionnement du cortex visuel, repose sur une première couche entraînée de manière non supervisée et une seconde subissant un entraînement supervisé; il inspirera les premiers réseaux de neurones convolutifs.
+En 1986, David Rumelhart, Geoffrey Hinton et Ronald Williams redécouvrent et popularisent l'algorithme de la rétropropagation du gradient et l'appliquent à l'apprentissage des réseaux de neurones. Cette avancée permet d'entraîner des modèles ayant des structures diverses et un nombre de couches cachées arbitraire (bien que le problème de la disparition et de l'explosion du gradient tempère cette ambition); cet algorithme demeure encore aujourd'hui au cœur de l'entraînement des réseaux profonds.
+Les réseaux de neurones (années 1990-2000)
+Les premiers réseaux de neurones à rencontrer un usage commercial permettent la reconnaissance optique de caractères, comme la lecture des chèques. Ils traitent efficacement les images grâce à l'architecture développée par Yann LeCun au cours des années 1990: les réseaux de neurones convolutifs. LeNet-5 en est un exemple; il traite 10 à 20 % des chèques aux États-Unis à la fin de la décennie et contient déjà plusieurs ingrédients qui feront le succès de cette architecture comme la convolution ou le sous-échantillonnage (pooling).
+En parallèle du développement des réseaux convolutifs, en 1997, Sepp Hochreiter et Jürgen Schmidhuber développent l'architecture LSTM qui permet de traiter plus efficacement les séquences temporelles.
+Malgré leurs premiers succès, les réseaux de neurones sont délaissés au profit des machines à vecteurs de support (SVM). Ces dernières, contrairement aux réseaux de neurones, apportent de meilleures garanties mathématiques et demandent moins de données tout en restant plus faciles à entraîner.
+Le terme « apprentissage profond » se popularise après les travaux de Geoffrey Hinton sur les réseaux de croyance profonds, cette appellation permettant aux chercheurs de s'affranchir de la mauvaise réputation des réseaux de neurones, notamment auprès de certaines revues. En 2007, un atelier sur l'apprentissage profond au NIPS marque l'adoption de ce terme dans la littérature spécialisée.
+L'essor de l'apprentissage profond (années 2010)
+L'événement qui marque le début de l'adoption de l'apprentissage profond est la publication du modèle AlexNet en 2012. Conçu par Alex Krizhevsky, Ilya Sutskever et leur directeur de thèse Geoffrey Hinton, le modèle obtient des performances de pointe lors de la campagne d'évaluation internationale ImageNet de reconnaissance d'images. Le réseau surpasse largement le deuxième et popularise ainsi l'apprentissage profond en vision par ordinateur et l'utilisation des cartes graphiques pour l'apprentissage.
+Cette réussite et le développement des réseaux profonds qui la suivent sont le résultat de la convergence de trois facteurs [ DLB2016 3 ]:
+les avancées théoriques, notamment dues à Geoffrey Hinton, qui a proposé des approches de pré-entraînement permettant d'apprendre des architectures profondes [ DLB2016 4 ];
+le phénomène de Big data, qui a permis la mise à disposition de volumes colossaux de données numériques, nécessaires pour apprendre les architectures profondes [ DLB2016 5 ];
+l'avènement du GPGPU, consistant à effectuer des calculs génériques et utiles pour l'apprentissage d'architectures profondes au moyen de processeurs graphiques qui accélèrent les calculs [ DLB2016 6 ]. Cette évolution a été permise grâce à l'écosystème logiciel CUDA proposé par Nvidia.
+Les avancées permises par les réseaux profonds ne se limitent pas au domaine du traitement d'images: en 2015, le programme AlphaGo, un modèle neuronal profond qui a été entraîné à jouer au jeu de go grâce à l' apprentissage par renforcement, bat le champion européen Fan Hui par cinq parties à zéro. En mars 2016, le même programme bat le champion du monde Lee Sedol par 4 parties à 1. Ces matches ont eu un fort retentissement dans le grand public, en particulier en Asie.
+Les modèles les plus performants utilisent une architecture de réseaux de neurones convolutifs, mais en 2017 l'architecture sur laquelle repose la plupart des grands modèles de langage actuels est publiée: l'architecture transformeur. À la conférence NIPS, des chercheurs travaillant pour la plupart dans des équipes de recherche de Google proposent l'architecture transformeur, qui servira peu de temps après de base aux grands modèles de langage. L'année suivante, l'entreprise propose le modèle BERT, fondé sur la partie « encodeur » du transformeur. Ce modèle de langage permettra une amélioration significative des performances en traitement automatique des langues.
+La même année, OpenAI propose le modèle GPT, qui est pour sa part fondé sur la partie « décodeur » des transformeurs; en 2019 OpenAI, après avoir initialement refusé de le faire, publie GPT-2, un modèle de fondation capable de générer du texte tout en communiquant sur ses craintes quant aux utilisations potentielles du modèle.
+En 2020, l'entreprise Google DeepMind dévoile AlphaFold 2 à l'occasion de la compétition CASP, qui met au défi des équipes de chercheurs à travers le monde de résoudre le problème du repliement des protéines. Ce défi, vieux de 50 ans et considéré comme critique pour la recherche médicale, consiste à concevoir un algorithme capable de prédire la structure tridimensionnelle d'une protéine à partir de sa chaîne d' acides aminés. Le modèle d'apprentissage profond proposé par DeepMind s'est montré si performant que le problème du repliement des protéines a été considéré comme résolu,. En 2022, AlphaFold a permis de prédire la structure de plus de 200 millions de protéines, soit plus de 1000 fois le nombre de protéines dont la forme a été identifiée expérimentalement jusque-là.
+En réaction à l'adoption massive de l'apprentissage profond, en 2018, Yann Le Cun, Yoshua Bengio et Geoffrey Hinton sont récipiendaires du prix Turing « Pour les percées conceptuelles et techniques qui ont fait des réseaux neuronaux profonds une composante essentielle de l'informatique ». En 2024, Geoffrey Hinton et John Joseph Hopfield sont co-lauréats du prix Nobel de physique pour « leurs découvertes fondamentales et inventions qui ont rendu possible l' apprentissage automatique et les réseaux de neurones artificiels ».
+Le nombre grandissant d'applications de l'apprentissage profond lui permet de toucher un public de plus en plus large et la nécessité de développer des modèles toujours plus performants ouvre la voie aux développements de modèles de plus en plus massifs.
+Les grands modèles et l'IA générative (années 2020)
+Avant l'année 2020, les modèles les plus massifs dépassent rarement quelques centaines de millions ou le milliard de paramètres (la version la plus lourde de GPT-2 comporte 1,5 milliard de paramètres). L'augmentation de la taille des modèles va permettre l'essor des modèles génératifs profonds, passant de simples curiosités à des technologies utilisées au quotidien par une partie de la population.
+L'entreprise OpenAI dévoile en 2020 une avancée dans le traitement du langage naturel avec le modèle GPT-3 reposant sur l'architecture transformeur et constitué de 175 milliards de paramètres. Le modèle n'est pas accessible au grand public mais ceux ayant pu interagir avec lui le présentent comme un système capable d'imiter l'être humain de manière convaincante, relançant ainsi les débats autour du test de Turing. OpenAI étudie notamment les capacités du modèle à apprendre des tâches nouvelles à partir d'un nombre restreint d'exemples (parfois un seul). Cette démonstration illustre la pertinence des lois d'échelle pour les modèles de langage selon lesquelles, en augmentant le nombre de paramètres ainsi que la quantité de données d'entraînement, on obtient des modèles plus performants et dotés de capacités nouvelles émergentes.
+Parallèlement, OpenAI dévoile en 2021 DALL-E, un outil reposant sur l'architecture transformeur et un auto-encodeur variationnel discret, capable de générer une image correspondant à la description textuelle fournie par l'utilisateur. Le modèle est alors disponible dans une démo en ligne, mais seules les descriptions fournies par l'entreprise sont autorisées. Cette preuve de concept ouvre la voie aux outils de génération d'images grand public qui arriveront l'année suivante.
+L'année 2022 marque un changement significatif pour les modèles de génération d'image fondés sur l'apprentissage profond avec l'avènement des modèles de diffusion qui supplantent les GAN pour la génération d'image conditionnée. L'arrivée successive de Midjourney (alors utilisable par le biais du logiciel Discord ), DALL-E 2 puis finalement Stable Diffusion, trois outils reposant sur les modèles de diffusion, marque le tournant où ces technologies deviennent utilisables par le grand public. Rapidement, des polémiques quant à l'usage ou la création de ces modèles éclatent, notamment lorsque Jason Allen remporte le prix de la meilleure peinture numérique à la Colorado State Fair, grâce à une œuvre créée avec Midjourney, ce qui suscite un débat sur la légitimité de ces outils dans la création artistique; d'autre part certains artistes s'inquiètent de violations de la propriété intellectuelle lors de l'entraînement de ces modèles.
+Finalement, le passage à l'année 2023 est marqué par l'arrivée fin novembre 2022 de ChatGPT qui annonce la démocratisation des agents conversationnels (ou chatbots). OpenAI donne accès au grand public à son outil fondé sur le modèle GPT-3.5 ajusté pour se comporter comme un agent conversationnel grâce à l' apprentissage par renforcement à partir de retours humains (RLHF),. En février, Meta dévoile l'existence de son propre modèle de langage, LLaMA, qui n'est pas accessible publiquement. Une semaine après l'annonce, le modèle fait l'objet d'une fuite et se retrouve téléchargeable par le plus grand nombre par le biais d'un torrent partagé sur le forum 4chan; cet événement motive le développement d'un écosystème de modèles de langage à poids ouverts.
+À partir de 2023, les modèles de langage évoluent vers la multimodalité, qui autorise la manipulation de données non textuelles comme des images. Le modèle Gemini développé par Google est considéré comme un pionnier dans cette approche,, grâce à la multimodalité native: l'image est traitée de la même manière que le texte grâce aux Vision-Transformers,. Parallèlement à ces avancées, en septembre 2024, les modèles évoluent vers l'adoption de l'apprentissage par renforcement avec des récompenses vérifiables (RLVR). Contrairement aux modèles qui génèrent une réponse immédiate, cette approche permet au modèle d'écrire des chaînes de raisonnement avant de générer sa réponse finale. Cette évolution est présentée comme la naissance des modèles de raisonnement. Les premiers modèles disponibles pour le grand public entraînés avec cette méthode sont OpenAI o1 suivi de DeepSeek R1,. Ces modèles atteignent des performances inédites au benchmark ARC-AGI qui mesure les capacités d'un modèle à mobiliser des concepts abstraits,.
+Défis techniques et évolutions architecturales
+Fonctions d'activation et leur dérivée. La dérivée de la fonction sigmoïde tend rapidement vers 0 en s'éloignant de l'origine. La fonction ReLU résout ce problème pour les valeurs positives, mais sa dérivée est strictement nulle pour les entrées négatives, contrairement aux fonctions Leaky ReLU ou SiLU.
+Généralement, les réseaux de neurones apprennent à accomplir une tâche grâce à l' algorithme de la descente de gradient ou à ses variantes; l'objectif est de garantir la bonne convergence et la stabilité de cet algorithme, malgré la profondeur des réseaux de neurones.
+L'un des obstacles qui a retardé l'adoption des réseaux de neurones profonds est le problème de la disparition ou de l'explosion du gradient. Ce phénomène se produit lorsque le signal diminue ou augmente à chaque couche du réseau, aboutissant soit à un réseau incapable d'apprendre (modifier la valeur d'un paramètre n'a presque aucune influence sur la sortie du réseau); soit à un apprentissage très instable (la moindre modification infime de la valeur d'un paramètre change radicalement la sortie). Un autre défi est la vitesse effective de l'apprentissage qui peut être différente pour les différents paramètres, par exemple avec des couches apprenant plus vite que d'autres à cause de l'instabilité du gradient.
+Avant l'entraînement, les paramètres du réseau de neurones sont initialisés avec une valeur aléatoire. Pour atténuer l'instabilité du gradient, Xavier Glorot et Yoshua Bengio proposent une nouvelle manière d'initialiser ces poids, inspirée de l'initialisation de LeCun. L'initialisation de Glorot consiste à adapter la distribution de probabilité de chaque paramètre en fonction de la taille de la couche précédente et celle de la suivante, dans l'objectif de conserver la variance du signal constante au travers du réseau. Cette méthode s'applique aux couches utilisant les fonctions d'activation tangente hyperbolique, logistique ou softmax. Pour ReLU et ses variantes, on privilégie l'initialisation de He et l'initialisation de LeCun pour SeLU.
+La fonction d'activation est une fonction non linéaire placée à la suite d'une couche linéaire dans un réseau de neurones. À l'origine, dans le but d'imiter le fonctionnement des neurones biologiques, la fonction logistique (ou sigmoïde) était privilégiée. Cette dernière est une fonction saturante, ce qui signifie que les valeurs qu'elle peut prendre sont bornées et que sa dérivée tend vers 0 en s'éloignant de l'origine, son usage contribue à la disparition du gradient. Cette faiblesse a motivé le passage à des fonctions non saturantes comme ReLU (définie par ). Son usage est à l'origine du problème de la mort des ReLU (ou neurones morts), motivant ainsi le développement de variantes comme Leaky ReLU, SiLU, Swish, les couches SwiGLU, etc,.
+Une initialisation des paramètres adaptée stabilise le début de l'entraînement mais n'offre pas de garantie au-delà. Par conséquent, des méthodes de normalisation entre les couches du réseau ont été développées; l'objectif est de garantir tout au long de l'entraînement que la variance du signal reste maîtrisée d'une couche à l'autre. Pour cela, les approches comme la normalisation par lot ou la normalisation par couche mesurent et corrigent la moyenne et la variance des activations d'un neurone à l'échelle d'un lot ou d'une couche,. Dans l'optique d'alléger le réseau, une approximation de la normalisation par couche ignorant la moyenne est parfois utilisée: RMSNorm (acronyme de Root Mean Square Normalization).
+Pour uniformiser la vitesse d'apprentissage des différents paramètres du réseau, des alternatives à la descente de gradient stochastique sont utilisées, comme Adam ou RMSProp. Ces derniers adaptent le pas d'apprentissage pour les différents paramètres du réseau en fonction de la norme du gradient.
+Dans un réseau profond, il peut être difficile pour l'information de traverser toutes les couches. Les connexions résiduelles (ou skip connections ) facilitent la communication en connectant une couche de moindre profondeur avec une couche plus profonde. On combine le vecteur en sortie de la première avec celui en entrée de la seconde; en général avec une concaténation ou une addition (on parle alors de connexion résiduelle). Ce dernier terme a donné son nom à une architecture de réseau convolutif très utilisée en reconnaissance d'image: ResNet.
+Principales architectures et paradigmes d'apprentissage
+Perceptron multicouche
+Après le perceptron simple, le perceptron multicouche (ou MLP pour Multilayer Perceptron ) fut l'une des premières architectures de réseau de neurones utilisées; cette dernière est constituée de différentes couches densément connectées. Chaque neurone d'une couche réalise une combinaison linéaire des sorties de tous les neurones de la couche précédente puis applique une fonction d'activation non linéaire au résultat. Cette architecture ne fait pas de supposition particulière sur la nature des données, elle a un faible biais inductif et est flexible.
+L'utilisation des perceptrons multicouches a initialement été motivée par le théorème d'approximation universelle qui affirme qu'un perceptron possédant une seule couche cachée suffisamment large peut approximer n'importe quelle fonction continue.
+Pour des problèmes complexes, il faut généralement un réseau large (pour ne pas sacrifier d'informations) et profond; cette combinaison de facteurs accroît considérablement le nombre de paramètres du réseau, c'est pour cela que les perceptrons multicouches sont peu utilisés seuls pour des modèles très profonds ou traitant des données de haute dimension. Cependant, ils sont parfois utilisés comme briques pour d'autres architectures comme les transformeurs et les réseaux convolutifs et certaines architectures cherchent à les moderniser pour des applications dans divers domaines comme la reconnaissance d'image (Gated MLP, MLP Mixer, etc),.
+Réseaux neuronaux convolutifs
+L'intérêt suscité par l'apprentissage profond depuis plus d'une décennie s'explique par sa capacité à produire des modèles de pointe. L'événement déclencheur de cette dynamique est le développement du réseau neuronal convolutif AlexNet en 2012 lors du concours ImageNet grâce à l'utilisation de GPU.
+Animation illustrant comment un noyau de convolution traite une image pour produire une carte de caractéristiques de même dimension.
+Les réseaux convolutifs sont particulièrement adaptés au traitement d'images. Ils reposent sur l'utilisation de l'opération de convolution, les paramètres appris durant l'entraînement correspondant aux coefficients du noyau de convolution. Cette opération peut être vue comme un neurone traitant une petite portion de l'image (par exemple, un champ récepteur de 3 x 3 pixels): ce dernier est décalé d'un pas dans toutes les directions. Les différentes sorties forment une nouvelle image appelée carte de caractéristiques. Ces calculs sont réalisés en parallèle pour bénéficier de la puissance des accélérateurs matériels (cartes graphiques ou autres composants dédiés). Plusieurs neurones peuvent être utilisés pour produire plusieurs cartes de caractéristiques. Le nombre total de paramètres du réseau ne dépend plus de la taille de l'image mais de la taille des noyaux, du nombre de cartes de caractéristiques et de la profondeur de l'image (le nombre de canaux; par exemple, une image en couleur contient trois canaux: RVB),.
+Les réseaux convolutifs empilent les couches de convolution, les fonctions d'activation et les couches de pooling. Le pooling sert à réduire la résolution spatiale de l'image, il permet au réseau de traiter l'image à différentes échelles en commençant au niveau du pixel jusqu'aux structures macroscopiques. Différentes techniques de pooling sont utilisées, comme le MaxPooling (on conserve les pixels les plus lumineux) ou l'AveragePooling (on conserve la luminosité moyenne); un pas supérieur à un dans une convolution peut être utilisé en substitution au pooling. Lorsque l'objectif est de générer une image, les couches de convolution transposées ou de suréchantillonnage peuvent être utilisées pour augmenter la résolution, elles peuvent être vues comme les opérations inverses des couches de pooling,,.
+Certains modèles de classification comme AlexNet utilisent les couches de convolution et de pooling comme simple prétraitement de l'image avant d'utiliser un perceptron multicouche classique, d'autres reposent uniquement sur les couches de convolution: les réseaux entièrement convolutionnels.
+L'efficacité des réseaux convolutifs s'explique par un biais inductif fort. Contrairement aux perceptrons multicouches, les réseaux convolutifs font des hypothèses fortes sur les données: l'information est locale et invariante par translation (la nature d'un objet ne change pas en fonction de sa position). L'architecture contraint le réseau à exploiter ces propriétés, il n'a pas besoin de les redécouvrir. Ainsi, le nombre de paramètres entraînables est réduit et l'apprentissage est plus rapide et efficace,.
+La principale critique à l'encontre des réseaux convolutifs est leur consommation de mémoire durant l'entraînement: pour calculer les gradients durant l'apprentissage avec l'algorithme de rétropropagation du gradient, la conservation de toutes les cartes de caractéristiques est obligatoire. Pour des images haute résolution, la quantité de mémoire nécessaire peut être importante lorsque le nombre de cartes de caractéristiques augmente,.
+Réseaux de neurones récurrents
+L'entraînement d'un perceptron multicouche nécessite des entrées de tailles constantes; les réseaux de neurones récurrents, à l'instar des transformeurs, peuvent traiter des entrées de tailles variables. Les réseaux de neurones récurrents sont particulièrement adaptés aux traitements de séries temporelles ou au traitement du langage naturel, bien que les transformeurs soient aujourd'hui prédominants dans ce domaine,.
+Schéma du fonctionnement d'un réseau de neurones récurrents à une couche. À gauche, le réseau utilise un état caché d'une itération à l'autre. À droite se trouve une version dépliée du réseau: le même neurone apparait plusieurs fois, comme plusieurs neurones partageant les mêmes paramètres.
+Le réseau de neurones est utilisé itérativement sur les différents éléments composant la séquence d'entrée, ou pour générer les différents éléments de la séquence de sortie. Dans une couche de neurones récurrents, en plus de l'entrée habituelle, les neurones reçoivent un vecteur d'état caché provenant de l'itération précédente. Ce vecteur agit comme une mémoire résumant l'information utile; lorsqu'il y a plusieurs couches de neurones récurrents, chaque couche a sa propre capacité de mémorisation. Le nombre de paramètres du modèle est indépendant de la longueur des séquences, puisque les mêmes poids sont utilisés pour traiter les différents éléments de la séquence,.
+Les réseaux de neurones récurrents peuvent oublier certaines informations contenues dans les séquences d'entrée: les capacités de mémorisation du modèle sont limitées par la taille des vecteurs d'état. Pour accroître les capacités de mémorisation, les LSTM ( long short-term memory ) utilisent deux vecteurs de mémoire à court et long terme (état caché et état de la cellule). Ces derniers permettent d'accroître les capacités de mémorisation du modèle et de capturer des dépendances sur des centaines, voire des milliers de pas dans certaines tâches. Les GRU (gated recurrent units), une version simplifiée des LSTM, permettent d'obtenir des performances similaires dans la plupart des tâches avec un unique vecteur de mémoire tout en étant plus faciles à entraîner,,.
+Pour entraîner un réseau de neurones récurrents, une couche à différentes itérations est traitée de manière analogue à deux couches distinctes partageant leurs poids: le réseau est déplié; un même paramètre entrainable traite l'information autant de fois qu'il n'y a d'itérations. C'est pourquoi les réseaux de neurones récurrents sont particulièrement sensibles aux problèmes de disparition et d'explosion du gradient, de plus leur nature séquentielle les rend plus difficiles à paralléliser. L'entraînement est plus lent et moins efficace que d'autres architectures comme les transformeurs,.
+Architecture transformeur
+Schéma d'un modèle Transformer ayant une architecture encodeur-décodeur.
+Les réseaux de neurones récurrents sont limités par leur capacité de mémorisation et par leur difficulté à mettre en relation des informations éloignées de la séquence. Les transformeurs permettent de traiter des séquences de longueurs variables en outrepassant ces limitations; c'est sur cette architecture que reposent la plupart des grands modèles de langages actuels,.
+Les transformeurs fonctionnent grâce aux couches d'attention; ces dernières ont besoin que chaque élément de la séquence ( token ) soit transformé en un vecteur de taille fixe. Trois transformations linéaires sont appliquées indépendamment à chaque token (les mêmes matrices sont utilisées pour tous les éléments); les résultats correspondent à la clé notée « K », la requête notée «Q» et la valeur notée «V». Les clés et les requêtes permettent, grâce au produit scalaire, de calculer une matrice qui contient pour chaque couple de tokens la quantité d'information qui doit être transmise de l'un à l'autre. Cette information associée aux valeurs permet d'actualiser chaque token de la séquence,.
+Ce processus correspond au fonctionnement d'une tête d'attention: l'attention multitête exécute plusieurs têtes en parallèle et concatène les résultats. La couche d'attention permet d'actualiser l'information contenue dans un élément en le contextualisant grâce à l'information contenue dans les autres éléments de la séquence. La faiblesse du mécanisme d'attention est qu'il est aveugle à la position des éléments; la couche d'attention décrite précédemment est incapable de différencier les phrases « Le chat mange la souris » et « La souris mange le chat ». Pour combler cette lacune, un encodage positionnel intègre dans chaque vecteur l'information de la position de l'élément correspondant,.
+Dans un transformeur, les couches d'attention sont suivies de couches de normalisation et d'une couche entièrement connectée (appliquée indépendamment à chaque token), ce bloc est répété plusieurs fois pour accroître la profondeur. Originellement, l'architecture transformeur est une architecture encodeur-décodeur. L'encodeur analyse une séquence d'entrée dans son ensemble et le décodeur utilise les informations de l'encodeur pour générer itérativement une séquence de sortie. Plusieurs modèles n'utilisent que l'un ou l'autre de ces composants, comme les modèles de langage qui n'utilisent que le décodeur,,.
+La principale faiblesse du transformeur est sa complexité quadratique, conséquence du calcul du score d'attention entre tous les couples d'éléments. En contrepartie, cette architecture montre de très bonnes performances dans divers domaines et, contrairement aux réseaux de neurones récurrents, ses calculs sont parallélisables, bénéficiant ainsi de la puissance apportée par les cartes graphiques,.
+Autoencodeurs
+Schéma d'un autoencodeur. La couche cachée contraint l'encodeur à compresser l'entrée vers un espace à trois dimensions.
+Contrairement aux architectures comme les réseaux de neurones convolutifs, les réseaux de neurones récurrents ou les transformeurs, qui sont des architectures générales de calcul, l'autoencodeur est plutôt défini par un cadre d'apprentissage visant un objectif précis (il peut par ailleurs utiliser les architectures énumérées précédemment).
+L'objectif de l'autoencodeur est d'apprendre la fonction identité afin d'extraire une représentation utile des données; pour que cet apprentissage ne soit pas trivial, des contraintes sont appliquées au réseau. Elles peuvent prendre plusieurs formes: une couche avec peu de neurones (goulot d'étranglement ou bottleneck ) pour forcer le modèle à compresser les données, un terme dans la fonction de perte pour motiver une représentation parcimonieuse (grande proportion d'activations à 0) ou l'utilisation d'un échantillonnage stochastique dans l' espace latent,.
+Les autoencodeurs s'organisent en deux composantes: un encodeur et un décodeur. L'objectif de l'encodeur est de convertir l'entrée en une représentation intermédiaire (un point de l'espace latent) qui servira d'entrée pour le décodeur afin qu'il reconstruise la donnée d'origine. Une variante très utilisée est l' autoencodeur variationnel ( VAE ): l'encodeur, plutôt que d'associer l'entrée à un vecteur fixe de l'espace latent, associe ce dernier à une distribution de probabilité proche d'une gaussienne multivariée. Les autoencodeurs variationnels fournissent de meilleures garanties sur l'espace latent, comme la continuité ou la régularité, ce qui permet d'utiliser le décodeur comme modèle génératif en échantillonnant un vecteur aléatoire de l'espace latent,.
+Un avantage de l'autoencodeur est qu'il ne nécessite pas de données étiquetées puisqu'un échantillon est sa propre étiquette. Les données non étiquetées sont souvent plus abondantes que les données étiquetées; ainsi un autoencodeur peut être utilisé dans une phase de préentraînement, l'un de ses modules (généralement l'encodeur) est ensuite réutilisé comme extracteur de caractéristiques pour une autre tâche, en servant d'initialisation pour un réseau spécialisé. Les autoencodeurs peuvent également être utilisés directement pour compresser ou extraire des caractéristiques pertinentes des données ( réduction de dimensionnalité ).
+Réseaux antagonistes génératifs (GAN)
+Schéma d'un réseau antagoniste génératif. Le générateur produit des données à partir de bruit aléatoire. Durant l'entraînement, le discriminateur les distingue des données réelles.
+Comme les autoencodeurs, les réseaux antagonistes génératifs (ou GAN pour generative adversarial network ) sont définis par un cadre d'apprentissage et peuvent reposer sur des architectures diverses.
+Un GAN est utilisé pour générer de nouveaux échantillons similaires à ceux de l'ensemble d'entraînement. Pour cela, deux modèles sont entraînés simultanément: le générateur qui produit un échantillon à partir d'un vecteur aléatoire et le discriminateur qui estime si l'échantillon en entrée est authentique ou non. Seul le discriminateur utilise l'ensemble d'entraînement pour calculer sa perte, il apprend à différencier les observations réelles de celles produites par le générateur. La fonction de perte du générateur correspond à la sortie du discriminateur: les poids du générateur sont mis à jour pour que le discriminateur classe les sorties du générateur comme authentiques,.
+Ce mécanisme est parfois illustré avec l'image du faussaire qui produit des contrefaçons et de l'expert qui doit les repérer. Même si au départ les deux ne réalisent pas correctement leur travail, l'expert apprend rapidement à distinguer les contrefaçons du bruit aléatoire et le faussaire s'améliore alors en apprenant à tromper l'expert; les deux progressent conjointement et développent leurs compétences respectives.
+L'entraînement d'un GAN est particulièrement instable: si pendant l’entraînement le générateur surpasse complètement le discriminateur ou inversement, alors les gradients de la fonction de perte deviennent presque nuls ou non informatifs et l'apprentissage stagne. De même, un phénomène appelé effondrement de mode (en) peut ponctuer l'entraînement: le générateur n'est pas diversifié et ne génère que quelques types précis d'observations. Les modèles ne convergent alors pas vers l' équilibre de Nash et les données générées ne sont pas représentatives de la distribution réelle,.
+Pour entraîner un GAN malgré ces contraintes, il est nécessaire de régler finement les hyperparamètres; certaines variantes ont été développées pour atténuer certains de ces problèmes. Le GAN de Wasserstein adapte la manière dont le discriminateur exprime la crédibilité d'une observation et impose au discriminateur (ou critique) d'être une fonction lipschitzienne afin de stabiliser l'apprentissage et de rendre les pertes plus faciles à interpréter durant l'entraînement,.
+Les GAN conditionnels permettent de conditionner la sortie en fonction de différents paramètres (choix d'une classe, ou de paramètres continus),.
+Modèles de diffusion
+Schéma du mécanisme de diffusion directe et de diffusion inverse dans un modèle de diffusion.
+Les modèles de diffusion permettent de générer de nouvelles observations semblables aux données d'entraînement. Contrairement à un autoencodeur variationnel ou à un réseau antagoniste génératif, un modèle de diffusion génère une nouvelle observation grâce à un processus itératif, la génération demande donc de multiples appels au modèle,.
+Le modèle est entraîné à débruiter une observation bruitée donnée en entrée. Pendant l'entraînement, un processus de diffusion directe est appliqué aux observations, en pratique cela se traduit par la moyenne pondérée entre les données et un bruit gaussien dans différentes proportions. Le modèle apprend à réaliser la diffusion inverse, c'est-à-dire à retirer le bruit des observations. La sortie du modèle n'est pas l'observation débruitée mais un vecteur de même dimension correspondant soit au bruit, soit au vecteur à additionner à l'entrée pour annuler le bruit. Durant l'inférence, cette sortie sert à débruiter partiellement l'observation, le réseau est appelé itérativement pour retirer complètement le bruit. En plus de l'entrée à traiter, le modèle reçoit un pas de temps indiquant la proportion de bruit dans celle-ci ainsi qu'éventuellement d'autres informations qui servent à conditionner le modèle pour influencer le traitement.
+Pour générer de nouvelles observations, le modèle est utilisé pour retirer le bruit d'un vecteur entièrement aléatoire. Au fur et à mesure des itérations, ce dernier évolue pour ressembler à une observation réelle. La proportion de bruit retirée à chaque itération n'est pas constante et varie au fil du processus de diffusion inverse en fonction d'un échéancier prédéfini,,.
+Limites
+Les réseaux de neurones profonds possèdent un nombre important de paramètres entraînables, ce qui leur donne une grande souplesse et la possibilité d'être employés pour des tâches diverses. La contrepartie de cette polyvalence est le besoin d'une grande quantité de données pendant la phase d'entraînement; il est nécessaire de constituer de vastes ensembles de données pour entraîner un réseau de neurones performant sans préentraînement (en général, il faut a minima plusieurs dizaines de milliers d'observations, mais certaines tâches en demandent bien plus). En l'absence de suffisamment de données, le modèle risque le surapprentissage (ou overfitting ): il mémorise les réponses attendues et ne parvient pas à généraliser à de nouvelles observations. Ce phénomène est classiquement décrit par le dilemme biais-variance et le compromis entre taille du modèle et quantité de données disponibles, bien que certains réseaux surparamétrés semblent échapper à cette règle (phénomène de double descente),. Au-delà de la quantité, les données d'entraînement doivent être exhaustives et couvrir les différents cas possibles, puisque les réseaux de neurones montrent de bonnes capacités d'interpolation mais présentent des difficultés à extrapoler.
+Outre les contraintes liées aux données, d'autres obstacles entravent l'utilisation des réseaux profonds. Contrairement à d'autres algorithmes comme les arbres de décision, il est difficile d'interpréter les opérations au sein du réseau et ce qui justifie ses prédictions: on parle de modèles « boîte noire ». Le problème de l'interprétabilité des modèles est critique concernant leur usage dans le domaine médical ou financier pour des raisons légales et éthiques,.
+Avant son entraînement, les poids du réseau de neurones sont initialisés avec des valeurs aléatoires; or, malgré une technique d'initialisation de poids appropriée, ces valeurs ont un impact sur les performances du modèle au terme de l'entraînement: deux réseaux partageant la même architecture et entraînés avec les mêmes données peuvent avoir des performances différentes à cause de leur état initial, parfois même lorsque ces états initiaux sont proches. Aussi, il est difficile de fournir des garanties sur les performances que l'on doit attendre d'un modèle avant son entraînement. Ces éléments soulèvent des problèmes de reproductibilité. Enfin, l'étude et le développement des réseaux de neurones profonds se heurtent à des besoins toujours plus massifs en puissance de calcul, en temps et en électricité.
+Comme beaucoup d'autres systèmes informatiques, les réseaux de neurones profonds présentent des faiblesses potentiellement exploitables par un attaquant. Certaines de ces vulnérabilités concernent la phase d'entraînement: l'attaquant peut empoisonner les données avec des observations corrompues en introduisant des échantillons mal étiquetés ou spécialement altérés pour perturber l'apprentissage. D'autres faiblesses concernent l'utilisation du modèle: les attaques antagonistes consistent à manipuler les entrées de manière imperceptible à l'œil humain, dans le but de provoquer une erreur de classification. Ces attaques peuvent être ciblées (l'attaquant choisit la sortie souhaitée) ou non. L'utilisation de ces méthodes n'est pas nécessairement malveillante; certains artistes les utilisent pour protéger leur style et éviter sa copie par des modèles génératifs. Pour cela, ils empoisonnent de manière imperceptible leurs créations.
+Domaines d'application
+Vision par ordinateur et imagerie
+L'apprentissage profond permet d'analyser, de modifier ou de créer des images et des vidéos. Ces modèles reposent souvent sur des réseaux de neurones convolutifs ou des transformeurs adaptés spécialement à cette tâche ( vision transformer ).
+Les réseaux profonds sont utilisés pour la reconnaissance de formes visuelles en vision par ordinateur. Ils peuvent reconnaître des panneaux de signalisation ou des objets déformables (notamment dans le cadre du développement de voitures autonomes ), et être utilisés pour estimer certaines propriétés physiques de l'environnement (propriété du sol sur lequel avance un robot, télédétection en imagerie satellitaire, etc). Certains modèles traitent des vidéos d'êtres humains, par exemple pour analyser les mouvements de la main pour traduire la langue des signes ou estimer les émotions visibles sur le visage.
+Ces réseaux permettent par ailleurs d'améliorer la qualité d'une image ou de la modifier. En infographie, ils permettent de suréchantillonner une image de faible résolution vers une résolution supérieure (notamment par la méthode du DLSS dans les jeux vidéos ), on parle d' upscaling. Des applications dans le domaine artistique permettent de créer une œuvre à partir d'une photo ou d'une description, ou de restaurer numériquement des peintures anciennes.
+Robotique et systèmes autonomes
+Différents modèles, comme ceux de vision par ordinateur, peuvent être utilisés comme composants dans un système autonome. Ces systèmes sont plus ou moins complexes, certains modèles permettent de positionner automatiquement une caméra alors que d'autres sont utilisés pour la conduite autonome ou le contrôle de robot, notamment grâce à l' apprentissage par renforcement.
+Au-delà du contrôle direct, en robotique l'apprentissage profond est utilisé pour planifier des actions ou des trajectoires dans la durée.
+Traitement automatique du langage naturel (TAL)
+Les réseaux profonds permettent de traiter ou de générer du texte. Ils peuvent analyser le ton d'un texte pour en extraire les sentiments exprimés ou proposer une traduction d'un texte d'une langue source à une langue cible; ils alimentent les traducteurs automatiques Google Traduction ou Deepl,.
+Les grands modèles de langage ( LLM ) permettent de produire et d'analyser du texte, ils trouvent des applications dans de nombreux domaines. Ils sont utilisés pour extraire des informations de documents, générer des programmes informatiques, écrire des preuves mathématiques, etc.
+Traitement de la parole et du signal audio
+La reconnaissance automatique de la parole a profité de l'apprentissage profond. Ce dernier a permis de développer une nouvelle manière pour l'humain d'interagir avec les machines, en plus de permettre le sous-titrage automatique de vidéos, comme avec le modèle Whisper développé par OpenAI. De plus, l'apprentissage profond est utilisé dans la génération de voix synthétiques réalistes ou pour le clonage de voix.
+Des modèles permettent de traiter un signal audio existant en effaçant les bruits parasites ou en séparant les sources (par exemple, séparation de la voix et de la musique). D'autres permettent de générer des œuvres musicales ou d'identifier des oiseaux à partir de leur chant.
+Jeux, planification et optimisation
+Les jeux constituent un terrain d'évaluation privilégié de la capacité des modèles à planifier des stratégies et interagir avec un environnement complexe. Les réseaux profonds ont permis d'améliorer les performances des modèles dans certains jeux de plateau pour lesquels les méthodes classiques n'étaient pas suffisamment efficaces pour atteindre un niveau d'expert humain, comme le jeu de Go.
+L'apprentissage profond alimente également des modèles jouant aux jeux vidéo à un niveau surhumain comme le modèle AlphaStar jouant à Starcraft, ou les agents entraînés sur les jeux de la console Atari 2600,.
+Sciences fondamentales et ingénierie
+En physique, l'apprentissage profond est utilisé pour la recherche sur les particules exotiques. Des modèles entraînés grâce à l' apprentissage par renforcement permettent de contrôler le plasma au sein d'un tokamak. Plus généralement, des modèles sont utilisés pour accélérer les simulations physiques, comme avec la mécanique des fluides.
+En biologie, AlphaFold permet d'estimer la structure dans l'espace d'une protéine à partir de sa séquence d'acides aminés, permettant ainsi un gain de temps important en comparaison des méthodes expérimentales. Des modèles facilitent également l'étude de l' ADN et des segments non codants du génome ou la cytométrie,,.
+Santé et diagnostic médical
+Beaucoup de défis médicaux profitent du développement de l'apprentissage profond, notamment en analyse d'image, mais ce secteur nécessite des garanties et une explicabilité que les modèles peuvent avoir des difficultés à apporter, freinant ainsi l'adoption.
+De nombreux succès de l'apprentissage profond concernent le diagnostic médical et la détection de maladies. À partir de photographies, de radiographies ou d'autres images, des modèles permettent de détecter et de localiser des cancers comme les mélanomes, des rétinopathies ou d'autres problèmes médicaux,,. Le diagnostic peut être réalisé à partir de sources diverses, comme l'utilisation de la voix pour détecter la maladie de Parkinson.
+Les réseaux profonds peuvent également traiter les images pour améliorer leur qualité et faciliter le diagnostic en retirant le bruit ou en augmentant leur résolution. Ces méthodes permettent parfois de raccourcir la période nécessaire à l'acquisition de l'image, réduisant ainsi les nuisances occasionnées au patient (dose de radiation, durée de l'examen),,.
+Des systèmes comme Horus permettent d'apporter une aide aux malvoyants ou aux aveugles en facilitant leur orientation et en fournissant une description de ce qui se passe devant eux.
+Enjeux sociétaux, éthiques et juridiques
+Usages malveillants et désinformation
+L'apprentissage profond facilite l'émergence d'usages malveillants. Il est devenu possible avec les hypertrucages d'incruster le visage d'une personne sur une autre, à son insu, et de lui faire faire ou dire des choses qu'elle n'a pas faites (comme dans le film Running Man de 1986), l'apprentissage profond recréant les mouvements du visage en rendant l'incrustation ressemblante. Ainsi, plusieurs actrices comme Gal Gadot, Emma Watson, Cara Delevingne, Emma Stone, Natalie Portman ou Scarlett Johansson se sont retrouvées avec leur visage incrusté sur celui d'une actrice pornographique, soulevant des craintes quant à la généralisation d'un tel usage, permettant à n'importe qui de nuire à la réputation d'une autre personne. Face à ce danger, plusieurs plates-formes telles que Pornhub, Twitter et Reddit ont réagi en interdisant la publication de telles vidéos, et l'utilisateur « deepfakes », créateur du logiciel éponyme permettant à tout usager de créer des fausses vidéos à caractère pornographique, a été banni de Reddit et son fil dédié supprimé.
+Les modèles d' intelligence artificielle générative permettent de générer des vidéos ou des images à partir d'une description, ils s'ajoutent aux technologies d'hypertrucages comme outils de désinformation politique. Aux États-Unis, lors de la primaire du Parti démocrate du New Hampshire, ces technologies ont été utilisées pour dissuader les électeurs de voter en imitant la voix de Joe Biden, alors à la tête du pays. En 2026, lors des élections législatives en Hongrie, le Fidesz (parti de Viktor Orbán, le premier ministre en poste) fait usage de l'hypertrucage pour décrédibiliser Péter Magyar, considéré comme le principal opposant au parti. Des vidéos générées par IA sont également diffusées par le parti pour justifier leur narratif.
+Au-delà du risque de croire une fausse information, ces outils peuvent conduire certains à remettre en doute la véracité de photos ou de vidéos pourtant authentiques. En 2025, Jean-Luc Mélenchon (homme politique français) publie une photo d'une manifestation, il est accusé à tort par certains internautes d'avoir utilisé l'intelligence artificielle pour modifier le contenu de l'image en y ajoutant des drapeaux français. Ces accusations, appuyées par des outils de détection de contenu généré par IA, s'avèrent toutefois erronées.
+Ces outils sont par ailleurs utilisés dans le cadre d'activités illégales comme des escroqueries, des arnaques ou des fraudes, mais également pour du chantage sexuel (on parle aussi de sextorsion ),,. D'après un rapport de Surfshark, les fraudes liées à l'hypertrucage représentent plus de 2 milliards de dollars pour l'année 2026.
+Droits d'auteur et propriété intellectuelle
+Pour entraîner des modèles d'IA générative capables de générer des images, de la vidéo ou du texte, leurs concepteurs utilisent le plus souvent du contenu trouvé sur internet, quand bien même celui-ci est protégé par des droits d'auteur. Certains ayants droit, comme des artistes ou des journaux, s'opposent à cet usage; l'accès à certains contenus, par exemple les articles du New York Times, est bloqué pour les systèmes automatisés, et des procès sont intentés à l'encontre d'entreprises comme Google ou OpenAI,,. Les concepteurs de ces outils d'intelligence artificielle justifient la légalité de leur activité en avançant que l'entraînement est un usage transformateur du contenu qui ne viole pas les droits d'auteur.
+L'utilisation de ce contenu repose sur des fondements légaux différents en Europe et aux États-Unis. Dans l' Union européenne, cet usage repose sur la directive européenne sur le droit d'auteur qui donne la possibilité aux ayants droit de refuser l'utilisation de leur propriété intellectuelle (à l'exception de la recherche scientifique par des organismes à but non lucratif). Mais ce dernier est parfois techniquement difficile à mettre en œuvre, d'autant que beaucoup d'ayants droit ont découvert l'utilisation de leurs œuvres a posteriori. Aux États-Unis, c'est sur la base légale du « fair use » que repose la défense des entreprises distribuant ces modèles.
+⁣Des procès dans différents pays ont conduit des juges à statuer sur la légalité de ces activités. Au Royaume-Uni, la justice rejette les accusations de contrefaçon portées par Getty Images contre Stability AI, estimant que son modèle StableDiffusion ne stocke pas et ne reproduit pas d'œuvres protégées (l'entreprise plaignante ayant abandonné certaines de ses accusations en cours de procès). En revanche, elle reconnaît coupable l'entreprise pour contrefaçon de marque suite à l'apparition du logo de Getty Images sur certaines images générées. Lors d'un procès opposant les auteurs Andrea Bartz, Charles Graeber et Kirk Wallace Johnson à Anthropic concernant l'utilisation de leurs ouvrages pour l'entraînement de Claude, la justice reconnait que l'utilisation d'œuvres obtenues légalement pour entraîner leur modèle peut relever du fair use mais elle rejette l'utilisation de contenus piratés, renvoyant cette partie à une procédure de fond. La question de la légalité de l'entraînement de modèles génératifs sur du contenu protégé est mondiale, des procès ont également été engagés en France et en Allemagne où OpenAI a été condamné pour avoir enfreint les droits d'auteur concernant des œuvres musicales; cette condamnation est une première mondiale,.
+Concernant les images générées elles-mêmes, la plupart des législations dans le monde n'accordent un droit d'auteur qu'aux créations humaines,; le contenu intégralement généré par IA n'est donc pas protégeable, comme l'illustre l'affaire Thaler v. Perlmutter. Cependant cela ne concerne pas les œuvres dont la création a été assistée par IA où les contributions humaines sont protégeables.
+Biais algorithmiques et discriminations
+À l'instar d'autres systèmes algorithmiques, les réseaux profonds peuvent perpétuer ou amplifier les inégalités et être à l'origine de discriminations. Ce comportement du modèle ne vient pas nécessairement d'une volonté de ses concepteurs. Il peut avoir pour origine les données et la manière dont elles ont été récoltées puis traitées, ou encore la présence de biais dans la manière dont le modèle est évalué,.
+Certains modèles sont moins performants pour une certaine catégorie d'utilisateurs que pour les autres: de nombreux algorithmes de reconnaissance faciale présentent des performances significativement moins bonnes pour les visages de personnes à la peau foncée, les femmes ou les personnes âgées; les femmes noires semblent être la catégorie de la population avec le taux d'erreur le plus élevé,.
+Certains algorithmes participent à entretenir des discriminations: un outil de recrutement développé par Amazon donnait des notes plus faibles aux femmes qu'aux hommes. Ce biais tire son origine de la base de données utilisée par l'entreprise, qui contenait beaucoup plus de profils masculins que féminins, le modèle interprétant ainsi le genre féminin comme une caractéristique à éviter,.
+Face à ce risque, certaines institutions publiques comme le Défenseur des droits ( autorité administrative indépendante chargée de lutter contre les discriminations en France) mettent en garde les entreprises vis-à-vis des systèmes algorithmiques et du risque de discrimination. Cette dernière recommande de renforcer l'explicabilité des algorithmes et de réaliser des audits avant la mise en production de systèmes automatisés susceptibles d'être à l'origine de discrimination. À l'échelle de l'Union européenne, l' AI Act impose des exigences de transparence pour limiter le risque de discrimination pour les systèmes d'IA à haut risque.
+Impact environnemental
+Le développement et l'utilisation des modèles profonds nécessitent du matériel informatique et de l'électricité, notamment les grands modèles de langages reposent sur des centres de données qui consomment de l'eau pour leur refroidissement et de grandes quantités d'électricité.
+L'entraînement des modèles nécessite de grandes quantités d'électricité. Pour entraîner le modèle GPT-3 (moins performant et moins lourd que les modèles plus récents), la consommation s'est élevée à environ 1 287 MWh d'électricité. Pourtant, puisque le modèle est utilisé par un grand nombre d'utilisateurs, l'entrainement représente une petite proportion de la consommation électrique; la majeure partie de la consommation électrique est imputable à l'utilisation du modèle: la phase d'inférence. Pour les modèles les plus populaires, il semblerait qu'au-delà de quelques semaines, la quantité d'électricité consommée par l'utilisation dépasse la quantité d'électricité utilisée pendant l'entraînement.
+Avec des densités plus élevées, les centres de données d'IA demandent souvent un refroidissement liquide, contrairement aux centres de données classiques qui sont refroidis avec de l'air. Ces centres prélèvent de l'eau d'une source (systèmes publics, eaux souterraines et eaux de surface) et en consomment une partie par évaporation pour refroidir leurs serveurs; l'eau non consommée peut être rejetée dans les systèmes d'assainissement des eaux usées. La proportion d'eaux consommées varie de 45 % à 60 % selon les entreprises. Cependant, cette consommation ne représente qu'une faible part de la consommation d'eau attribuable à l'utilisation de ces modèles. Ainsi 13 % de la consommation d'eau imputable à la génération d'une réponse par le modèle GPT-3 sont directement attribuables au centre de données, les 87 % restants sont liés à la production d'électricité en amont ( refroidissement des centrales électriques ).
+Finalement, une analyse du cycle de vie d'un modèle de Mistral AI montre que 85,5 % des émissions de gaz à effet de serre et 91 % de la consommation d'eau ont lieu durant la phase d'entraînement et d'utilisation du modèle (regroupées dans l'analyse sans distinctions fines) et que 61 % de la consommation de matériaux est attribuable à la fabrication, au transport et à la fin de vie des serveurs.
+Notes et références
+↑ a et b « apprentissage profond », Grand Dictionnaire terminologique, Office québécois de la langue française (consulté le 28 janvier 2020 ).
+↑ Commission d'enrichissement de la langue française, « Vocabulaire de l’intelligence artificielle (liste de termes, expressions et définitions adoptés) », Journal officiel de la République française n o 0285 du 9 décembre 2018 [ lire en ligne ] [PDF].
+↑ Jean-Marie Chauvet, The 30-Year Cycle In The AI Debate, 8 octobre 2018 ( DOI 10.48550/arXiv.1810.04053, lire en ligne )
+↑ (en) Warren S. McCulloch et Walter Pitts, « A logical calculus of the ideas immanent in nervous activity », The bulletin of mathematical biophysics, vol. 5, n o 4,‎ 1 er décembre 1943, p. 115–133 ( ISSN 1522-9602, DOI 10.1007/BF02478259, lire en ligne, consulté le 25 juillet 2026 )
+↑ Alex Kiefer, « A Defense of Pure Connectionism », Dissertations, Theses, and Capstone Projects,‎ 1 er février 2019 ( lire en ligne, consulté le 8 août 2026 )
+↑ a b et c Alexandre Piquard, « « Les contenus utilisés pour entraîner les IA ont une valeur et un prix » », Le Monde,‎ 27 septembre 2024 ( ISSN 1950-6244, lire en ligne, consulté le 17 juillet 2026 )
+↑ a b et c « Ce que consomme l'IA: point de situation | IFP School », sur www.ifp-school.com (consulté le 18 juillet 2026 )
+↑ a b et c Yann LeCun, Quand la machine apprend: La révolution des neurones artificiels et de l'apprentissage profond, Odile Jacob, 2019, 394 p. ( ISBN 978-2-7381-4932-9 ), p. 92-107
+↑ Yann Le Cun, Quand la machine apprend: La révolution des neurones artificiels et de l'apprentissage profond, Odile Jacob, 2019, 394 p. ( ISBN 978-2-7381-4932-9 ), p. 31-46
+↑ Yann Le Cun, Quand la machine apprend: La révolution des neurones artificiels et de l'apprentissage profond, Odile Jacob, 2019, 394 p. ( ISBN 978-2-7381-4932-9 ), p. 101-183
+↑ a b et c Yann LeCun, Quand la machine apprend: La révolution des neurones artificiels et de l'apprentissage profond, Odile Jacob, 2019, 394 p. ( ISBN 978-2-7381-4932-9 ), p. 50-65
+↑ Sepp Hochreiter et Jürgen Schmidhuber, « Long Short-Term Memory », Neural Computation, vol. 9, n o 8,‎ 1 er novembre 1997, p. 1735–1780 ( ISSN 0899-7667, DOI 10.1162/neco.1997.9.8.1735, lire en ligne, consulté le 25 juillet 2026 )
+↑ (en) « The corporate forces that helped shape AI », sur www.marketplace.org (consulté le 25 juillet 2026 )
+↑ (en) Alex Krizhevsky, Ilya Sutskever et Geoffrey E. Hinton, « ImageNet classification with deep convolutional neural networks », International Conference on Neural Information Processing System,‎ 2012 ( lire en ligne [PDF] ).
+↑ « ImageNet Large Scale Visual Recognition Competition 2012 (ILSVRC2012) », sur Image-net (consulté le 12 mars 2024 ).
+↑ David Larousserie et Morgane Tual, « Première défaite d’un professionnel du go contre une intelligence artificielle », Le Monde,‎ 27 janvier 2016 ( lire en ligne ).
+↑ William Audureau, « Jeu de go: pour Lee Sedol, la victoire de la machine est moins tactique que psychologique », Le Monde,‎ 15 mars 2016 ( ISSN 1950-6244, lire en ligne, consulté le 16 mars 2016 ).
+↑ (en) Ashish Vaswani, « Attention Is All You Need », 2017.
+↑ (en) Md Saiful Islam, Li Xiangdong et Jubayer Ahmed, « BERT: advancements in language understanding for different NLP tasks: challenges and future perspectives », Journal of Electrical Systems and Information Technology, vol. 13, n o 1,‎ 12 mai 2026, p. 49 ( ISSN 2314-7172, DOI 10.1186/s43067-026-00341-1, lire en ligne, consulté le 1 er août 2026 )
+↑ « OpenAI lance une version allégée de son générateur automatisé de textes GPT-2 », sur Le Monde informatique, 18 février 2019 (consulté le 9 octobre 2024 ).
+↑ Radio-Canada, « La forme des protéines prédite avec précision grâce à l’intelligence artificielle », sur Radio-Canada, 9 décembre 2020 (consulté le 18 juillet 2026 )
+↑ (en-US) Cade Metz, « London A.I. Lab Claims Breakthrough That Could Accelerate Drug Discovery », The New York Times,‎ 30 novembre 2020 ( ISSN 0362-4331, lire en ligne, consulté le 14 juillet 2026 )
+↑ (en) Demis Hassabis, « AlphaFold reveals the structure of the protein universe », sur Google DeepMind, 28 juillet 2022 (consulté le 14 juillet 2026 )
+↑ « Yann LeCun, lauréat du prix Turing: « L’IA continue de faire des progrès fulgurants » », Le Monde,‎ 27 mars 2019 ( lire en ligne, consulté le 27 mars 2019 ).
+↑ Denis Delbecq, « Le Nobel de physique récompense les pionniers de l'intelligence artificielle », Le Temps,‎ 8 octobre 2024 ( lire en ligne, consulté le 31 janvier 2026 ).
+↑ William Grant Hatcher et Wei Yu, « A Survey of Deep Learning: Platforms, Applications and Emerging Research Trends », IEEE Access, vol. 6,‎ 2018, p. 24411–24432 ( ISSN 2169-3536, DOI 10.1109/ACCESS.2018.2830661, lire en ligne, consulté le 1 er août 2026 )
+↑ (en-US) « GPT-2: 1.5B release », sur OpenAI, 16 janvier 2024 (consulté le 25 juillet 2026 )
+↑ (en) John Thornhill, « The imitation game », Financial Times, Life and Arts,‎ 14 novembre 2020, p. 18–19.
+↑ Tom B. Brown, Benjamin Mann, Nick Ryder et Melanie Subbiah, Language Models are Few-Shot Learners, 22 juillet 2020 ( DOI 10.48550/arXiv.2005.14165, lire en ligne )
+↑ Aditya Ramesh, Mikhail Pavlov, Gabriel Goh et Scott Gray, Zero-Shot Text-to-Image Generation, 26 février 2021 ( DOI 10.48550/arXiv.2102.12092, lire en ligne )
+↑ (en) « You know WALL-E. Now, here’s DALL-E: An algorithm is learning to draw the world around it », sur NBC News, 27 janvier 2021 (consulté le 14 juillet 2026 )
+↑ Prafulla Dhariwal et Alex Nichol, Diffusion Models Beat GANs on Image Synthesis, 1 er juin 2021 ( DOI 10.48550/arXiv.2105.05233, lire en ligne )
+↑ Julie Le Baron, « Au cœur de nouvelles communautés artistiques, les images créées par intelligence artificielle fascinent et inquiètent », Le Monde,‎ 2 octobre 2022 ( ISSN 1950-6244, lire en ligne, consulté le 14 juillet 2026 )
+↑ Joséphine Bindé, « Une peinture créée par une intelligence artificielle fait scandale en remportant un concours d’art », sur Beaux Arts, 14 septembre 2022 (consulté le 14 juillet 2026 )
+↑ (en-GB) Cait Kelly, « Australian artists accuse popular AI imaging app of stealing content, call for stricter copyright laws », The Guardian,‎ 11 décembre 2022 ( ISSN 0261-3077, lire en ligne, consulté le 14 juillet 2026 )
+↑ (en-US) « What is ChatGPT? », sur OpenAI Help Center (consulté le 14 juillet 2026 )
+↑ Dominic D. Matthews, « Qu’est-ce que le robot conversationnel ChatGPT dont tout le web parle? », sur Radio-Canada, 8 décembre 2022 (consulté le 18 juillet 2026 )
+↑ (en-US) James Vincent, « Meta’s powerful AI language model has leaked online — what happens now? », sur The Verge, 8 mars 2023 (consulté le 14 juillet 2026 )
+↑ (en) Sage Lazzaro, « Multimodal AI puts on quite a show, but it’s still in its infancy », sur Fortune (consulté le 14 juillet 2026 )
+↑ « Google présente GEMINI, le modèle multimodal qui alimente déjà BARD », sur ActuIA, 7 décembre 2023 (consulté le 14 juillet 2026 )
+↑ « Gemini 3.5 Pro: Multimodal Transformer », sur www.emergentmind.com (consulté le 14 juillet 2026 )
+↑ Gemini Team, Rohan Anil, Sebastian Borgeaud et Jean-Baptiste Alayrac, Gemini: A Family of Highly Capable Multimodal Models, 9 mai 2025 ( DOI 10.48550/arXiv.2312.11805, lire en ligne )
+↑ DeepSeek-AI, Daya Guo, Dejian Yang et Haowei Zhang, « DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning », Nature, vol. 645, n o 8081,‎ 18 septembre 2025, p. 633–638 ( ISSN 0028-0836 et 1476-4687, DOI 10.1038/s41586-025-09422-z, lire en ligne, consulté le 14 juillet 2026 )
+↑ « L’apprentissage du raisonnement avec les LLM », sur OpenAI (consulté le 14 juillet 2026 )
+↑ (en) « OpenAI o3 Breakthrough High Score on ARC-AGI-Pub », sur ARC Prize (consulté le 14 juillet 2026 )
+↑ Rédacteur, « Que valent les comparateurs d'IA? », sur Sciences et Avenir, 31 mai 2026 (consulté le 14 juillet 2026 )
+↑ « Descente de gradient et rétro-propagation du gradient | Collège de France », sur www.college-de-france.fr, 17 juillet 2018 (consulté le 15 juillet 2026 )
+↑ a et b Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 101-104
+↑ a b et c Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 105-115
+↑ (en) Xavier Glorot, Antoine Bordes et Yoshua Bengio, « Deep Sparse Rectifier Neural Networks », Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics, JMLR Workshop and Conference Proceedings,‎ 14 juin 2011, p. 315–323 ( lire en ligne, consulté le 15 juillet 2026 )
+↑ Vladimír Kunc et Jiří Kléma, Three Decades of Activations: A Comprehensive Survey of 400 Activation Functions for Neural Networks, 14 février 2024 ( DOI 10.48550/arXiv.2402.09092, lire en ligne )
+↑ Jingjing Xu, Xu Sun, Zhiyuan Zhang et Guangxiang Zhao, « Understanding and Improving Layer Normalization », Advances in Neural Information Processing Systems, Curran Associates, Inc., vol. 32,‎ 2019 ( lire en ligne, consulté le 15 juillet 2026 )
+↑ Biao Zhang et Rico Sennrich, « Root Mean Square Layer Normalization », Advances in Neural Information Processing Systems, Curran Associates, Inc., vol. 32,‎ 2019 ( lire en ligne, consulté le 15 juillet 2026 )
+↑ Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 126-127
+↑ Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en œuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 237-239
+↑ Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 57-64
+↑ « Approximation universelle par un réseau à une couche cachée | Collège de France », sur www.college-de-france.fr, 17 juillet 2018 (consulté le 19 juillet 2026 )
+↑ « X.1 - Cours — RCP209 - Apprentissage statistique: modélisation décisionnelle et apprentissage profond », sur cedric.cnam.fr (consulté le 19 juillet 2026 )
+↑ Jin Sun, Xiaoshuang Shi, Zhiyuan Wang et Kaidi Xu, « Caterpillar: A Pure-MLP Architecture with Shifted-Pillars-Concatenation », Proceedings of the 32nd ACM International Conference on Multimedia, Association for Computing Machinery, mM '24,‎ 28 octobre 2024, p. 7123–7132 ( ISBN 979-8-4007-0686-8, DOI 10.1145/3664647.3680809, lire en ligne, consulté le 19 juillet 2026 )
+↑ Ilya O Tolstikhin, Neil Houlsby, Alexander Kolesnikov et Lucas Beyer, « MLP-Mixer: An all-MLP Architecture for Vision », Advances in Neural Information Processing Systems, Curran Associates, Inc., vol. 34,‎ 2021, p. 24261–24272 ( lire en ligne, consulté le 19 juillet 2026 )
+↑ Jaime Sevilla, Lennart Heim, Anson Ho et Tamay Besiroglu, « Compute Trends Across Three Eras of Machine Learning », 2022 International Joint Conference on Neural Networks (IJCNN),‎ 18 juillet 2022, p. 1–8 ( DOI 10.1109/IJCNN55064.2022.9891914, lire en ligne, consulté le 19 juillet 2026 )
+↑ a b c d et e Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 213-263
+↑ Alex Krizhevsky, Ilya Sutskever et Geoffrey E Hinton, « ImageNet Classification with Deep Convolutional Neural Networks », Advances in Neural Information Processing Systems, Curran Associates, Inc., vol. 25,‎ 2012 ( lire en ligne, consulté le 19 juillet 2026 )
+↑ « CS 230 - Convolutional Neural Networks Cheatsheet », sur stanford.edu (consulté le 19 juillet 2026 )
+↑ Martin Kolarik, Radim Burget et Kamil Riha, « Upsampling Algorithms for Autoencoder Segmentation Neural Networks: A Comparison Study », 2019 11th International Congress on Ultra Modern Telecommunications and Control Systems and Workshops (ICUMT),‎ octobre 2019, p. 1–5 ( DOI 10.1109/ICUMT48472.2019.8970918, lire en ligne, consulté le 19 juillet 2026 )
+↑ Zihao Wang et Lei Wu, Theoretical Analysis of Inductive Biases in Deep Convolutional Networks, 20 janvier 2024 ( DOI 10.48550/arXiv.2305.08404, lire en ligne )
+↑ Tristan Hascoet, Quentin Febvre, Yasuo Ariki et Tetsuya Takiguchi, Reversible designs for extreme memory cost reduction of CNN training, 24 octobre 2019 ( DOI 10.48550/arXiv.1910.11127, lire en ligne )
+↑ a b c et d Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 265-287
+↑ a et b (en) Ibomoiye Domor Mienye, Theo G. Swart et George Obaido, « Recurrent Neural Networks: A Comprehensive Review of Architectures, Variants, and Applications », Information, vol. 15, n o 9,‎ 25 août 2024, p. 517 ( ISSN 2078-2489, DOI 10.3390/info15090517, lire en ligne [ archive du 19 novembre 2025 ], consulté le 19 juillet 2026 )
+↑ a et b (en) Samit Ahlawat, « Recurrent Neural Networks », dans Reinforcement Learning for Finance: Solve Problems in Finance with CNN and RNN Using the TensorFlow Library, Apress, 2023, 177–232 p. ( ISBN 978-1-4842-8835-1, DOI 10.1007/978-1-4842-8835-1_4, lire en ligne )
+↑ Muhammad Waqas et Usa Wannasingha Humphries, « A critical review of RNN and LSTM variants in hydrological time series predictions », MethodsX, vol. 13,‎ décembre 2024, p. 102946 ( ISSN 2215-0161, PMID 39324077, PMCID 11422155, DOI 10.1016/j.mex.2024.102946, lire en ligne, consulté le 19 juillet 2026 )
+↑ (en) Thomas Messi Nguelé, Armel Jacques Nzekon Nzeko'o et Damase Donald Onana, « Parallelization of Recurrent Neural Network training algorithm with implicit aggregation on multi-core architectures », Revue Africaine de Recherche en Informatique et Mathématiques Appliquées, vol. Volume 42 - Special issue CRI 2023 - 2024/2025,‎ 11 février 2025 ( ISSN 1638-5713, DOI 10.46298/arima.13400, lire en ligne, consulté le 19 juillet 2026 )
+↑ a b c d et e Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 314-329
+↑ a b c et d Ashish Vaswani, Noam Shazeer, Niki Parmar et Jakob Uszkoreit, « Attention is all you need », Proceedings of the 31st International Conference on Neural Information Processing Systems, Curran Associates Inc., nIPS'17,‎ 4 décembre 2017, p. 6000–6010 ( ISBN 978-1-5108-6096-4, DOI 10.5555/3295222.3295349, lire en ligne, consulté le 20 juillet 2026 )
+↑ Philipp Dufter, Martin Schmitt et Hinrich Schütze, « Position Information in Transformers: An Overview », Computational Linguistics, vol. 48, n o 3,‎ 1 er septembre 2022, p. 733–763 ( ISSN 0891-2017, DOI 10.1162/coli_a_00445, lire en ligne, consulté le 20 juillet 2026 )
+↑ David Foster, Deep learning génératif — Apprendre aux machines à dessiner, composer, écrire et jouer, First Interactive, 2024, 456 p. ( ISBN 978-2-412-09269-9 ), p. 257-286
+↑ a et b Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 331-354
+↑ G. E. Hinton et R. R. Salakhutdinov, « Reducing the Dimensionality of Data with Neural Networks », Science, vol. 313, n o 5786,‎ 28 juillet 2006, p. 504–507 ( DOI 10.1126/science.1127647, lire en ligne, consulté le 22 juillet 2026 )
+↑ Diederik P. Kingma et Max Welling, Auto-Encoding Variational Bayes, 10 décembre 2022 ( DOI 10.48550/arXiv.1312.6114, lire en ligne )
+↑ Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 119-120
+↑ a b c et d Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 2020, 553 p. ( ISBN 978-2-10-079066-1 ), p. 355-369
+↑ a b c d et e David Foster, Deep learning génératif - Apprendre aux machines à dessiner, composer, écrire et jouer, First Interactive, 2024, 456 p. ( ISBN 978-2-412-09269-9 ), p. 111-145
+↑ Karimul Makhtidi, Alhadi Bustamam, Risman Adnan et Hanif Amal Robbani, « Fast Sampling of Score-Based Models With Cyclical Diffusion Sampling », IEEE Access, vol. 12,‎ 2024, p. 49578–49589 ( ISSN 2169-3536, DOI 10.1109/ACCESS.2024.3365146, lire en ligne, consulté le 3 août 2026 )
+↑ a b et c David Foster, Deep learning génératif - Apprendre aux machines à dessiner, composer, écrire et jouer, First Interactive, 2024, 456 p. ( ISBN 978-2-412-09269-9 ), p. 225-253
+↑ Jiaming Song, Chenlin Meng et Stefano Ermon, Denoising Diffusion Implicit Models, 5 octobre 2022 ( DOI 10.48550/arXiv.2010.02502, lire en ligne )
+↑ Yang Song, Jascha Sohl-Dickstein, Diederik P. Kingma et Abhishek Kumar, Score-Based Generative Modeling through Stochastic Differential Equations, 10 février 2021 ( DOI 10.48550/arXiv.2011.13456, lire en ligne )
+↑ Thomas Dagès, Laurent D. Cohen et Alfred M. Bruckstein, « A model is worth tens of thousands of examples for estimation and thousands for classification », Pattern Recognition, vol. 157, n o 110904,‎ janvier 2025 ( ISSN 0031-3203, DOI 10.1016/j.patcog.2024.110904, lire en ligne, consulté le 16 juillet 2026 )
+↑ Aurélien Géron, Deep Learning avec Keras et TensorFlow - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 553 p. ( ISBN 978-2-10-079066-1 ), p. 29
+↑ (en-US) « Deep double descent », sur OpenAI, 23 janvier 2020 (consulté le 16 juillet 2026 )
+↑ « NeurIPS Why Can't Neural Networks Master Extrapolation? Insights from Physical Laws », sur neurips.cc (consulté le 16 juillet 2026 )
+↑ Aurélien Géron, Machine Learning avec Scikit-Learn - 2e éd. - Mise en oeuvre et cas concrets, DUNOD, 297 p. ( ISBN 978-2-10-079065-4 ), p. 170
+↑ (en) Giovanni Cinà, Tabea E. Röber, Rob Goedhart et Ş. İlker Birbil, « Why we do need explainable AI for healthcare », Diagnostic and Prognostic Research, vol. 9, n o 1,‎ 2 décembre 2025, p. 24 ( ISSN 2397-7523, PMID 41327501, PMCID 12670843, DOI 10.1186/s41512-025-00209-4, lire en ligne, consulté le 16 juillet 2026 )
+↑ (en) Xingyu Lan, Hong Fan, Wanan Liu, Meng Xia et Kai Guo, « Sparse-enhanced additive interaction neural network for interpretable credit decision », Decision Support Systems, vol. 197, n o 114507,‎ octobre 2025 ( DOI https://doi.org/10.1016/j.dss.2025.114507 )
+↑ Andrew Ly et Pulin Gong, Riddled basin geometry sets fundamental limits to predictability and reproducibility in deep learning, 7 octobre 2025 ( DOI 10.48550/arXiv.2510.05606, lire en ligne )
+↑ Grigoris Velegkas, « Challenges in Modern Machine Learning: Generalization and Responsible Use », Yale Graduate School of Arts and Sciences Dissertations,‎ 1 er janvier 2025 ( lire en ligne, consulté le 16 juillet 2026 )
+↑ Jingxiao Ma, Priyadarshini Panda et Sherief Reda, « FF-INT8: Efficient Forward-Forward DNN Training on Edge Devices with INT8 Precision », 2025 62nd ACM/IEEE Design Automation Conference (DAC),‎ juin 2025, p. 1–7 ( DOI 10.1109/DAC63849.2025.11133061, lire en ligne, consulté le 16 juillet 2026 )
+↑ Antonio Emanuele Cinà, Kathrin Grosse, Ambra Demontis et Sebastiano Vascon, « Wild Patterns Reloaded: A Survey of Machine Learning Security against Training Data Poisoning », ACM Computing Surveys, vol. 55, n o 13s,‎ 13 juillet 2023, p. 294:1–294:39 ( ISSN 0360-0300, DOI 10.1145/3585385, lire en ligne, consulté le 16 juillet 2026 )
+↑ Zhongliang Guo, Yifei Qian, Yanli Li et Weiye Li, Beyond Vulnerabilities: A Survey of Adversarial Attacks as Both Threats and Defenses in Computer Vision Systems, 3 août 2025 ( DOI 10.48550/arXiv.2508.01845, lire en ligne )
+↑ (en) « Artists are taking things into their own hands to protect their work from generative AI », sur AP News, 18 juillet 2024 (consulté le 16 juillet 2026 )
+↑ (en) Chenfei Wu, Jian Liang, Lei Ji, Fan Yang, Yuejian Fang, Daxin Jiang et Nan Duan, « NÜWA: Visual Synthesis Pre-training for Neural visUal World creAtion », sur ACM Digital Library, octobre 2022 ( DOI 10.1007/978-3-031-19787-1_41, consulté le 1 er août 2026 )
+↑ (en-US) « Transformers for Vision: A Survey on Innovative Methods for Computer Vision », sur xplorestaging.ieee.org (consulté le 1 er août 2026 )
+↑ (en) D. Held, S. Thrun et S. Savarese (2015), « Deep Learning for Single-View Instance Recognition », arXiv preprint arXiv:1507.08286.
+↑ (en) Dan Cireşan, Ueli Meier, Jonathan Masci et Jürgen Schmidhuber, « Multi-column deep neural network for traffic sign classification », Neural Networks, vol. 32 « Selected Papers from IJCNN 2011 »,‎ août 2012, p. 333-338 ( ISSN 0893-6080, e-ISSN 1879-2782, PMID 22386783, DOI 10.1016/j.neunet.2012.02.023 ).
+↑ (en) I. Mariolis, G. Peleka, A. Kargakos et S. Malassiotis, « Pose and category recognition of highly deformable objects using deep learning », International Conference on Advanced Robotics ( ICAR ), juillet 2015, p. 655-662, IEEE ( résumé ).
+↑ (en) Matthew Veres, Griffin Lacey et Graham W. Taylor, « Deep Learning Architectures for Soil Property Prediction », dans 2015 12th Conference on Computer and Robot Vision (CRV), 2015 ( ISBN 978-1-4799-1986-4, DOI 10.1109/CRV.2015.15, lire en ligne [PDF] ).
+↑ (en) Rose Moskolai, Wahabou Abdou, Albert Dipanda et Kolyang, « Application of Deep Learning Architectures for Satellite Image Time Series Prediction: A Review », Remote Sensing, vol. 13, n o 23,‎ 2021, p. 4822 ( lire en ligne ).
+↑ M. Oberweger, P. Wohlhart et V. Lepetit (2015), « Hands Deep in Deep Learning for Hand Pose Estimation », arXiv preprint arXiv:1502.06807.
+↑ (en) S. E. Kahou, X. Bouthillier, P. Lamblin, C. Gulcehre, V. Michalski, K. Konda, … et Y. Bengio (2015). EmoNets: Multimodal deep learning approaches for emotion recognition in video. arXiv preprint arXiv:1503.01800.
+↑ David Louapre, Le Labo du jeu vidéo, Paris, Albin Michel, coll. « Sciences », 2026, 432 p. ( ISBN 978-2-226-49023-0 ), 1 – Du pixel au photon, chap. 7 (« Des effets comme au cinéma »), p. 101-102.
+↑ « DeepArt, l'ordinateur qui peint votre portrait », sur actu.epfl.ch, 11 avril 16 (consulté le 5 juillet 2016 ).
+↑ (en) Aditya Ramesh, Mikhail Pavlov, Gabriel Goh et Scott Gray, « Zero-Shot Text-to-Image Generation », Proceedings of the 38th International Conference on Machine Learning, PMLR,‎ 1 er juillet 2021, p. 8821–8831 ( lire en ligne, consulté le 29 juillet 2026 )
+↑ Fabio Merizzi, Perrine Saillard, Oceane Acquier et Elena Morotti, Deep image prior inpainting of ancient frescoes in the Mediterranean Alpine arc, 11 décembre 2023 ( DOI 10.48550/arXiv.2306.14209, lire en ligne )
+↑ A. Kendall et R. Cipolla (2015), « Modelling Uncertainty in Deep Learning for Camera Relocalization », arXiv preprint arXiv:1509.05909 ( résumé ).
+↑ Sorin Grigorescu, Bogdan Trasnea, Tiberiu Cocias et Gigel Macesanu, « A Survey of Deep Learning Techniques for Autonomous Driving », Journal of Field Robotics, vol. 37, n o 3,‎ avril 2020, p. 362–386 ( ISSN 1556-4959 et 1556-4967, DOI 10.1002/rob.21918, lire en ligne, consulté le 29 juillet 2026 )
+↑ (en) « https://dl.acm.org/action/cookieAbsent », sur ACM Digital Library ( DOI 10.1609/aaai.v39i27.35095, consulté le 29 juillet 2026 )
+↑ (en) Reza Hoseinnezhad, « A Comprehensive Review of Deep Learning Techniques in Mobile Robot Path Planning: Categorization and Analysis », Applied Sciences, vol. 15, n o 4,‎ 18 février 2025, p. 2179 ( ISSN 2076-3417, DOI 10.3390/app15042179, lire en ligne [ archive du 14 avril 2026 ], consulté le 29 juillet 2026 )
+↑ Nihel Kooli et Erwan Pigneul, « Analyse de sentiments à base d'aspects par combinaison de réseaux profonds: application à des avis en français (A combination of deep learning methods for aspect-based sentiment analysis: application to French reviews) », Actes de la Conférence TALN. Volume 1 - Articles longs, articles courts de TALN, ATALA,‎ mai 2018, p. 303–310 ( lire en ligne, consulté le 29 juillet 2026 )
+↑ Yonghui Wu, Mike Schuster, Zhifeng Chen et Quoc V. Le, Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation, 8 octobre 2016 ( DOI 10.48550/arXiv.1609.08144, lire en ligne )
+↑ Mohamad Kamaluddin, Moch Rasyid, Fourus Abqoriyyah et Andang Saehu, « Accuracy Analysis of DeepL: Breakthroughs in Machine Translation Technology », Journal of English Education Forum (JEEF), vol. 4,‎ 29 juin 2024, p. 122–126 ( DOI 10.29303/jeef.v4i2.681, lire en ligne, consulté le 29 juillet 2026 )
+↑ Derong XU, Wei CHEN, Wenjun PENG et Chao ZHANG, « Large language models for generative information extraction: a survey », Frontiers of Computer Science, vol. 18, n o 6,‎ décembre 2024 ( ISSN 2095-2228, DOI 10.1007/s11704-024-40555-y, lire en ligne, consulté le 29 juillet 2026 )
+↑ Mark Chen, Jerry Tworek, Heewoo Jun et Qiming Yuan, Evaluating Large Language Models Trained on Code, 14 juillet 2021 ( DOI 10.48550/arXiv.2107.03374, lire en ligne )
+↑ George Tsoukalas, Anton Kovsharov, Sergey Shirobokov et Anja Surina, Advancing Mathematics Research with AI-Driven Formal Proof Search, 8 juin 2026 ( DOI 10.48550/arXiv.2605.22763, lire en ligne )
+↑ Masduki Khamdan Muchamad, Zahrul Fuadi et Nasaruddin Nasaruddin, « Prototype Design of Deep Learning-based Voice Control Model for Smart Home », 2022 IEEE International Conference on Internet of Things and Intelligence Systems (IoTaIS),‎ novembre 2022, p. 25–30 ( DOI 10.1109/IoTaIS56727.2022.9975901, lire en ligne, consulté le 29 juillet 2026 )
+↑ Alec Radford, Jong Wook Kim, Tao Xu et Greg Brockman, Robust Speech Recognition via Large-Scale Weak Supervision, 6 décembre 2022 ( DOI 10.48550/arXiv.2212.04356, lire en ligne )
+↑ Chengyi Wang, Sanyuan Chen, Yu Wu et Ziqiang Zhang, Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers, 5 janvier 2023 ( DOI 10.48550/arXiv.2301.02111, lire en ligne )
+↑ (fy) « A Hybrid DSP/Deep Learning Approach to Real-Time Full-Band Speech Enhancement », sur Mozilla Foundation (consulté le 29 juillet 2026 )
+↑ (en) Romain Hennequin, Anis Khlif, Felix Voituret et Manuel Moussallam, « Spleeter: a fast and efficient music source separation tool with pre-trained models », Journal of Open Source Software, vol. 5, n o 50,‎ 24 juin 2020, p. 2154 ( ISSN 2475-9066, DOI 10.21105/joss.02154, lire en ligne, consulté le 29 juillet 2026 )
+↑ Jade Copet, Felix Kreuk, Itai Gat et Tal Remez, « Simple and controllable music generation », Proceedings of the 37th International Conference on Neural Information Processing Systems, Curran Associates Inc., nIPS '23,‎ 10 décembre 2023, p. 47704–47720 ( DOI 10.5555/3666122.3668188, lire en ligne, consulté le 29 juillet 2026 )
+↑ (en-US) Stefan Kahl, Connor M. Wood, Maximilian Eibl et Holger Klinck, « BirdNET: A deep learning solution for avian diversity monitoring », Ecological Informatics, vol. 61,‎ mars 2021, p. 101236 ( ISSN 1574-9541, DOI 10.1016/j.ecoinf.2021.101236, lire en ligne [ archive du 13 juillet 2024 ], consulté le 29 juillet 2026 )
+↑ (en) David Silver, Aja Huang, Chris J. Maddison et Arthur Guez, « Mastering the game of Go with deep neural networks and tree search », Nature, vol. 529, n o 7587,‎ janvier 2016, p. 484–489 ( ISSN 1476-4687, DOI 10.1038/nature16961, lire en ligne, consulté le 29 juillet 2026 )
+↑ (en) Oriol Vinyals, Igor Babuschkin, Wojciech M. Czarnecki et Michaël Mathieu, « Grandmaster level in StarCraft II using multi-agent reinforcement learning », Nature, vol. 575, n o 7782,‎ novembre 2019, p. 350–354 ( ISSN 1476-4687, DOI 10.1038/s41586-019-1724-z, lire en ligne, consulté le 29 juillet 2026 )
+↑ Volodymyr Mnih, Koray Kavukcuoglu, David Silver et Alex Graves, Playing Atari with Deep Reinforcement Learning, 19 décembre 2013 ( DOI 10.48550/arXiv.1312.5602, lire en ligne )
+↑ (en) P. Baldi, P. Sadowski et D. Whiteson (2014), « Searching for exotic particles in highenergy physics with deep learning », Nature Communications, 5, 23.
+↑ (en) Jonas Degrave, Federico Felici, Jonas Buchli et Michael Neunert, « Magnetic control of tokamak plasmas through deep reinforcement learning », Nature, vol. 602, n o 7897,‎ février 2022, p. 414–419 ( ISSN 1476-4687, DOI 10.1038/s41586-021-04301-9, lire en ligne, consulté le 29 juillet 2026 )
+↑ (en-US) M. Raissi, P. Perdikaris et G.E. Karniadakis, « Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations », Journal of Computational Physics, vol. 378,‎ février 2019, p. 686–707 ( ISSN 0021-9991, DOI 10.1016/j.jcp.2018.10.045, lire en ligne [ archive du 13 janvier 2025 ], consulté le 29 juillet 2026 )
+↑ B. Alipanahi, A. Delong, M. T. Weirauch et B. J. Frey (2015), « Predicting the sequence specificities of DNA-and RNA-binding proteins by deep learning », Nature Biotechnology ( résumé ).
+↑ (en) Jian Zhou et Olga G Troyanskaya, « Predicting effects of noncoding variants with deep learning–based sequence model », Nature Methods, vol. 12, n o 10,‎ octobre 2015, p. 931–934 ( ISSN 1548-7091 et 1548-7105, PMID 26301843, PMCID PMC4768299, DOI 10.1038/nmeth.3547 ).
+↑ (en) Anindya Gupta, Philip J. Harrison, Håkan Wieslander et Nicolas Pielawski, « Deep Learning in Image Cytometry: A Review », Cytometry Part A, vol. 95, n o 4,‎ 2019, p. 366–380 ( ISSN 1552-4930, DOI 10.1002/cyto.a.23701, lire en ligne, consulté le 23 avril 2019 ).
+↑ (en) Eric J. Topol, « High-performance medicine: the convergence of human and artificial intelligence », Nature Medicine, vol. 25, n o 1,‎ janvier 2019, p. 44–56 ( ISSN 1546-170X, DOI 10.1038/s41591-018-0300-7, lire en ligne, consulté le 29 juillet 2026 )
+↑ (en) Varun Gulshan, Lily Peng, Marc Coram et Martin C. Stumpe, « Development and Validation of a Deep Learning Algorithm for Detection of Diabetic Retinopathy in Retinal Fundus Photographs », JAMA, vol. 316, n o 22,‎ 13 décembre 2016, p. 2402 ( ISSN 0098-7484, DOI 10.1001/jama.2016.17216, lire en ligne, consulté le 3 février 2024 ).
+↑ (en) A. Halpern et J. R. Smith (octobre 2015), « Deep Learning, Sparse Coding, and SVM for Melanoma Recognition in Dermoscopy Images », dans Machine Learning in Medical Imaging: 6th International Workshop, MLMI 2015, organisé en conjunction avec MICCAI 2015, Munich, Allemagne, 5 octobre 2015, Proceedings (Vol. 9 352, p. 118), Springer ( résumé ).
+↑ (en) Andre Esteva, Brett Kuprel, Roberto A. Novoa et Justin Ko, « Dermatologist-level classification of skin cancer with deep neural networks », Nature, vol. 542, n o 7639,‎ 2 février 2017, p. 115–118 ( ISSN 0028-0836 et 1476-4687, PMID 28117445, PMCID PMC8382232, DOI 10.1038/nature21056, lire en ligne, consulté le 3 février 2024 ).
+↑ (en) Laetitia Jeancolas, Dijana Petrovska-Delacrétaz, Graziella Mangone, Badr-Eddine Benkelfat, Jean-Christophe Corvol, Marie Vidailhet, Stéphane Lehéricy et Habib Benali, « X-Vectors: New Quantitative Biomarkers for Early Parkinson's Disease Detection From Speech », Frontiers in Neuroinformatics, vol. 15,‎ 2021 ( ISSN 1662-5196, DOI 10.3389/fninf.2021.578369, lire en ligne ).
+↑ Hu Chen, Yi Zhang, Mannudeep K. Kalra et Feng Lin, « Low-Dose CT With a Residual Encoder-Decoder Convolutional Neural Network », IEEE transactions on medical imaging, vol. 36, n o 12,‎ décembre 2017, p. 2524–2535 ( ISSN 1558-254X, PMID 28622671, PMCID 5727581, DOI 10.1109/TMI.2017.2715284, lire en ligne, consulté le 29 juillet 2026 )
+↑ Michael P. Recht, Jure Zbontar, Daniel K. Sodickson et Florian Knoll, « Using Deep Learning to Accelerate Knee MRI at 3 T: Results of an Interchangeability Study », AJR. American journal of roentgenology, vol. 215, n o 6,‎ décembre 2020, p. 1421–1429 ( ISSN 1546-3141, PMID 32755163, PMCID 8209682, DOI 10.2214/AJR.20.23313, lire en ligne, consulté le 29 juillet 2026 )
+↑ (en) N. Koonjoo, B. Zhu, G. Cody Bagnall et D. Bhutto, « Boosting the signal-to-noise of low-field MRI with deep learning image reconstruction », Scientific Reports, vol. 11, n o 1,‎ 15 avril 2021, p. 8248 ( ISSN 2045-2322, DOI 10.1038/s41598-021-87482-7, lire en ligne, consulté le 29 juillet 2026 )
+↑ Olivier Lascar, « Le système de reconnaissance visuelle Horus destiné aux aveugles doit tout au "deep learning" », sur Sciences et Avenir.fr, 9 janvier 2017 (consulté le 21 février 2018 ).
+↑ (en-US) « Facial Recognition for Porn Stars Is a Privacy Nightmare Waiting to Happen », Motherboard,‎ 11 octobre 2017 ( lire en ligne, consulté le 26 janvier 2018 ).
+↑ « Le porno avec des stars incrustées dedans n’est pas le bienvenu sur Internet », Madmoizelle,‎ 8 février 2018 ( lire en ligne, consulté le 8 février 2018 ).
+↑ (en-US) Fabrice Lollia, « Deepfakes et élections en Afrique: la prochaine grande menace démocratique? », sur The Conversation, 3 octobre 2025 (consulté le 17 juillet 2026 )
+↑ « Hongrie: une campagne électorale dopée à la désinformation générée par IA », TV5MONDE - Informations,‎ 10 avril 2026 ( lire en ligne [ archive du 11 avril 2026 ], consulté le 17 juillet 2026 )
+↑ « Le «halo de la deepfake»: le mensonge politique au-delà des images », sur Telos, 23 février 2026 (consulté le 17 juillet 2026 )
+↑ « Pourquoi Jean-Luc Mélenchon est accusé à tort d'avoir publié une image générée par IA », sur Les Observateurs - France 24, 14 mai 2025 (consulté le 17 juillet 2026 )
+↑ « Sextorsion et deepfake: une nouvelle ligne de front dans la lutte contre la cybercriminalité », sur rts.ch, 18 octobre 2025 (consulté le 17 juillet 2026 )
+↑ Chloé Costecalde, « Piégée par un faux Emmanuel Macron, une retraitée investit ses économies et perd 25.000 euros », sur Le Figaro, 15 juin 2026 (consulté le 17 juillet 2026 )
+↑ Morgane Tual, « « Deepfake »: dupée par une voix synthétique, une entreprise se fait dérober 220 000 euros », Le Monde,‎ 11 novembre 2019 ( ISSN 1950-6244, lire en ligne, consulté le 17 juillet 2026 )
+↑ (en) « Global deepfake fraud reaches $2.19B — US leads in losses », sur Surfshark (consulté le 17 juillet 2026 )
+↑ (en-GB) Ariel Bogle, « New York Times, CNN and Australia’s ABC block OpenAI’s GPTBot web crawler from accessing content », The Guardian,‎ 25 août 2023 ( ISSN 0261-3077, lire en ligne, consulté le 17 juillet 2026 )
+↑ « Hachette et d’autres éditeurs poursuivent Google, l’accusant de violer les droits d’auteur avec son IA Gemini », Le Monde,‎ 15 juillet 2026 ( ISSN 1950-6244, lire en ligne, consulté le 17 juillet 2026 )
+↑ (en) « News outlets urge a judge to sanction OpenAI in a high-stakes AI copyright fight », sur AP News, 9 juillet 2026 (consulté le 17 juillet 2026 )
+↑ (en-US) Rachel Scharf, « Anthropic Argues for Fair Use in UMG’s AI Lawsuit: ‘Training on Lyrics Is Transformative’ », sur Billboard, 22 avril 2026 (consulté le 17 juillet 2026 )
+↑ (en) « Stability AI largely wins UK court battle against Getty Images over copyright and trademark », sur AP News, 4 novembre 2025 (consulté le 17 juillet 2026 )
+↑ (en-US) Maximiliano Marzetti, « Les droits d’auteur en danger? Ce que l’affaire « Bartz contre Anthropic » risque de changer aux États-Unis… et ailleurs », sur The Conversation, 17 juillet 2025 (consulté le 17 juillet 2026 )
+↑ « Livres, droits d'auteur et IA: Meta poursuivi en France », sur snrtnews.com (consulté le 17 juillet 2026 )
+↑ « OpenAI reconnu coupable d’avoir enfreint les droits d’auteur de chansons en Allemagne, une première victoire pour l’industrie musicale », Le Monde,‎ 11 novembre 2025 ( ISSN 1950-6244, lire en ligne, consulté le 17 juillet 2026 )
+↑ (en) « U.S. Copyright Office Issues Report on Artificial Intelligence and Copyrightability | Insights | Sidley Austin LLP », sur www.sidley.com (consulté le 17 juillet 2026 )
+↑ « Protéger les œuvres soumises aux droits d’auteur à l’ère de l’IA | Actualité | Parlement européen », sur www.europarl.europa.eu, 10 mars 2026 (consulté le 17 juillet 2026 )
+↑ (en-US) « Thaler v. Perlmutter », sur Stanford Copyright and Fair Use Center, 18 mars 2025 (consulté le 17 juillet 2026 )
+↑ (en) « Copyright Office Publishes Report on Copyrightability of AI-Generated Materials | Insights | Skadden, Arps, Slate, Meagher & Flom LLP », sur www.skadden.com (consulté le 17 juillet 2026 )
+↑ Agnieszka Mikołajczyk-Bareła et Michał Grochowski, « A Survey on Bias in Machine Learning Research », IEEE Access, vol. 14,‎ 2026, p. 3284–3311 ( ISSN 2169-3536, DOI 10.1109/ACCESS.2025.3649998, lire en ligne, consulté le 17 juillet 2026 )
+↑ (en) Ankur Kumar, Sanjay Dhanka, Abhinav Sharma et Anchal Sharma, « A Comprehensive Review of Bias in AI, ML, and DL Models: Methods, Impacts, and Future Directions », Archives of Computational Methods in Engineering, vol. 33, n o 4,‎ 1 er mai 2026, p. 5743–5773 ( ISSN 1886-1784, DOI 10.1007/s11831-025-10483-6, lire en ligne, consulté le 17 juillet 2026 )
+↑ (en) Patrick Grother, Mei Ngan et Kayee Hanaoka, « Face Recognition Vendor Test Part 3: Demographic Effects », www.nist.gov, National Institute of Standards and Technology, n o 8280,‎ 19 décembre 2019 ( lire en ligne, consulté le 17 juillet 2026 )
+↑ « Pourquoi les algorithmes de reconnaissance faciale ne peuvent pas être parfaitement équitables sur tous les fronts en même temps », sur www.telecom-paris.fr (consulté le 17 juillet 2026 )
+↑ « Amazon met fin à une intelligence artificielle sexiste », sur France Inter, 12 octobre 2018 (consulté le 17 juillet 2026 )
+↑ (en) Jeffrey Dastin, « Insight - Amazon scraps secret AI recruiting tool that showed bias against women », sur reuters, 11 octobre 2018 (consulté le 17 juillet 2026 )
+↑ « Algorithmes: prévenir l’automatisation des discriminations » [PDF], sur defenseurdesdroits, mai 2020 (consulté le 17 juillet 2026 )
+↑ « Le règlement européen sur l'intelligence artificielle (AI Act) », sur Les services de l'État dans l'Ain (consulté le 17 juillet 2026 )
+↑ « Intelligence artificielle, données, calculs: quelles infrastructures dans un monde décarboné? » [PDF], sur theshiftproject, octobre 2025 (consulté le 18 juillet 2026 )
+↑ Pauline Bandelier, « Le refroidissement liquide gagne du terrain dans les centres de données », L'Usine Nouvelle,‎ 2 décembre 2024 ( lire en ligne )
+↑ (en) « There are many ways to minimise water use related to AI operations, but they may not be what you think », sur oecd.ai (consulté le 18 juillet 2026 )
+↑ « Nouveau jalon dans la transparence environnementale de l’IA générative - Analyse du cycle de vie d’un LLM de Mistral AI », sur Carbone 4 (consulté le 18 juillet 2026 )
+(en) Ian Goodfellow, Yoshua Bengio et Aaron Courville, Deep Learning, MIT Press, 2016 ( ISBN 0262035618, lire en ligne ) [ détail des éditions ]
+↑ Deep learning book, p. 1.
+↑ p. 13.
+↑ Deep learning book, p. 18 à 23.
+↑ p. 18 et 19
+↑ p. 19
+↑ p. 20 et 23
+Voir aussi
+Comparaison de logiciels d'apprentissage profond
+Articles connexes
+Notions
+Algorithme émergent
+Apprentissage
+Apprentissage automatique ( machine learning )
+Apprentissage par renforcement profond
+Modèle du monde
+Apprentissage non supervisé
+Apprentissage supervisé
+Automation
+Connexionnisme
+Cybernétique
+Histoire de l'intelligence artificielle
+Informatique
+Intelligence artificielle
+Reconnaissance automatique de la parole
+Réseau de neurones artificiels
+Révolution numérique
+Robotique
+Traitement automatique du langage naturel
+Vision artificielle
+Extreme learning machine
+Logiciels
+Keras
+MATLAB
+PyTorch
+TensorFlow
+Theano (logiciel)
+Théoriciens
+Yoshua Bengio
+Geoffrey Hinton
+Yann LeCun
+François Chollet
+Liens externes
+Medical Subject Headings
+France 24
+Store norske leksikon
+Universalis
+BnF ( données )
+LCCN
+GND
+Israël
+Tchéquie
+Lettonie
+L'apprentissage profond: une révolution en intelligence artificielle.
+Bibliographie
+(en) Ian Goodfellow, Yoshua Bengio et Aaron Courville, Deep Learning, MIT Press, 2016 ( ISBN 0262035618, lire en ligne ) [ détail des éditions ].
+(en) Christopher M. Bishop et Hugh Bishop, Deep Learning: Foundations and Concepts, Springer, novembre 2023, 669 p. ( ISBN 978-3-031-45467-7, lire en ligne ).
+Le 7 août 2026, Apprentissage profond a été proposé pour être reconnu comme un « bon article ». Vous pouvez donner votre avis sur cette proposition. Suivi des modifications de l'article depuis la proposition.
+v · m Deep learning
+Logiciels open-source
+Apache SINGA
+Caffe (software) (en)
+Deeplearning4j
+DLib (en)
+Keras
+Microsoft Cognitive Toolkit
+Apache MXNet
+OpenNN
+PyTorch
+TensorFlow
+Theano
+Torch (machine learning) (en)
+ONNX
+Logiciels propriétaires
+Maple
+Neural Designer
+Mathematica
+Apple Core ML
+v · m Science des données
+Concepts
+MapReduce
+Apprentissage profond
+Extreme learning machine
+Apprentissage automatique
+Apprentissage supervisé
+Apprentissage non supervisé
+Réseau de neurones artificiels
+Visualisation de données
+Exploration de données
+Fouille de textes
+Segmentation
+Intelligence artificielle
+Big data
+Data lineage
+Architecture
+Hadoop
+Cloudera
+Hortonworks
+Apache Hive
+NoSQL
+NewSQL
+HBase
+Cassandra
+Apache Spark
+Outils
+Presto
+Apache Impala
+Pig
+Tableau Software
+Elasticsearch
+MongoDB
+Apache Mahout
+Scikit-learn
+TensorFlow
+Theano (logiciel)
+SPSS
+JMP
+Dataiku
+Apache MXNet
+ONNX
+Apache SINGA
+Keras
+Programmation
+Ggplot2
+SAS
+Python
+Julia
+SQL
+Scala
+Statistique
+ACP
+AFC
+ACM
+Méthode des moindres carrés
+Analyse des données
+Homoscédasticité
+Knn
+Cartes de Kohonen
+Statistique multivariée
+Théorème de Bayes
+Analyse de la variance
+Test du χ²
+Distance de Cook
+Articles liés
+Watson
+Teradata
+Glossaire de l'exploration de données
+Extract-transform-load
+Traitement analytique en ligne
+v · m Informatique théorique
+Codage
+Codage de l'information
+Compression de données
+Chiffrement
+Cryptanalyse
+Cryptographie
+Théorie de l'information
+Modèles de calcul
+Calculabilité
+Décidabilité et indécidabilité
+Ensemble récursif
+Problème de l'arrêt
+Ensemble récursivement énumérable
+Machine de Turing
+Thèse de Church
+Automate cellulaire
+Réseau de neurones artificiels
+Réduction polynomiale
+Problème NP-complet
+Principe de Church-Turing-Deutsch
+Algorithmique
+Algorithmique
+Algorithme glouton
+Algorithme probabiliste
+Algorithme génétique
+Complexité algorithmique
+Analyse d'algorithme
+Diviser pour régner
+Heuristique
+Programmation dynamique
+Géométrie algorithmique
+Algorithmes de tri
+Algorithmique du texte
+Exploration de données
+Science des données
+Apprentissage profond
+Test de primalité
+Structure de données
+Arbre enraciné
+Concurrence
+Parallélisme
+Syntaxe
+Réécriture
+Compilation
+Expression régulière
+Grammaire formelle
+Langage rationnel
+Ensemble rationnel
+Théorie des langages
+Théorie des automates
+Automate fini
+Automate sur les mots infinis
+Automate d'arbres
+Automate à pile
+Hiérarchie de Chomsky
+Linguistique informatique
+Sémantique
+Interprétation abstraite
+Méthodes formelles
+Vérification de modèles
+Sémantique des langages de programmation
+Sémantique dénotationnelle
+Sémantique axiomatique
+Sémantique opérationnelle
+Logique mathématique
+Assistant de preuve
+Calcul des prédicats
+Correspondance de Curry-Howard
+Fonction récursive
+Lambda-calcul
+Théorèmes d'incomplétude de Gödel
+Théorie des types
+Mathématiques discrètes
+Combinatoire
+Algorithme du simplexe
+Optimisation combinatoire
+Théorie des graphes
+Algorithmes de la théorie des graphes
+Recherche opérationnelle
+Théorie de la décision
+Analyse numérique
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+v · m Intelligence artificielle (IA)
+Concepts
+IA agentique
+Effet IA
+Grand modèle de langage
+Hallucination
+IA générative
+Test de Turing
+Techniques
+Analyse prédictive
+Apprentissage automatique
+Apprentissage non supervisé
+Apprentissage profond
+Apprentissage supervisé
+Génération à enrichissement contextuel
+Machine d'apprentissage logique
+Modèle de fondation
+Modèle des croyances transférables
+IA symbolique
+Réseau bayésien
+Réseau de neurones récurrents
+Réseau neuronal convolutif
+Transformeur
+Transformeur génératif préentraîné
+Système expert
+Apprentissage par renforcement à partir de rétroaction humaine
+Applications
+Art créé par IA
+Apple Intelligence
+ChatGPT
+Conséquences économiques de l'intelligence artificielle
+DeepL
+Diagnostic
+Écriture assistée par IA
+IA dans la santé
+IA dans le jeu vidéo
+Modèle texte-image
+Modèle texte-vidéo
+Perception artificielle
+Planification
+Robotique
+Synthèse vocale
+Traduction automatique
+Traitement automatique des langues
+Véhicule autonome
+Vision par ordinateur
+Enjeux et philosophie
+Alignement des intelligences artificielles
+Chambre chinoise
+Conscience artificielle
+Contrôle des capacités de l'IA
+Détection de contenu généré par IA
+Éthique de l'IA
+IA digne de confiance
+Philosophie de l'IA
+Sûreté des IA
+Histoire et événements
+Logic Theorist (1955)
+Perceptron (1957)
+General Problem Solver (1959)
+Prolog (1972)
+Matchs Deep Blue contre Kasparov (1996-1997)
+Match AlphaGo - Lee Sedol (2016)
+Sommet pour l'action sur l'IA (2025)
+Concepts prospectifs
+Anticipation
+IA-complet
+IA générale
+Risque existentiel posé par l'IA
+Superintelligence
+Règlementation
+Réglementation de l'IA
+Règlement sur l'IA
+Organisations
+Agence francophone pour l'IA
+Anthropic
+Google DeepMind
+Hugging Face
+OpenAI
+Partenariat sur l'IA
+Ouvrages
+Déclaration de Montréal pour un développement responsable de l'IA
+I.A. La Plus Grande Mutation de l'Histoire
+Intelligence artificielle: une approche moderne
+Lettre ouverte sur l'IA
+Power and Progress
+Superintelligence: Paths, Dangers, Strategies
+Portail de l’intelligence artificielle
+Portail de l'informatique théorique
+Portail des données

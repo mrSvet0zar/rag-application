@@ -1,0 +1,48 @@
+# Validation croisée
+
+Source : fr.wikipedia.org, révision 214276325
+
+Pour les articles homonymes, voir Validation (homonymie).
+Cet article est une ébauche concernant les mathématiques.
+Vous pouvez partager vos connaissances en l’améliorant ( comment? ) selon les recommandations des projets correspondants.
+En statistiques et en apprentissage automatique, la validation croisée ( « cross-validation » en anglais) est une méthode d’estimation de fiabilité d’un modèle fondée sur une technique d’ échantillonnage.
+Motivation
+Considérons un modèle statistique avec un ou plusieurs paramètres inconnus, et un ensemble de données d'apprentissage sur lequel on peut apprendre (ou « entraîner ») le modèle. Le processus d'apprentissage optimise les paramètres du modèle afin que celui-ci corresponde le mieux possible aux données d'apprentissage. Si on prend ensuite un échantillon de validation indépendant, supposément issu de la même population que l'échantillon d'apprentissage, il s'avérera en général que le modèle ne modélise pas aussi bien les données de validation que les données d'apprentissage: on parle de surapprentissage. Néanmoins, un échantillon de validation indépendant n'est pas toujours disponible. De plus, d'un échantillon de validation à un autre, la performance de validation du modèle peut varier. La validation croisée permet de tirer plusieurs ensembles de validation d'une même base de données et ainsi d'obtenir une estimation plus robuste, avec biais et variance, de la performance de validation du modèle.
+Techniques de validation
+Il existe de nombreuses variantes de validation mais on peut distinguer les trois suivantes dans un premier temps.
+Validation non-croisée
+Pour la validation non-croisée, « test set validation » ou « holdout method », on divise l'échantillon de taille en deux sous-échantillons, le premier dit d'apprentissage (communément supérieur à 60 % de l'échantillon) et le second dit de validation ou de test. Le modèle est bâti sur le sous-échantillon d'apprentissage. Il est validé sur le sous-échantillon de test avec un score de performance de notre choix.
+Validation croisée à k blocs
+Validation croisée à k = 3 blocs avec n = 12 observations. Après mélange, il sera possible de valider 3 fois le modèle. En bleu, tour à tour, l'ensemble de validation. En rouge, tour à tour, l'ensemble d'apprentissage.
+Pour la validation croisée à blocs, « k-fold cross-validation », on divise l'échantillon original en échantillons (ou « blocs »), puis on sélectionne un des échantillons comme ensemble de validation pendant que les autres échantillons constituent l' ensemble d'apprentissage. Après apprentissage, on peut calculer une performance de validation. Puis on répète l'opération en sélectionnant un autre échantillon de validation parmi les blocs prédéfinis. À l'issue de la procédure nous obtenons ainsi scores de performances, un par bloc. La moyenne et l'écart type des scores de performances peuvent être calculés pour estimer le biais et la variance de la performance de validation.
+Tableau de répartitions des données pour une validation croisée à k=3 blocs
+bloc 1
+bloc 2
+bloc 3
+validation
+apprentissage
+apprentissage
+apprentissage
+validation
+apprentissage
+apprentissage
+apprentissage
+validation
+Validation croisée d'un contre tous
+Validation croisée un contre tous pour n = 8 observations. Le modèle peut être entrainé et validé 8 fois.
+La validation croisée d'un contre tous, « leave-one-out cross-validation » (LOOCV) est le cas particulier de la validation croisée à blocs avec. C'est-à-dire qu'à chaque itération d'apprentissage-validation, l'apprentissage se fait sur observations et la validation sur l'unique observation restante.
+Après avoir réalisé la validation du modèle, il faut alors passer au test avec le jeu de test précédemment mis de côté.
+Gestion des bases de données non-équilibrées
+Dans les tâches de classification, la répartition des classes dans la base de données peut être déséquilibrée, c'est-à-dire que le nombre d'observations par classe peut ne pas être le même d'une classe à l'autre: si l'on dénote le nombre d'observations de la -ème classe, alors il existe tel que. Dans ce cas, pour éviter que la performance de validation (et d'apprentissage) ne soit biaisée par une répartition changeante des classes d'un ensemble de validation (resp. d'apprentissage) à un autre, il est recommandé d'utiliser une validation croisée stratifiée (« stratified cross validation »). La stratification consiste à s'assurer que la répartition des classes soit la même dans tous les ensembles d'apprentissage et de validation utilisés. C'est-à-dire que si la base de données initiale présente, par exemple, 3 observations de la classe 1 pour 7 observations de la classe 2, alors chaque ensemble de validation (resp. d'apprentissage) devra présenter ce ratio de 3 pour 7.
+Dans le cas de la validation croisée à blocs, il s'agit simplement de répartir les classes de la même manière d'un bloc à un autre. Les ensembles de validation et d'apprentissage qui en dériveront hériteront de cette répartition.
+Voir aussi
+Liens internes
+Apprentissage automatique
+Bootstrap (statistiques)
+Jackknife
+Références
+↑ Payam Refaeilzadeh, Lei Tang, Huan Liu, « Cross-Validation » ( Archive.org • Wikiwix • Google • Que faire? ) (consulté le 20 avril 2020 )
+↑ Andrew W. Moore, Cross-validation for detecting and preventing overfitting
+Portail de l’informatique
+Portail des probabilités et de la statistique
+Portail de l'informatique théorique

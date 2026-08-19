@@ -1,0 +1,299 @@
+# Grand modèle de langage
+
+Source : fr.wikipedia.org, révision 238586790
+
+Type
+Type de modèle d'intelligence artificielle ( d ), modèle de langage
+Nom court
+(en) LLM
+Décrit par
+Large Language Models ( d )
+Aspect de
+Intelligence artificielle
+modifier - modifier le code - modifier Wikidata
+Un grand modèle de langage, grand modèle linguistique, grand modèle de langue,, modèle de langage de grande taille ou encore modèle massif de langage (abrégé LLM de l' anglais large language model ) est un modèle de langage possédant un grand nombre de paramètres (généralement plus d'un milliard).
+Ce sont des réseaux de neurones profonds entraînés par apprentissage auto-supervisé sur de grandes quantités de texte. Les grands modèles de langage sont apparus vers 2017 et ont été utilisés pour la mise en œuvre d' agents conversationnels. Ils constituent également le socle technique des moteurs de recherche génératifs, qui synthétisent directement une réponse en langage naturel à partir de multiples sources plutôt que de retourner une liste de liens.
+Au lieu d'être entraînés pour une tâche spécifique comme l' analyse des sentiments, la reconnaissance d'entités nommées ou le raisonnement mathématique, ils peuvent accomplir un large éventail de tâches. Ils sont d'abord « pré-entraînés » à prédire une suite probable pour une entrée donnée. Cela leur permet d'acquérir une grande quantité de connaissances. La qualité du contenu généré semble augmenter régulièrement avec le nombre de paramètres, la taille et la qualité des données d'entraînement, ainsi que la quantité de calculs utilisée pour entraîner le modèle. Les grands modèles de langage sont ensuite le plus souvent entraînés par réglage fin ( fine-tuning ) pour adopter un rôle d'assistant conversationnel et afin d'être « utiles, sincères et inoffensifs ».
+Les modèles de langage possédant un grand nombre de paramètres s'avèrent capables de capturer une grande partie de la syntaxe et de la sémantique du langage humain. Avant le succès des grands modèles de langage, l'attention des chercheurs en traitement automatique des langues était principalement focalisée sur l' apprentissage supervisé de modèles spécialisés pour des tâches spécifiques.
+Architecture
+Un modèle de langage reçoit typiquement en entrée des données séquentielles de longueur variable. Pendant longtemps, l'architecture utilisée préférentiellement pour ce genre de données était celle dite de réseaux de neurones récurrents. Cette architecture présentait comme inconvénient majeur de mal se prêter à la parallélisation des calculs nécessaires à l'entrainement.
+En 2017, un article très influent suggère qu'une architecture non récurrente, le transformeur, basée sur un mécanisme d'attention, peut avec succès traiter des données séquentielles tout en étant parallélisable lors de l'entrainement.
+C'est l'avènement de cette architecture, et surtout les gains en performance qu'elle procure, qui permettent aux chercheurs d'augmenter considérablement le nombre de paramètres de leurs modèles, d'où le qualificatif « grand » les concernant. La plupart des grands modèles de langage utilisent donc cette architecture, même si la recherche se poursuit pour trouver des architectures encore plus performantes,,,.
+Analyse lexicale
+Les LLM sont des fonctions mathématiques dont l'entrée et la sortie sont des listes de nombres. Pour que ceux-ci fonctionnent avec des mots, une conversion est nécessaire.
+Cette conversion est ce qu'on appelle l' analyse lexicale. L'analyseur lexical est une fonction bijective qui établit une correspondance entre des textes et des listes de nombres entiers. Il est généralement d'abord adapté à l'ensemble complet des données d'entraînement, puis gelé, avant que le modèle de langage ne soit entraîné. Un choix courant est le codage par paires d'octets.
+Une autre fonction des analyseurs lexicaux est la compression de texte, qui épargne du temps de calcul. Des mots ou expressions courants tels que « où est » peuvent être encodés dans une seule unité lexicale (ou jeton, token en anglais), au lieu d'être encodés par six caractères. La série de modèles GPT d' OpenAI utilise un analyseur lexical où une unité lexicale correspond à environ quatre caractères, soit environ 0,75 mot dans un texte anglais courant. Un texte anglais peu courant est moins prévisible, donc moins compressible, nécessitant ainsi plus de jetons pour être encodé.
+Un analyseur lexical convertit une suite de caractères en un nombre entier dans la plage, où est appelé la taille de vocabulaire.
+Certains sont capables de gérer des textes arbitraires en opérant généralement directement sur Unicode, mais d'autres non. Lorsqu'il rencontre du texte non encodable, un analyseur lexical génère une unité lexicale spéciale (par exemple 0) qui représente un « texte inconnu ». Ceci est souvent écrit comme [UNK], comme dans l'article du modèle BERT.
+Une autre unité lexicale spéciale couramment utilisée est [PAD] (souvent 1), pour « padding ». Ceci est utilisé car les LLM sont généralement utilisés sur différents lots de texte à la fois, et ces textes ne sont pas codés à la même longueur. Étant donné que les LLM exigent généralement que l'entrée soit un tableau de taille fixe, les textes les plus courts doivent être complétés.
+Sortie
+La sortie d'un LLM est un vecteur où est la taille du lexique produit lors de l'analyse lexicale. Le vecteur est ensuite passé par une fonction softmax pour obtenir;
+le vecteur est généralement appelé le vecteur logit non normalisé;
+le vecteur est appelé le vecteur de probabilité.
+Puisque le vecteur a entrées, toutes non négatives, et dont la somme est égale à 1, on peut l'interpréter comme une distribution de probabilité sur le vocabulaire du LLM (indexé par ).
+Pré-entraînement
+La plupart des LLM commencent leur apprentissage par un pré-entraînement génératif, c'est-à-dire qu'à partir d'un ensemble de données d'entraînement de jetons de texte, le modèle prédit les jetons dans l'ensemble de données. Il existe deux styles généraux de pré-entrainement pour la génération:
+autorégressif (comme le fait GPT, la prédiction des mots suivants): en partant d'un segment de texte comme « J'aime manger », le modèle prédit les jetons suivants, comme « de la mousse au chocolat » ou « des fruits »;
+masqué (de type BERT » ou « texte à trous »): en partant d'un segment de texte comme « J'aime [__] [__] fruits », le modèle prédit les jetons masqués, comme « manger des ».
+Les LLM peuvent être entraînés sur des tâches auxiliaires qui testent leur compréhension de la distribution des données, telles que la prédiction de la phrase suivante (NSP), dans laquelle des paires de phrases sont présentées et le modèle doit prédire si elles apparaissent consécutivement dans le corpus d'entraînement.
+Habituellement, les LLM sont entraînés pour minimiser une fonction de perte spécifique: la log-vraisemblance négative moyenne par jeton (également appelée perte d' entropie croisée ). [réf. nécessaire]
+Par exemple. si étant donné « j'aime manger », un modèle autorégressif prédit une distribution de probabilité alors la perte de vraisemblance logarithmique négative sur ce jeton est.
+Pendant l'entraînement, la perte de régularisation est également utilisée pour stabiliser l'entraînement. Cependant, celle-ci n'est que peu utilisée pendant les tests et l'évaluation. Il y existe beaucoup d'autres critères d'évaluation que la simple vraisemblance logarithmique négative, comme le décrit la section ci-dessous.
+Taille de l'ensemble de données
+Les premiers LLM ont été entraînés sur des corpus contenant des milliards de mots.
+GPT-1, le premier modèle de la série de transformeurs génératifs pré-entraînés d' OpenAI, est entraîné en 2018 sur BookCorpus, composé de 985 millions de mots. La même année, le modèle BERT de Google est entraîné sur une combinaison de BookCorpus et de Wikipedia anglais, totalisant 3,3 milliards de mots. Depuis, les corpus d'entraînement pour les LLM ont augmenté de plusieurs ordres de grandeur; le modèle LLaMA 3 de META, sorti en avril 2024, utilise 15 billions de jetons.
+Coût
+Évolution du coût estimé d'entraînement des grands modèles de langage entre 2017 et 2023.
+L'entraînement des LLM est coûteux en calculs. Une étude de 2020 estime le coût de l'entraînement d'un modèle de 1,5 milliard de paramètres (deux ordres de grandeur inférieurs au dernier cri à l'époque) à 1,6 million de dollars. Depuis, les progrès logiciels et matériels ont considérablement réduit ces coûts, comme relaté dans un article de 2023 qui fait état d'un coût de 72 300 heures A100-GPU pour entraîner un modèle de 12 milliards de paramètres. La taille des modèles a cependant aussi augmenté [ réf. souhaitée].
+Pour un LLM utilisant un transformeur, le coût d'entraînement du modèle est beaucoup plus élevé que son coût d' inférence. L'entraînement sur un jeton coûte 6 FLOPS par paramètre, alors que l'inférence sur un jeton coûte de 1 à 2 FLOPS par paramètre.
+Réglage après entraînement
+Le réglage fin ( fine-tuning ), ou ajustement, est la pratique consistant à modifier un modèle de langage pré-entraîné existant en l'entraînant (souvent de manière supervisée) sur une tâche spécifique (par exemple, l' analyse des sentiments, la reconnaissance d'entités nommées ou le marquage d'une partie du discours ). C'est une forme d' apprentissage par transfert qui permet de spécialiser le LLM.
+Le réglage fin peut se faire de différentes façons, notamment:
+en ré-entraînant tous les paramètres du modèle, mais sans trop les modifier pour ne pas écraser les connaissances acquises lors du pré-entraînement. Cette méthode est efficace mais nécessite beaucoup de temps de calcul;
+en entraînant seulement une partie des paramètres (souvent une partie des couches). Les autres paramètres sont dits « gelés »;
+en ajoutant une ou plusieurs couches à la fin du modèle, avec de nouveaux paramètres;
+en ajoutant un « adaptateur », contenant ses propres paramètres. Ces méthodes ( LoRA notamment) ajoutent souvent peu de paramètres à entraîner, nécessitant ainsi moins de ressources informatiques;
+en ajoutant automatiquement une série de tokens au début du prompt, optimisés automatiquement pour fournir le bon résultat ( prompt tuning ). Dans ce cas, le modèle lui-même est entièrement gelé et aucun de ses paramètres n'est entraîné, seul le prompt est ajusté. Lors de l' inférence, ces tokens seront également ajoutés automatiquement au début du prompt sans que l'utilisateur ne les voie. De façon similaire, cela peut aussi se faire en injectant des vecteurs plutôt que des tokens ( prefix tuning ).
+Réglage par instructions
+Le réglage par instructions ( instruction fine-tuning en anglais) est une forme d'apprentissage supervisé visant à ce que le LLM réponde d'une certaine façon, par exemple en adoptant le rôle d'assistant. Étant donné un prompt en entrée, un modèle de langage pré-entraîné générera une complétion qui correspond à la distribution du texte sur laquelle il a été entraîné. En réponse au prompt « Écrire un essai sur les principaux thèmes de Hamlet. », un modèle de langage pré-entraîné pourrait produire: « Une pénalité de retard de 10 % par jour sera appliquée aux travaux reçus après le 17 mars ». Dans le réglage par instructions, le modèle de langage est entraîné sur de nombreux exemples de tâches formulées sous forme d'instructions en langage naturel, ainsi que des réponses appropriées. Les instructions et les réponses correspondantes attendues peuvent être soit écrites par des humains, soit générées automatiquement, par exemple avec la méthode self-instruct.
+Apprentissage par renforcement
+Les grands modèles de langage suivent souvent une phase supplémentaire de réglage fin exploitant l' apprentissage par renforcement, afin de les rendre utiles et inoffensifs et de réduire les hallucinations.
+Une méthode populaire est celle de l' apprentissage par renforcement à partir de rétroaction humaine ( reinforcement learning from human feedback ou RLHF, en anglais). Avec cette méthode, différentes réponses sont d'abord générées par le modèle, avant d'être annotées par des humains en fonction de leur vraisemblance. Avec ces notations, un « modèle de préférences » est entraîné à prédire quelles réponses satisferaient les annotateurs humain. Les réponses fausses, agressives ou inutiles sont ainsi le plus souvent évaluées comme étant mauvaises. D'autres modèles peuvent ensuite être entraînés par apprentissage par renforcement à satisfaire ce modèle de préférences.
+La méthode de l' IA constitutionnelle, conçue par l'entreprise Anthropic, comporte une étape d'apprentissage par renforcement, en plus de celle des réglages par instructions. Le but est là aussi de générer un modèle de préférences permettant ensuite d'entraîner d'autres modèles. La différence est que les données servant à entraîner ce modèle de préférences ne sont pas annotées manuellement par des humains. Ces données sont générées automatiquement par un modèle en évaluant quelles réponses satisfont le mieux une constitution donnée, qui est une liste de principes de conduite.
+Propriétés
+Ensembles de données de pré-entraînement
+Les LLM sont pré-entraînés sur de grands ensembles de données textuelles comme Common Crawl, The Pile, MassiveText, Wikipedia ou GitHub. Ces ensembles de données contiennent jusqu'à 10 000 milliards de mots.
+Le stock de données linguistiques de haute qualité se situe entre 4,6 et 17 milliards de mots, soit un ordre de grandeur similaire à celui des plus grands ensembles de données textuelles disponibles.
+Lois d'échelle
+En général, les performances d'un réseau de neurones augmentent régulièrement avec,:
+sa taille (c'est-à-dire son nombre de paramètres )
+la taille du jeu de données d'apprentissage
+la quantité de calcul ayant servi à l'entraînement
+Les relations empiriquement observées entre les performances d'un réseau de neurones et chacun de ces trois paramètres sont tellement précises qu'elles ont été nommées « lois d'échelle » ( scaling laws ),. Par exemple, une loi de mise à l'échelle particulière ( Chinchilla scaling ) pour le LLM Chinchilla (en) entraîné de manière autorégressive (c'est-à-dire avec prédiction du mot suivant étant donné un segment de texte) pour une époque, avec un calendrier de taux d'apprentissage log-log, stipule que: où les variables sont:
+est la quantité de calcul ayant servi à entraîner le modèle (mesurée en FLOP );
+est le nombre de paramètres du modèle;
+est le nombre de jetons dans l'ensemble d'apprentissage;
+est la perte de log-vraisemblance négative moyenne par jeton ( nats /jeton), qui représente les performances du LLM;
+et les paramètres statistiques sont:, ce qui signifie qu'il en coûte 6 FLOP par paramètre pour s'entraîner sur un jeton;.
+Capacités émergentes
+Sur certains tests de performance en traitement du langage, les modèles ne font généralement pas mieux que le hasard jusqu'à ce qu'ils atteignent une certaine échelle (ici mesurée par la quantité de calculs utilisés pour entraîner le modèle), après quoi leurs performances augmentent fortement. Ce sont des exemples de capacités émergentes.
+Généralement les performances de grands modèles de langage sur diverses tâches peuvent être extrapolées sur la base des performances de modèles plus petits similaires. Cependant, les grands modèles subissent parfois un « déphasage discontinu » où le modèle acquiert soudainement des capacités substantielles non vues dans les modèles plus petits. Celles-ci sont connues sous le nom de « capacités émergentes » et ont fait l'objet d'études approfondies. Les chercheurs notent que de telles capacités « ne peuvent pas être prédites simplement en extrapolant les performances de modèles plus petits ». Ces capacités sont découvertes plutôt que programmées ou conçues, dans certains cas seulement après le déploiement public du LLM. Des centaines de capacités émergentes ont été décrites. Les exemples incluent le raisonnement arithmétique, la passation d'examens de niveau universitaire, l'identification du sens voulu d'un mot, le décodage de l' alphabet phonétique international, le fait de pouvoir comprendre des mots dont l'ordre des lettres est modifié, l'identification du contenu offensant dans les paragraphes de l' hinglish (un mélange d'hindi et d'anglais) et la génération d'un équivalent anglais aux proverbes kiswahili.
+Hallucination
+Les LLM génèrent parfois des affirmations fausses qui ne semblent pas être justifiées par leurs données d'entraînement, on parle alors d'« hallucination ».
+Biais et limites
+Les biais sont une préoccupation car tout modèle complexe créé par des humains peut refléter les biais des équipes qui préparent et conçoivent les LLM, et des scientifiques des données qui entraînent et mettent en œuvre les modèles.
+Préjugés sexistes
+Les préjugés sexistes font référence à la tendance de ces modèles à produire des résultats injustement préjugés en faveur d’un sexe plutôt qu’un autre. Ce biais provient généralement des données sur lesquelles ces modèles sont formés. Par exemple, les grands modèles linguistiques attribuent souvent des rôles et des caractéristiques basés sur les normes de genre traditionnelles; elle pourrait associer principalement les infirmières ou les secrétaires aux femmes et les ingénieurs ou les PDG aux hommes.
+Biais spécistes
+Selon Jotautaitė, Caviola, Brewster et leurs collègues, les grands modèles de langage manifestent un biais spéciste en classant des énoncés spécistes comme moralement acceptables et en normalisant les préjudices envers les animaux d'élevage, alors qu'ils refusent de le faire pour les autres animaux. Ils constatent cependant que ce biais spéciste est plus faible chez les modèles de langage que chez les humains.
+Stéréotypes
+Au-delà du genre et de l'origine, ces modèles peuvent renforcer un large éventail de stéréotypes, notamment ceux fondés sur l’âge, la nationalité, la religion ou la profession. Cela peut conduire à des résultats qui généralisent ou caricaturent injustement des groupes de personnes, parfois de manière préjudiciable ou désobligeante.
+Biais politique
+Les préjugés politiques font référence à la tendance des algorithmes à favoriser systématiquement certains points de vue politiques, idéologies ou résultats par rapport à d’autres. Les modèles linguistiques peuvent également présenter des préjugés politiques. Étant donné que les données de formation incluent un large éventail d'opinions et de couvertures politiques, les modèles peuvent générer des réponses qui penchent vers des idéologies ou des points de vue politiques particuliers, en fonction de la prévalence de ces points de vue dans les données.
+Biais linguistique
+Les biais linguistiques font référence au fait que les données d'apprentissage peuvent ne pas être représentatives de la population mondiale. Par exemple, pour un concept comme le « libéralisme », un modèle principalement entraîné en anglais privilégiera une interprétation anglo-américaine, centrée sur les droits de l'homme et l'égalité. Des points de vue d'autres cultures sur le libéralisme, comme « s'oppose à l'État » au Vietnam, ou « limitation du pouvoir gouvernemental » en Chine, risquent d'être sous-représentées.
+Mise en œuvre
+En amont (dans la construction du LLM), des biais sont engrammés dans les données; ils sont par exemple liés à la vision du monde des opérateurs (et donc à leur époque), à la langue et aux cultures des programmeurs. Ils sont d'autre part liés aux biais présents dans les bases de données d'entraînement de l'IA (stéréotypes discriminatoires, inexactitudes, incohérences…); les plus grandes bases de données qui ont entrainé ChatGPT ont été la base des brevets américaine et Wikipédia en anglais, qui ne reflètent pas toute la richesse et la diversité du monde). Des LLM entraînés par exemple avec un corpus de textes de discussions sur Twitter associeront de fortes probabilités à des énoncés agressifs, racistes et d'exclusion, biaisés, toxiques ou sensibles si de tels langages sont présents dans leurs données d'entraînement.
+En aval, le prompt peut lui même introduire des biais qui orienteront la réponse de l'IA utilisant un modèle LLM. Les LLM peuvent apprendre, et ensuite plus ou moins perpétuer voire amplifier des biais sociaux délétères.
+Pour limiter ces biais, il est possible de régulièrement mettre à jour la qualité et la taille des bases de connaissances des LLM. Des processus dits « d'IA responsable » peuvent corriger une grande partie des biais. Ils le font via des techniques et des outils ad hoc, c'est-à-dire développés (et en cours d'amélioration) pour « garantir que les systèmes d'IA peuvent respecter ces définitions, en traitant les données au préalable, en modifiant les décisions du système par la suite, ou en intégrant les définitions d' équité dans le processus de formation lui-même ». Ces techniques s'appuient notamment sur des audits par des tiers indépendants, des études scientifiques multidisciplinaires sur les biais, et des « équipes rouges » internes chargées de tester le système utilisant le LLM.
+Un autre processus responsable est de diversifier la communauté de l'IA (pour collaborativement mieux anticiper, examiner et repérer les biais, en faisant participer les communautés discriminées et affectées par ces biais). Il est aussi nécessaire, lors des phases d'apprentissage du LLM, de diversifier les sources de données; et dans le même temps d'accorder plus de poids aux données et conversations basées sur des faits et/ou basés sur des preuves ( ex.: médecine fondée sur les faits ) et sur la science (par rapport aux conversations basées sur des opinions), grâce à l'exécution d'algorithmes régulièrement contrôlés par des humains, grâce à des analyses comparées des résultats, et à la mobilisation de techniques d'explicabilité des résultats. Dans certains cas, des données synthétiques conçues pour être aussi peu biaisées que possibles peuvent être utilisées.
+Optimisation de requête
+Entre 2018 et 2020, la méthode standard pour exploiter un LLM pour une tâche spécifique de traitement automatique des langues consistait à affiner le modèle avec un entraînement supplémentaire spécifique à la tâche. Il a ensuite été découvert que des LLM plus puissants tels que GPT-3 peuvent résoudre des tâches sans entraînement supplémentaire via des techniques dans lesquelles le problème à résoudre est présenté au modèle sous forme de requête (synonyme de « prompt » ou « invite » ), éventuellement avec quelques exemples textuels de problèmes similaires avec les réponses correspondantes attendues afin de guider le modèle.
+L'approche qui consiste à fournir d'abord quelques exemples de réponses valides pour des requêtes similaires est appelée « requête en quelques coups » ( few-shot prompt ). Par exemple, une tâche d'analyse des sentiments consistant à déterminer le sentiment d'une critique de film pourrait être formulée avec la requête:
+Critique: Ce film est nul.
+Sentiment: négatif
+Critique: Ce film est fantastique!
+Sentiment:
+Si le modèle affiche « positif », alors il a correctement résolu la tâche. Dans la requête à partir de zéro ( zero-shot prompt ), aucun exemple n'est fourni. Un exemple de requête à partir de zéro pour la même tâche d'analyse des sentiments serait
+Le sentiment associé à la critique de film "Ce film est fantastique!" est
+Il a été démontré que les performances en quelques coups de LLM permettent d'obtenir des résultats compétitifs sur des tâches de traitement automatique des langues, dépassant parfois les approches de réglage fin. Par exemple en traduction, en réponse aux questions, en complétion de texte ou en programmation [source insuffisante]. La création et l'optimisation de requêtes concerne l' ingénierie de prompt, aussi appelée « rédactique ».
+Une autre méthode parfois utilisée est celle de la chaîne de pensée. Par exemple en ajoutant dans la requête « raisonnons étape par étape ». Cette méthode peut s'avérer efficace pour les problèmes nécessitant plusieurs étapes de raisonnement, tels que les problèmes d'arithmétique.
+Génération à enrichissement contextuel
+Les grands modèles de langage sont utilisés pour construire des systèmes de génération à enrichissement contextuel. Ces systèmes permettent d'interroger une base documentaire et de générer des réponses.
+Évaluation
+Perplexité
+La mesure la plus couramment utilisée de la performance d'un modèle de langage est sa perplexité sur un corpus de texte donné. La perplexité est une mesure de la capacité d'un modèle à prédire le contenu d'un ensemble de données; plus la probabilité que le modèle attribue à l'ensemble de données est élevée, plus la perplexité est faible. Mathématiquement, la perplexité est définie comme l'exponentielle de la moyenne de la log-vraisemblance négative par jeton: ici est le nombre de jetons dans le corpus de texte, et le « contexte du jeton i » dépend du type spécifique de LLM utilisé. Si le LLM est autorégressif, alors le « contexte pour le jeton i » est le segment de texte apparaissant avant le jeton i. Si le LLM est masqué, alors « contexte pour le jeton i » est le segment de texte entourant le jeton i.
+Étant donné que les modèles de langage peuvent suradapter à leurs données d'apprentissage, les modèles sont généralement évalués en fonction de leur perplexité sur un ensemble de tests de données invisibles. Cela présente des défis particuliers pour l'évaluation de grands modèles de langage. Au fur et à mesure qu'ils sont entraînés sur des corpus de texte de plus en plus volumineux largement extraits du Web, il devient de plus en plus probable que les données d'entraînement des modèles incluent par inadvertance des parties d'un ensemble de tests donné.
+Cette notion est à l'origine du nom de la startup d'IA Perplexity AI, créée en août 2022.
+Ensembles de données et points de repère spécifiques aux tâches
+Un grand nombre d'ensembles de données de test de validation ou de performance ont également été développés pour évaluer les capacités des modèles de langage sur des tâches en aval plus spécifiques. Les tests peuvent être conçus pour évaluer une variété de capacités, y compris les connaissances générales, le raisonnement de bon sens et la résolution de problèmes mathématiques.
+Une grande catégorie d'ensembles de données d'évaluation est les ensembles de données de questions-réponses, consistant en des paires de questions et de réponses correctes, par exemple, (« Les Sharks de San Jose ont-ils remporté la Coupe Stanley? », « Non »). Une tâche de réponse aux questions est considérée comme un « livre ouvert » si l'invite du modèle comprend un texte à partir duquel la réponse attendue peut être dérivée (par exemple, la question précédente pourrait être jointe à un texte qui comprend la phrase « Les Sharks ont atteint la coupe Stanley finales une fois, perdant contre les Penguins de Pittsburgh en 2016. »). Sinon, la tâche est considérée comme « livre fermé », et le modèle doit s'appuyer sur les connaissances retenues pendant l'entraînement. Voici quelques exemples d'ensembles de données de réponse aux questions couramment utilisés: TruthfulQA, Web Questions, TriviaQA et SQuAD.
+Les ensembles de données d'évaluation peuvent également prendre la forme d'une complétion de texte, le modèle sélectionnant le mot ou la phrase la plus probable pour compléter une invite, par exemple: « Alice était amie avec Bob. Alice est allée rendre visite à son amie, ____ ».
+Certains repères composites ont également été développés, qui combinent une diversité d'ensembles de données et de tâches d'évaluation différents. Les exemples incluent GLUE, SuperGLUE, MMLU, BIG-bench et HELM.
+Auparavant, il était courant de rapporter les résultats sur une partie non conservée d'un ensemble de données d'évaluation après avoir effectué un réglage fin supervisé sur le reste. Il est maintenant plus courant d'évaluer un modèle pré-formé directement par des techniques d'incitation, bien que les chercheurs varient dans les détails de la façon dont ils formulent des invites pour des tâches particulières, en particulier en ce qui concerne le nombre d'exemples de tâches résolues qui sont associés à l'invite.
+Évaluations antagonistes
+En raison du rythme rapide d'amélioration des grands modèles de langage, les repères d'évaluation ont souffert de courtes durées de vie, les modèles de pointe « saturant » rapidement les repères existants, dépassant les performances des annotateurs humains, conduisant à des efforts pour remplacer ou augmenter le repère avec des tâches plus exigeantes.
+Certains ensembles de données ont été construits de manière antagoniste, visant à piéger les modèle de langage existants en se concentrant sur des problèmes sur lesquels ils semblent avoir des performances inhabituellement médiocres par rapport aux humains. Un exemple est l'ensemble de données TruthfulQA, un ensemble de données de questions-réponses composé de 817 questions auxquelles les modèles de langage sont susceptibles de répondre de manière incorrecte en imitant les faussetés auxquelles ils ont été exposés à plusieurs reprises pendant l'entraînement. Par exemple, un LLM peut répondre « Non » à la question « Pouvez-vous apprendre de nouveaux tours à un vieux chien? » en raison de son exposition à l'expression anglaise, vous ne pouvez pas apprendre de nouveaux tours à un vieux chien, même si ce n'est pas littéralement vrai.
+Un autre exemple d'ensemble de données d'évaluation antagoniste est Swag et son successeur, HellaSwag, des collections de problèmes dans lesquels l'une des multiples options doit être sélectionnée pour compléter un passage de texte. Les complétions incorrectes ont été générées par échantillonnage à partir d'un modèle de langage et filtrage avec un ensemble de classificateurs. Les problèmes qui en résultent sont insignifiants pour les humains, mais au moment où les ensembles de données ont été créés, les modèles de langage de pointe étaient peu précis. Par exemple:
+Nous voyons un panneau indiquant un centre de remise en forme. Nous voyons ensuite un homme parler à la caméra et assis et allongé sur un ballon d'exercice. L'homme... a) montre comment augmenter l'efficacité de l'exercice en faisant monter et descendre des balles. b) bouge tous ses bras et ses jambes et développe beaucoup de muscles. c) joue ensuite la balle et nous assistons à une démonstration de graphisme et de taille de haie. d) effectue des redressements assis tout en étant sur le ballon et en parlant.
+BERT sélectionne b) comme l'achèvement le plus probable, bien que la bonne réponse soit d).
+Saturation des évaluations
+En réponse au problème de saturation des repères d'évaluation des grands modèles de langage existants en 2025, le test de performance HLE ( Humanity's Last Exam, Dernier Examen de l'Humanité) est créé par le Center for AI Safety et Scale AI. Il comprend 2500 questions dans sept disciplines principales ( mathématiques, physique, biologie / médecine, sciences humaines et sociales, informatique et IA, ingénierie, chimie ), créées par des experts de leur domaine et conçues pour être difficiles. Il est publié dans la revue Nature, le 28 janvier 2026.
+Applications
+Évaluation par des grands modèles de langage
+Les grands modèles de langage sont régulièrement utilisés comme des évaluateurs ou juges dans des tâches d'annotation ou d'évaluation. Cette approche est couramment appelée LLM-as-a-Judge (en) dans la littérature académique.
+Références
+↑ a b c et d « grand modèle de langage », Grand Dictionnaire terminologique, Office québécois de la langue française (consulté le 7 septembre 2023 ).
+↑ (fr + en) Accuracy of Information and References Using ChatGPT-3 for Retrieval of Clinical Radiological Information, journal de l'association canadienne de radiologistes.
+↑ Christian Wolf, « Histoire des réseaux de neurones et du deep learning en traitement des signaux et des images », sur hal.science, 4 avril 2023 (consulté le 11 mai 2023 ).
+↑ Ornes (2023, traduction française).
+↑ (en-US) Shraddha Goled, « Self-Supervised Learning Vs Semi-Supervised Learning: How They Differ », sur Analytics India Magazine, 7 mai 2021 (consulté le 1 er juin 2023 ).
+↑ « Comment les moteurs de réponses d'IA générative redéfinissent le référencement web », sur Les Echos, 2 mars 2026.
+↑ (en) Jason Wei, Yi Tay, Rishi Bommasani et Colin Raffel, « Emergent Abilities of Large Language Models », Transactions on Machine Learning Research,‎ 31 août 2022 ( ISSN 2835-8856, lire en ligne, consulté le 1 er juin 2023 ).
+↑ a et b (en) Samuel R. Bowman, « Eight Things to Know about Large Language Models » [PDF], Proceedings of the International Conference on Machine Learning 2023 (conférence), 2 avril 2023.
+↑ (en) Adam Dahlgren Lindström, Leila Methnani, Lea Krause et Petter Ericson, « Helpful, harmless, honest? Sociotechnical limits of AI alignment and safety through Reinforcement Learning from Human Feedback », Ethics and Information Technology, vol. 27, n o 2,‎ 4 juin 2025, p. 28 ( ISSN 1572-8439, PMID 40486676, PMCID 12137480, DOI 10.1007/s10676-025-09837-2, lire en ligne, consulté le 25 septembre 2025 ).
+↑ Ashish Vaswani, Noam Shazeer, Niki Parmar et Jakob Uszkoreit, Attention Is All You Need, 2 août 2023 ( DOI 10.48550/arXiv.1706.03762, lire en ligne ).
+↑ (en) RWKV: Reinventing RNNs for the Transformer Era
+↑ (en) Retentive Network: A Successor to Transformer for Large Language Models
+↑ (en) HyperAttention: Long-context Attention in Near-Linear Time
+↑ (en) Mamba: Linear-Time Sequence Modeling with Selective State Spaces
+↑ (en) « OpenAI API » [ archive du 23 avril 2023 ], platform.openai.com (consulté le 30 avril 2023 ).
+↑ Munazza Zaib, Quan Z. Sheng et Wei Emma Zhang, « A Short Survey of Pre-trained Language Models for Conversational AI-A New Age in NLP », Proceedings of the Australasian Computer Science Week Multiconference,‎ 4 février 2020, p. 1–4 ( ISBN 9781450376976, DOI 10.1145/3373017.3373028, arXiv 2104.10810, S2CID 211040895, lire en ligne ).
+↑ Yukun Zhu, Ryan Kiros, Rich Zemel et Ruslan Salakhutdinov, « Aligning Books and Movies: Towards Story-Like Visual Explanations by Watching Movies and Reading Books », 2015 IEEE International Conference on Computer Vision (ICCV),‎ décembre 2015, p. 19–27 ( ISBN 978-1-4673-8391-2, DOI 10.1109/ICCV.2015.11, arXiv 1506.06724, S2CID 6866988, lire en ligne, consulté le 11 avril 2023 ).
+↑ (en) « LLama3 Model Details », sur Github, 11 juillet 2024 (consulté le 30 mai 2025 ).
+↑ (en) Jared Kaplan, Sam McCandlish, Tom Henighan et Tom B. Brown, Scaling Laws for Neural Language Models, 23 janvier 2020 ( DOI 10.48550/arXiv.2001.08361 ).
+↑ Ayush Mittal, « Un guide complet pour affiner les grands modèles de langage », sur Unite.AI, 25 mars 2024 (consulté le 4 mai 2024 ).
+↑ (en) « Self-Instruct: Aligning Language Models with Self-Generated Instructions », ACL,‎ 2023 ( arXiv 2212.10560, lire en ligne ).
+↑ Alex McFarland, « Qu'est-ce que l'apprentissage par renforcement à partir de la rétroaction humaine (RLHF) », Unite.AI,‎ 29 mars 2023 ( lire en ligne ).
+↑ (en) « What to Know About Claude 2, Anthropic's Rival to ChatGPT », sur Time, 18 juillet 2023 (consulté le 5 mai 2024 ).
+↑ (en) common crawl, site officiel]
+↑ (en) the Pile, sur commoncrawl.org.
+↑ (en) « Papers with Code - MassiveText Dataset », paperswithcode.com (consulté le 26 avril 2023 ).
+↑ Julia Luczak-Rougeaux, « Trafic IA: les plateformes privilégient Wikipedia, les forums ou les réseaux sociaux aux médias », sur Minted, 4 septembre 2025 (consulté le 23 septembre 2025 ).
+↑ Pablo Villalobos, Jaime Sevilla, Lennart Heim et Tamay Besiroglu, « Will we run out of data? An analysis of the limits of scaling datasets in Machine Learning », arXiv:2211.04325 [cs],‎ 25 octobre 2022 ( lire en ligne ).
+↑ a et b (en) « Scaling Laws », sur AI Alignment Forum, 31 juillet 2022 (consulté le 15 novembre 2024 ).
+↑ a et b (en) Yasaman Bahri, Ethan Dyer, Jared Kaplan et Jaehoon Lee, « Explaining neural scaling laws », Proceedings of the National Academy of Sciences, vol. 121, n o 27,‎ 2 juillet 2024 ( ISSN 0027-8424 et 1091-6490, PMID 38913889, PMCID PMC11228526, DOI 10.1073/pnas.2311878121 ).
+↑ Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch et Elena Buchatskaya, « Training Compute-Optimal Large Language Models », arXiv:2203.15556 [cs],‎ 29 mars 2022 ( lire en ligne ).
+↑ Notez que le coût d'entraînement est beaucoup plus élevé que le coût d'inférence, puisqu’il en coûte 1 à 2 FLOP par paramètre pour inférer sur un jeton.
+↑ a b c et d (en) Jason Wei, Yi Tay, Rishi Bommasani et Colin Raffel, « Emergent Abilities of Large Language Models », Transactions on Machine Learning Research,‎ 31 août 2022 ( ISSN 2835-8856, arXiv 2206.07682 ).
+↑ Ornes (2023).
+↑ Ziwei Ji, Nayeon Lee, Rita Frieske et Tiezheng Yu, « Survey of Hallucination in Natural Language Generation », ACM Computing Surveys, Association for Computing Machinery, vol. 55, n o 12,‎ novembre 2022, p. 1–38 ( DOI 10.1145/3571730, arXiv 2202.03629, S2CID 246652372 ).
+↑ a et b (en) Michael McKenna, « Machines and Trust: How to Mitigate AI Bias », sur Toptal Engineering Blog (consulté le 15 novembre 2023 ).
+↑ Hadas Kotek, Rikker Dockum et David Sun, « Gender bias and stereotypes in Large Language Models », Proceedings of The ACM Collective Intelligence Conference, Association for Computing Machinery, cI '23,‎ 5 novembre 2023, p. 12–24 ( ISBN 979-8-4007-0113-9, DOI 10.1145/3582269.3615599 ).
+↑ (en) Monika Jotautaitė, Lucius Caviola, David A. Brewster et Thilo Hagendorff, « Large language models exhibit speciesist bias against animals », Nature Communications, vol. 17, n o 1,‎ 9 mai 2026, p. 5569 ( ISSN 2041-1723, DOI 10.1038/s41467-026-72297-9, lire en ligne, consulté le 26 juillet 2026 )
+↑ Fatma Elsafoury, Steve R. Wilson, Stamos Katsigiannis et Naeem Ramzan, « SOS: Systematic Offensive Stereotyping Bias in Word Embeddings », Proceedings of the 29th International Conference on Computational Linguistics, International Committee on Computational Linguistics,‎ octobre 2022, p. 1263–1274 ( lire en ligne, consulté le 26 décembre 2023 ).
+↑ Karen Zhou et Chenhao Tan, « Entity-Based Evaluation of Political Bias in Automatic Summarization », Findings of the Association for Computational Linguistics: EMNLP 2023, Association for Computational Linguistics,‎ décembre 2023, p. 10374–10386 ( DOI 10.18653/v1/2023.findings-emnlp.696 ).
+↑ (en) Queenie Luo, Michael J. Puett et Michael D. Smith, « A Perspectival Mirror of the Elephant: Investigating Language Bias on Google, ChatGPT, Wikipedia, and YouTube », scientific journal,‎ 12-25-2023 ( lire en ligne [ archive ] [PDF] ).
+↑ a b c et d (en) James Manyika et Jake Silberg, « What Do We Do About the Biases in AI? », sur Harvard Business Review, 25 octobre 2019 ( ISSN 0017-8012, consulté le 15 novembre 2023 ).
+↑ (en-US) Meeta Ramnani, « How bias creeps into large language models », sur Analytics India Magazine, 11 janvier 2022 (consulté le 15 novembre 2023 ).
+↑ (en) Isabel O. Gallegos et al., « Bias and Fairness in Large Language Models: A Survey », 1 er septembre 2023..
+↑ « requête », sur vitrinelinguistique.oqlf.gouv.qc.ca (consulté le 12 novembre 2023 ).
+↑ (en) « Deep learning in digital health with chatgpt: a study on efficient code generation », sur academic.oup.com (consulté le 12 novembre 2023 ).
+↑ (en) « Résultats de recherche », sur Vitrine linguistique (consulté le 12 novembre 2023 ).
+↑ (en) Roger Montti, « Google's Chain of Thought Prompting Can Boost Today's Best Algorithms », sur Search Engine Journal, 13 mai 2022 (consulté le 5 mai 2024 ).
+↑ (en) Joanne Chen, « How Perplexity.ai Is Pioneering The Future Of Search », sur forbes.com, 6 septembre 2023 (consulté le 6 janvier 2024 ).
+↑ (en) « Qu'est-ce que l'évaluation des LLM? — Klu », sur klu.ai, 4 juillet 2023 (consulté le 14 décembre 2023 ).
+↑ (en) Long Phan, Alice Gatti, Nathaniel Li et Adam Khoja, « A benchmark of expert-level academic questions to assess AI capabilities », Nature, vol. 649, n o 8099,‎ janvier 2026, p. 1139–1146 ( ISSN 1476-4687, PMID 41606155, PMCID 12851929, DOI 10.1038/s41586-025-09962-4, lire en ligne, consulté le 11 août 2026 )
+↑ (en) Gu, J., Jiang, X., Shi, Z., Tan, H., Zhai, X., Xu, C.,... & Guo, J., « A survey on llm-as-a-judge. », The Innovation,‎ 2026 ( DOI 10.1016/j.xinn.2025.101253 )
+Voir aussi
+Sur les autres projets Wikimedia:
+Grand modèle de langage, sur Wikimedia Commons
+Bibliographie
+Jean-Paul Delahaye, « Derrière les modèles massifs de langage », Pour la science, n o 555,‎ janvier 2024, p. 80-85.
+Stephen Ornes, « Modèles massifs de langage. D'où viennent les coups de génie de l'IA? », Pour la science, n o 549,‎ juillet 2023, p. 46-51 ( lire en ligne ), adaptation française par la revue.
+Articles connexes
+Liste de grands modèles de langage
+Modèles de fondation
+Modèle de langage
+Intelligence artificielle générale
+GPT-3
+Petit modèle de langage
+Synthèse vocale
+Liens externes
+Medical Subject Headings
+Britannica
+GND
+Tchéquie
+Lettonie
+v · m Intelligence artificielle (IA)
+Concepts
+IA agentique
+Effet IA
+Grand modèle de langage
+Hallucination
+IA générative
+Test de Turing
+Techniques
+Analyse prédictive
+Apprentissage automatique
+Apprentissage non supervisé
+Apprentissage profond
+Apprentissage supervisé
+Génération à enrichissement contextuel
+Machine d'apprentissage logique
+Modèle de fondation
+Modèle des croyances transférables
+IA symbolique
+Réseau bayésien
+Réseau de neurones récurrents
+Réseau neuronal convolutif
+Transformeur
+Transformeur génératif préentraîné
+Système expert
+Apprentissage par renforcement à partir de rétroaction humaine
+Applications
+Art créé par IA
+Apple Intelligence
+ChatGPT
+Conséquences économiques de l'intelligence artificielle
+DeepL
+Diagnostic
+Écriture assistée par IA
+IA dans la santé
+IA dans le jeu vidéo
+Modèle texte-image
+Modèle texte-vidéo
+Perception artificielle
+Planification
+Robotique
+Synthèse vocale
+Traduction automatique
+Traitement automatique des langues
+Véhicule autonome
+Vision par ordinateur
+Enjeux et philosophie
+Alignement des intelligences artificielles
+Chambre chinoise
+Conscience artificielle
+Contrôle des capacités de l'IA
+Détection de contenu généré par IA
+Éthique de l'IA
+IA digne de confiance
+Philosophie de l'IA
+Sûreté des IA
+Histoire et événements
+Logic Theorist (1955)
+Perceptron (1957)
+General Problem Solver (1959)
+Prolog (1972)
+Matchs Deep Blue contre Kasparov (1996-1997)
+Match AlphaGo - Lee Sedol (2016)
+Sommet pour l'action sur l'IA (2025)
+Concepts prospectifs
+Anticipation
+IA-complet
+IA générale
+Risque existentiel posé par l'IA
+Superintelligence
+Règlementation
+Réglementation de l'IA
+Règlement sur l'IA
+Organisations
+Agence francophone pour l'IA
+Anthropic
+Google DeepMind
+Hugging Face
+OpenAI
+Partenariat sur l'IA
+Ouvrages
+Déclaration de Montréal pour un développement responsable de l'IA
+I.A. La Plus Grande Mutation de l'Histoire
+Intelligence artificielle: une approche moderne
+Lettre ouverte sur l'IA
+Power and Progress
+Superintelligence: Paths, Dangers, Strategies
+Portail de l’intelligence artificielle
+Portail des données
+Portail de l’informatique
+Portail des probabilités et de la statistique
+Portail de la linguistique

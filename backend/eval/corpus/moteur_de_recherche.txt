@@ -1,0 +1,372 @@
+# Moteur de recherche
+
+Source : fr.wikipedia.org, révision 238179907
+
+Si ce bandeau n'est plus pertinent, retirez-le. Cliquez ici pour en savoir plus.
+Cet article ne cite pas suffisamment ses sources ( septembre 2010 ).
+Si vous disposez d'ouvrages ou d'articles de référence ou si vous connaissez des sites web de qualité traitant du thème abordé ici, merci de compléter l'article en donnant les références utiles à sa vérifiabilité et en les liant à la section « Notes et références ».
+Si ce bandeau n'est plus pertinent, retirez-le. Cliquez ici pour en savoir plus.
+Cet article contient une ou plusieurs listes ( décembre 2024 ).
+Type
+Logiciel
+Utilisation
+Utilise
+Algorithme de recherche
+Usage
+Recherche d'information
+modifier - modifier le code - modifier Wikidata
+Un moteur de recherche est une application permettant à un utilisateur d'effectuer une recherche locale ou en ligne, c'est-à-dire de trouver des ressources à partir d'une requête composée de termes. Les ressources peuvent notamment être des pages web, des articles de forums Usenet, des images, des vidéos, des fichiers, des ouvrages, des sites, pédagogiques, des applications, des logiciels open source. Des intelligences artificielles comme Perplexity commencent à entrer en concurrence avec les moteurs de recherche « classiques ».
+Principe
+Un moteur de recherche fonctionne généralement selon le principe suivant:
+Il commence par indexer du contenu dans une ou plusieurs bases de données qui lui appartiennent. Cette indexation est effectuée au préalable de toute recherche effectuée par un utilisateur. Lorsqu'une requête est soumise, le moteur utilise ses paramètres et algorithmes de classement pour générer une liste de résultats.
+Certains sites web offrent un moteur de recherche comme principale fonctionnalité; on appelle alors « moteur de recherche » le site lui-même. Contrairement aux annuaires, les moteurs de recherche ne nécessitent pas d'intervention humaine. Ils sont basés sur des « robots », appelés « bots », « spiders «, « crawlers » ou « agents », qui parcourent automatiquement les sites à intervalles réguliers afin de découvrir de nouvelles adresses ( URL ). Ils suivent les liens hypertexte qui relient les pages les unes aux autres, les uns après les autres. Chaque page identifiée est alors indexée dans une base de données, accessible ensuite par les internautes à partir de mots-clés.
+C'est par abus de langage qu'on appelle également « moteurs de recherche » des sites web proposant des annuaires de sites web: dans ce cas, ce sont des instruments de recherche élaborés par des personnes qui répertorient et classifient des sites web jugés dignes d'intérêt, et non des robots d'indexation.
+Les moteurs de recherche ne s'appliquent pas uniquement à Internet: certains moteurs sont des logiciels installés sur un ordinateur personnel. Ce sont des moteurs dits « de bureau » qui combinent la recherche parmi les fichiers stockés sur le PC et la recherche parmi les sites web. On peut citer par exemple Copernic Desktop Search, Windex Server, etc.
+On trouve également des métamoteurs, c'est-à-dire des sites web où une même recherche est lancée simultanément sur plusieurs moteurs de recherche, les résultats étant ensuite fusionnés pour être présentés à l' internaute.
+Historique
+Les moteurs de recherche Internet précèdent les débuts du Web à la fin des années 1990:
+1982: Whois, outil de recherche d'utilisateurs.
+1989: Knowbot Information Service (en), service de recherche d'utilisateurs sur plusieurs réseaux.
+1990: Archie, premier moteur de recherche de contenu, qui s'appuie sur le protocole de transfert de fichiers (ftp).
+Les moteurs de recherche sont inspirés des outils de recherche documentaire (à base de fichiers inversés, alias fichiers d'index ) utilisés sur les mainframes depuis les années 1970, comme le logiciel STAIRS sur IBM. Le mode de remplissage de leurs bases de données est cependant différent, car orienté réseau. Par ailleurs la distinction entre données formatées (« Champs ») et texte libre n'y existe plus, bien que commençant depuis 2010 à se réintroduire par le biais du web sémantique.
+Des moteurs historiques ont été Yahoo! (1994), Lycos (1994), AltaVista (1995, premier moteur 64 bits) et Backrub (1997), ancêtre de Google (1998). Google apporte un changement important: il stocke dans ses serveurs les pages qu'il indexe, ce que ne faisaient pas les autres moteurs.
+Et pour répondre aux besoins des étudiants, des universitaires, chercheurs et ingénieurs, des moteurs spécialisés destinés aux sujets scientifiques et techniques, comme Google Scholar sont apparus.
+Dans les années 2020, des systèmes d' intelligence artificielle émergent face aux moteurs de recherche classiques. Par exemple, Perplexity AI et son robot d'exploration web (PerplexityBot), pourrait à moyen terme bouleverser la recherche en ligne, à ce moment dominé par des acteurs comme Google ou Bing. Ces nouveaux agents conversationnels, au lieu de présenter une longue liste de liens parmi lesquels l'internaute peut choisir, fournissent des réponses synthétiques, contextualisées et sourcées,, à partir de données qu'ils consultent en temps réel. Chaque réponse est accompagnée de citations cliquables, renforçant la transparence et la vérifiabilité des contenus. Une autre différence est que les IA comme Perplexity comprennent bien mieux le langage courant, mémorisent le contexte des échanges et proposent des suggestions pertinentes pour approfondir les recherches. Les géants du web réagissent à cette montée en puissance: Apple a confirmé en 2025 des discussions avec Perplexity, OpenAI et Anthropic pour intégrer leurs moteurs IA dans Safari, en réponse au procès antitrust contre Google. Mozilla teste aussi l'intégration de Perplexity dans Firefox; pendant que Perplexity a, de son côté, lancé son propre navigateur, Comet, conçu autour de son moteur IA et d'un assistant embarqué capable de résumer des pages web, interagir avec des contenus et automatiser des tâches simples. Cette concurrence soulève des enjeux majeurs:
+remise en question de l'hégémonie des moteurs de recherche traditionnels;
+incitation à faire évoluer le référencement: les pratiques SEO doivent s'adapter au Generative Engine Optimization (GEO), visant à apparaître dans les réponses générées par l'IA;
+protection des données personnelles: des Agents intelligents (assistants IA) comme Comet proposent des fonctions plus larges s'ils ont un accès étendu à certaines informations privées (agenda, mails, navigation);
+monétisation et modèle économique à revoir; le financement par la publicité et la vente d'information sur le profils et le comportement des utilisateurs et modèles économiques: En 2025, des moteurs IA proposent déjà des versions gratuites limitées, et des abonnements premium ( ex.: Perplexity Max à 200 $/mois ). Les modèles de financement par la publicité.
+Fonctionnement
+Représentation d'un petit morceau du web autour de Wikipedia.org.
+Le fonctionnement d'un moteur de recherche comme tout instrument de recherche se décompose en trois processus principaux:
+L'exploration ou crawl: le Web est systématiquement exploré par un robot d'indexation suivant récursivement tous les hyperliens qu'il trouve et récupérant les ressources jugées intéressantes. L'exploration est lancée depuis une ressource pivot, comme une page d' annuaire web. Un moteur de recherche est d'abord un outil d' indexation, c'est-à-dire qu'il dispose d'une technologie de collecte de documents à distance sur les sites Web, via un outil que l'on appelle robot ou bot. Un robot d'indexation dispose de sa propre signature (comme chaque navigateur web). Par exemple, Googlebot est le user agent (signature) du crawler de Google; BingBot est celui de Bing; AppleBot, celui de Apple.
+L' indexation des ressources récupérées consiste à extraire les mots considérés comme significatifs du corpus à explorer. Les mots extraits sont enregistrés dans une base de données organisée comme un gigantesque dictionnaire inverse ou, plus exactement, comme l' index terminologique d'un ouvrage, qui permet de retrouver rapidement dans quel chapitre de l'ouvrage se situe un terme significatif donné. Les termes non significatifs dans un contexte donné s'appellent des mots vides. Les termes significatifs sont associés à un poids. Celui-ci reflète à la fois la probabilité d'apparition du mot dans un document et le « pouvoir discriminant de ce mot » dans une langue, conformément au principe de la formule TF-IDF. L'indexation s'effectue après un ensemble de traitement syntaxiques et sémantiques ( lemmatisation, catégorisation, suppression des mots « vides »…) et algorithmiques selon différentes techniques basées aujourd'hui sur l' intelligence artificielle ( Word2Vec, LDA …).
+La recherche correspond à la partie requêtes du moteur, qui restitue les résultats. Un algorithme est appliqué pour identifier dans le corpus documentaire (en utilisant l'index), les documents qui correspondent le mieux aux mots contenus dans la requête, afin de présenter les résultats des recherches par ordre de pertinence supposée. Les algorithmes de recherche font l'objet de très nombreuses investigations scientifiques. Les moteurs de recherche les plus simples se contentent de requêtes booléennes pour comparer les mots d'une requête avec ceux des documents. Mais cette méthode atteint vite ses limites sur des corpus volumineux. Les moteurs plus évolués sont basés sur le paradigme du modèle vectoriel: ils utilisent la formule TF-IDF pour mettre en relation le poids des mots dans une requête avec ceux contenus dans les documents. Cette formule est utilisée pour construire des vecteurs de mots, comparés dans un espace vectoriel, par une similarité cosinus. Pour améliorer encore les performances d'un moteur, il existe de nombreuses techniques, la plus connue étant celle du PageRank de Google qui permet de pondérer une mesure de cosinus en utilisant un indice de notoriété de pages. Les recherches les plus récentes utilisent la méthode dite d'analyse sémantique latente qui tente d'introduire l'idée de cooccurrences dans la recherche de résultats (le terme « voiture » est automatiquement associé à ses mots proches tels que « garage » ou un nom de marque dans le critère de recherche).
+De même, un article sur la « récolte » du « blé » en « France » sera jugé pertinent comme candidat à la réponse sur une question concernant la « culture » des « céréales » en « Europe ».
+Des modules complémentaires sont souvent utilisés en association avec les trois briques de bases du moteur de recherche. Les plus connus sont les suivants:
+Le correcteur orthographique:
+Le lemmatiseur:
+L'anti-dictionnaire:
+Il permet de corriger les erreurs introduites dans les mots de la requête en s'assurant de leur pertinence par la prise en compte de leur forme canonique.
+Il supprime tous les mots « vides » (tels que « de », « le », « la ») qui sont non-discriminants, et qui perturbent le score de recherche en introduisant du bruit. La suppression se fait dans l'index et dans les requêtes.
+Optimisation pour les moteurs de recherche
+Afin d'optimiser les moteurs de recherche, les webmestres insèrent des métaéléments (métatags) dans les pages web, dans l'en-tête HTML (head). Ces informations permettent d'optimiser les recherches d'information sur les sites web.
+Financement
+Les sites dont la recherche est le principal service se financent par la vente de technologie et de publicité.
+Le financement par la publicité consiste à présenter des publicités correspondant aux mots recherchés par le visiteur. L'annonceur achète des mots-clés: par exemple une agence de voyages peut acheter des mots-clés comme « vacances », « hôtel » et « plage » ou « Cannes », « Antibes » et « Nice » si elle est spécialisée dans cette région. Cet achat permet d'obtenir un référencement dit « référencement payant » à distinguer du référencement dit « référencement naturel ».
+Le moteur de recherche peut afficher la publicité de deux manières: en encart séparé ou en l'intégrant aux résultats de la recherche. Pour le visiteur, l'encart séparé se présente comme une publicité classique. L'intégration aux résultats se fait en revanche au détriment de la pertinence des résultats et peut avoir des retombées négatives sur la qualité perçue du moteur. De ce fait, tous les moteurs ne vendent pas de placement dans les résultats.
+Les moteurs de recherche constituent un enjeu économique. La valeur boursière du holding Alphabet propriétaire de Google, principal moteur de recherche, était de 831 milliards USD en avril 2020.
+Techniques de détournement
+L'importance des enjeux économiques a généré des techniques de détournement malhonnêtes des moteurs de recherche pour obtenir des référencements « naturels », le spamdexing (référencement abusif en français).
+Les techniques les plus pratiquées de spamdexing sont:
+Le cloaking, qui est une technique permettant de fournir une page différente aux moteurs de recherche de celle visible par un internaute.
+Les sites miroirs, qui sont des copies exactes d'un site internet, mais sous une autre adresse.
+Le zurnisme, qui est la création d'un néologisme pour obtenir une exclusivité de référencement. Le mot zurnisme est lui-même un zurnisme, qui a été créé en 2007 par un blog français.
+Les techniques de référencement abusif sont pourchassées par les éditeurs de moteurs de recherches, qui constituent des listes noires, provisoires ou définitives.
+On distingue le spamdexing, détournement malhonnête, du « SEO », Search Engine Optimization ( optimisation pour les moteurs de recherche en français). Les techniques de SEO sont commercialisées par des sociétés spécialisées.
+Vente de technologie
+Les grandes organisations (entreprises, administrations) disposent généralement de très nombreuses ressources informatiques dans un vaste intranet. Leurs ressources n'étant pas accessibles depuis Internet, elles ne sont pas couvertes par les moteurs de recherche du web. Elles doivent donc installer leur propre moteur si elles veulent mener des recherches dans leurs ressources. Elles constituent donc un marché pour les développeurs de moteurs de recherche. On parle alors de moteur de recherche pour entreprise (voir plus bas).
+Il arrive également que des sites web publics utilisent les services d'un moteur de recherche pour étoffer leur offre. On parle alors de « SiteSearch ». Ces logiciels permettent la recherche de contenus dans un ou plusieurs groupes de sites. Ces technologies sont particulièrement exploitées sur les sites de contenus et les sites de vente en ligne. La particularité de ces outils est souvent la complexité de mise en œuvre et les ressources techniques nécessaires disponibles.
+Il arrive aussi que de grands portails exploitent la technologie des moteurs de recherche. Ainsi Yahoo!, spécialiste de l' annuaire web, a utilisé pendant quelques années la technologie de Google pour la recherche jusqu'à ce qu'elle lance son propre moteur de recherche Yahoo Search Technology en 2004 dont les fondations proviennent de Altavista, Inktomi et Overture, sociétés fondatrices des moteurs de recherche et rachetées par Yahoo!.
+Évolution vers le web sémantique
+De plus en plus de producteurs de contenu, à la suite des recommandations du W3C sur le web sémantique, indexent leurs bases avec des métadonnées ou des taxinomies ( ontologies ), en vue de permettre aux moteurs de recherche de s'adapter aux analyses sémantiques.
+Ces formes de recherches et d'analyses de corpus d'informations par voie informatique ne sont encore que des potentialités.
+Par comparaison avec des recherches plein texte, des recherches réalisées sur le web sémantique doivent être plus conviviales pour l'utilisateur:
+L'utilisateur d'un système sémantique doit pouvoir directement poser sa question en langue naturelle.
+Le moteur de recherche sémantique fournit la réponse précise à une question plutôt qu'une liste de pages y répondant.
+Il n'existe pas encore à proprement parler de moteur de recherche sémantique qui permette de comprendre une question en langue naturelle et d'adapter une réponse en fonction des résultats trouvés.
+Quelques tentatives existent néanmoins pour chercher à répondre par des formes intermédiaires à cette problématique du sens dans la recherche d'information:
+Powerset racheté par Microsoft et partiellement intégré à Bing;
+KartOO, de la société Kartoo, qui affichait des graphes sémantiques dans le cadre de ses cartes de recherche (fermé en 2010);
+WolframAlpha, moteur de recherche qui répond aux questions en langue naturelle à partir d'une base de données.
+Yatedo, moteur de recherche de personnes utilise la sémantique afin d'extraire les informations relatives à une personne sur une page Web.
+Évolution vers le moteur et annuaire
+Les recherches d'adresses sur internet
+L'abandon progressif des annuaires imprimés conduit les usagers à effectuer les mêmes recherches sur l'internet « profession+localité ». Google a donc acquis en 2010 un fichier d'entreprises (pour la France et un certain nombre de pays), pour effectuer un mixage des données web et annuaire lorsque les requêtes correspondent a une activité localisée. Cette nouvelle tendance se vérifie chez les principaux moteurs de recherche et de nouveaux « outils mixte » voient le jour. Yandex et Baidu n'ont pas encore adopté ce modèle de mixage.
+Selon une étude réalisée par McKinsey&Co, seulement 65 % des PME françaises disposaient d'une présence sur Internet en 2013.
+Les moteurs de recherche qui par définition collectent uniquement des données issues de l'internet, ont donc été obligés d'acquérir et de proposer ces adresses d'annuaire en complément pour satisfaire la recherche d'adresses des internautes. Google a baptisé ces adresses « Google Adresses », puis d'office basculées vers « Google + », actuellement « Google My Business ». Les moteurs de recherche Bing et Google ne communiquent pas l'origine de ces fichiers d'entreprises intégrés, hormis Yahoo! qui est en partenariat avec Pages Jaunes.
+Part de marché
+Part de marché en mai 2025.
+Moteur
+Logo
+Mondial
+France
+Allemagne
+Canada
+États-Unis
+Mexique
+Brésil
+Maroc
+Chine
+Russie
+Google
+90,11 %
+87,93 %
+88,53 %
+90,19 %
+87,81 %
+89,84 %
+93,77 %
+95,99 %
+26,12 %
+Microsoft Bing
+3,92 %
+5,59 %
+5,85 %
+6,3 %
+7,11 %
+7,71 %
+4,55 %
+2,72 %
+30,53 %
+0,9 %
+Yandex
+2,23 %
+1,89 %
+2 %
+0,24 %
+0,23 %
+0,15 %
+0,19 %
+0,27 %
+2,57 %
+72,48 %
+Yahoo!
+1,29 %
+1,47 %
+1,21 %
+1,87 %
+2,53 %
+1,97 %
+1,29 %
+0,74 %
+0,12 %
+Baidu
+0,78 %
+51,35 %
+DuckDuckGo
+1,15 %
+1,2 %
+2,53 %
+0,19 %
+0,15 %
+0,13 %
+0,22 %
+Méta-moteurs
+Les métamoteurs sont des outils de recherche qui interrogent plusieurs moteurs de recherche simultanément et affichent à l'internaute une synthèse pertinente.
+Exemples: Startpage, Searx, Seeks, Lilo, Kagi...
+Multi-moteurs
+Un multi-moteur (en) est une page web proposant un ou plusieurs formulaires permettant d'interroger plusieurs moteurs. Il peut également s'agir d'un logiciel, d'une fonction ou d'une extension de navigateur web, ou d'une barre d'outils …
+Le choix d'un des moteurs peut se faire par bouton, bouton radio, onglet, liste déroulante ou autre.
+Les premières pages de ce type recopiaient le code des formulaires de plusieurs moteurs. Avec l'apparition du JavaScript il est devenu possible de n'avoir plus qu'un seul formulaire. On peut citer par exemple Creative Commons Search, Ecosia, Disconnect, le moteur de recherche de Maxthon, HooSeek (fermé en 2012), searchall.net, etc.
+Moteurs ou métamoteurs destinés à la littérature scientifique et technique
+Le moteur de recherche le plus connu et le plus utilisé concernant la littérature scientifique et technique est Google Scholar, dont l'algorithme indexe un grand nombre de bases de données et de métadonnées structurées de littérature scientifique et technique et de brevets, mais il existe d'autres moteurs, plus ou moins spécialisés:
+Les grands moteurs de recherche du domaine scientifique (en 2022)
+Nom
+Descriptif
+Base ( Bielefeld Academic Search Engine )
+Spécialisé dans l'échange d'archives numériques, il explore plus de 300 millions de documents d'intérêt scientifique, issus de plus de 10 000 ressources libres (en 2022) et exploitant l' Open Archives Initiative (OAI).
+OAIster (moteur du WorldCat Discovery )
+fouille les corpus d'images de plus de 500 entités académiques: articles de journaux, textes, livres, vidéos, sons open-sources et d'intérêt académique, avec environ 25 millions de notices en 2022; plutôt orienté Biologie, médecine et chimie
+BioTechSearchEngine
+fouille les contenus d'environ 300 revues en libre accès
+BioMed Central
+fouille les contenus en libre accès de 200 revues des domaines de la médecine et la biologie et en médecine
+PubChem
+destiné à la chimie
+CiteSeerX
+bibliothèque numérique et moteur de recherche, destiné aux sciences de l'information et à l'informatique
+TechXtra
+explore des articles, ouvrage, journaux, rapports techniques, thèses, mémoires et « ressources éducatives libres » (OER)
+WorldWideScience
+destiné aux brevets et aux contenus issus de sociétés savantes du monde entier
+Moteur de l' INIST
+information scientifique et technique
+Science.gouv
+Portail gouvernemental français (disparu)
+NARCIS
+co-élaboré et géré par l' Académie royale néerlandaise des arts et des sciences et le Canada Institute for Scientific and Technical Information
+Journal@rchive (japonais)
+Archives de journaux et revues scientifiques japonaises.
+Isidore
+conçu par le CNRS pour les étudiants, doctorants, enseignants et chercheurs en sciences humaines et sociales. Il explore 3 millions de documents dans plus de 2 000 sources (en 2022), dont notamment du SUDOC, de la BnF, de la bibliothèque du Congrès, et de l' Institut de recherche et d'histoire des textes
+Jurn
+destiné aux arts et aux sciences humaines et sociales (SHS), avec un accès à plus de 1 000 revues électroniques en libre accès
+Moteurs de recherche solidaires ou écologiques
+On désigne par « moteur de recherche solidaire », un moteur qui reverse une partie de ses revenus à des causes écologiques, sociales ou humanitaires. Ces moteurs sont nés du constat que les revenus annuels générés par la publicité sur les moteurs de recherche sont assez importants (environ 45 $ par an par utilisateur pour Google en 2014 ). Les moteurs de recherches solidaires se distinguent notamment dans la façon de distribuer les revenus générés. Certains moteurs comme Ecosia reversent alors une partie des revenus à une seule et unique cause, alors que des moteurs comme Lilo et YouCare permettent aux internautes de choisir les projets à financer.
+Certains moteurs ont également adopté une politique de neutralité carbone, tels que Google, DuckDuckGo et Ecosia. Google affirme qu'il sera neutre en carbone d'ici 2030, en partie en achetant des énergies renouvelables et dès 2017, l'entreprise en rachète autant qu'elle en consomme mais il ne faut pas oublier que l'utilisation des énergies renouvelables produit souvent des gaz à effet de serre. Au début des années 2020 Google est le plus gros acheteur privé au monde de ce type d'énergie. Les énergies renouvelables étant essentiellement intermittentes, Google ne peut les utiliser directement ou de façon permanente: une entreprise qui se déclare neutre en carbone utilise dans les faits des « garanties d'origines renouvelables »(ce qui n'est pas forcément vrai, car certaines entreprises achètent des garanties d'origine renouvelables, mais fournissent en réalité l'électricité du réseau) qui permettent de s'assurer que l'énergie carbonée qu'elles consomment sera compensée par une production équivalente d'énergie renouvelable. Or, selon l'association The Shift Project, le modèle économique de Google nécessite toujours plus de puissance de calcul, de renouveler et d'augmenter son infrastructure, ses réseaux et ses équipements dont la production est une source importante de gaz à effet de serre. Pour l' association négaWatt, la communication de Google se focalise sur l'usage, mais éclipse les problèmes environnementaux liés à l' extraction des ressources, du transport et du recyclage,.
+Le métamoteur de recherche Ecosia utilise 80 % de ses revenus publicitaires pour des projets de reforestation aux quatre coins du monde.
+Moteurs verticaux
+On désigne par « moteurs verticaux » une page web ou un service multimédia qui propose une recherche spécialisée dans un domaine professionnel ou qui est particulièrement ciblée. Cet outil de recherche est spécialisé dans un secteur particulier, tel que les télécommunications, le droit, la biotechnologie, la finance (assurance) ou encore l'immobilier. Son fonctionnement général est basé sur une base de données constituée à partir des bases de tous les sites spécialisés de l'activité ciblée.
+Certains de ces moteurs sont utilisés par des professionnels pour cibler des consommateurs, avec le plus souvent une finalité économique qui dérive sur la géolocalisation.
+On retrouve ainsi pour le grand public des annuaires, des comparateurs. Il en existe maintenant pour toutes les activités: immobilier, tourisme, recherche d'emploi, recrutement, automobile, loisirs, jeux.
+Moteur de recherche d'entreprise
+L'explosion du nombre de contenus de formats divers (données, informations non structurées, images, vidéos…) disponibles dans les entreprises les poussent à s'équiper de moteurs de recherche en interne.
+Selon une étude menée par MARKESS International en février 2008, 49 % des organisations ont déjà recours à un moteur de recherche d'entreprise, et 18 % envisagent son utilisation d'ici à 2010. Ces moteurs de recherche sont en majeure partie intégrés aux postes de travail ou aux outils de gestion électronique des documents, mais ils sont dans un nombre grandissant d'entreprises capables de couvrir à la fois les contenus internes et externes de l'entreprise, ou encore intégrés aux outils de gestion de contenu ou aux solutions décisionnelles.
+Parmi les acteurs proposant des moteurs de recherche d'entreprise figurent Google, Exalead, PolySpot ou OpenSearchServer.
+Ressources pour les moteurs de recherche
+Les technologies d'analyse du langage, telles que la lemmatisation, l'extraction d'entités nommées, la classification et le clustering permettent d'améliorer grandement le fonctionnement des moteurs de recherche. Ces technologies permettent à la fois d'améliorer la pertinence des résultats et d'engager l'internaute dans un processus de recherche plus performant, comme c'est le cas avec la recherche à facettes [précision nécessaire].
+Impact environnemental
+Selon l'étude de l' ADEME « Internet, courriels, réduire les impacts » publiée en février 2014, aller directement à l'adresse d'un site, soit en tapant son adresse dans son navigateur, soit en l'ayant enregistré comme « favori » (plutôt que de rechercher ce site via un moteur de recherche) divise par 4 les émissions de gaz à effet de serre, ce qui dépend en réalité du type de moteur de recherche, les recherches dans les moteurs comme Ecosia ayant une empreinte moyenne négative.
+Notes et références
+↑ Daisy, « Perplexity AI: Guide Complet en Français pour Mieux Rechercher en 2025 », 5 juin 2025 (consulté le 22 juillet 2025 ).
+↑ Julien Castex, « Perplexity.ai: Moteur de recherche intelligent avec sources vérifiables », sur Krusell France, 29 septembre 2024 (consulté le 22 juillet 2025 ).
+↑ Mickael Dorigny, « Perplexity: le moteur de recherche boosté à l'IA », sur it-connect.fr, 29 septembre 2024 (consulté le 22 juillet 2025 ).
+↑ « Blog - Perplexity AI en 2025: Guide complet du moteur de recherche révolutionnaire », sur roboto.fr (consulté le 22 juillet 2025 ).
+↑ Zone Bourse, « ALPHABET INC.: Données Financières Prévisions Estimations et Attentes | GOOGL | Zone bourse », sur zonebourse.com (consulté le 13 avril 2020 ).
+↑ « Accélérer la mutation numérique des entreprises: un gisement de croissance et de compétitivité pour la France », sur McKinsey & Company (consulté le 29 novembre 2018 ).
+↑ « Groupe Pages Jaunes et Yahoo! Canada s'associent pour fournir aux Canadiens une expérience de recherche locale améliorée », sur newswire.ca (consulté le 21 mai 2025 ).
+↑ (en) Influence, « Search Engine Market Share Worldwide - May 2025 », sur gs.statcounter.com (consulté le 17 juin 2025 ).
+↑ Flavien Chantrel, « Moteurs de recherche de photos et vidéos: Owaks et Tagbulb », Blog du Modérateur, 12 mars 2009.
+↑ Creative Commons Search
+↑ « BASE - Bielefeld Academic Search Engine », sur base-search.net (consulté le 6 janvier 2023 ).
+↑ « How much are you worth? Average revenue per user at Google, Facebook and Twitter », sur digitalstrategyconsulting.com via Wikiwix (consulté le 9 octobre 2023 ).
+↑ Lucas Martin-Brodzicki, « Neutralité carbone: pourquoi Google reste malgré tout un danger pour le climat », sur L'Humanité, 15 décembre 2020 (consulté le 31 mars 2022 ).
+↑ Margaux Deuley, « Google utilise-t-il réellement 100% d'énergie verte pour alimenter ses services? », sur Libération, 13 juillet 2018 (consulté le 31 mars 2022 ).
+↑ Ecosia, une start-up qui lutte contre la déforestation
+↑ ADEME, « Internet, courriels, réduire les impacts. Limiter nos consommations d'énergie et de matières premières », Etudes,‎ 2014 ( lire en ligne [PDF] ).
+Voir aussi
+Sur les autres projets Wikimedia:
+Moteur de recherche, sur Wikimedia Commons
+moteur de recherche, sur le Wiktionnaire
+Moteur de recherche, sur Wikiquote
+Articles connexes
+Outils
+Liste de moteurs de recherche
+Instrument de recherche
+Recherche plein texte
+Moteur de recherche collaboratif, Métamoteur, Annuaire web, Référencement, Positionnement, Spamdexing
+Page de résultats d'un moteur de recherche
+Smart bookmark
+Consensus (moteur de recherche)
+Bulle de filtres
+Moteur de réponse
+Théorie
+Combinatoire sémantique
+Recherche d'information (IR)
+Système de recherche d'information
+Analyse sémantique
+Recherche d'image par le contenu
+Transition numérique
+Automatisation
+Indexation automatique de documents
+Exploration (robot d'indexation)
+Algorithme de recherche
+Bibliographie
+Guillaume Sire, Les Moteurs de recherche, Paris, La Découverte, coll. « Repères: culture, communication » ( n o 671), 2016, 126 p. ( ISBN 978-2-7071-8495-5 ).
+Liens externes
+Medical Subject Headings
+France 24
+Britannica
+Enciclopedia De Agostini
+Gran Enciclopèdia Catalana
+Treccani
+BnF ( données )
+LCCN
+GND
+Japon
+Israël
+v · m Moteurs de recherche (logiciels) ( catégorie, liste )
+ASPseek
+Apache Solr
+DataparkSearch
+Elasticsearch
+Exalead
+Gigablast
+Googlebot
+Heritrix
+ht://Dig
+Lucene
+mnoGoSearch
+Nutch
+Piria
+Searx
+Seeks
+Sphinx
+Theseus
+Verticrawl
+Whoosh
+Xapian
+YaCy
+Zettair
+Permettant le P2P
+Gigablast
+Seeks
+YaCy
+v · m Moteurs de recherche (sites)
+Général
+Baidu
+Bing
+Copernic Agent
+Google
+HotBot
+Junglekey
+Lycos
+Mojeek
+Naver
+Seznam
+Soso
+Sogou
+WebCrawler
+Yahoo!
+Yandex
+Yippy (en)
+Solidaires
+Ecogine (écologique)
+Ecosia (écologique)
+Lilo (social/environnemental)
+Vie privée
+Brave
+Disconnect
+DuckDuckGo
+Kagi
+Startpage
+Qwant
+Searx
+Seeks
+Swisscows
+YaCy
+Emploi
+Cadremploi
+HelloWork
+Indeed
+Jobboom
+Jobillico
+Keljob
+Meteojob
+Monster
+Workopolis
+Sciences
+CiteSeerX
+Google Scholar
+ScientificCommons
+Sci-Hub
+WolframAlpha
+Autres
+Basedig
+Kelkoo
+NexTag
+Qwant Junior
+Sepia Search
+Skyscanner
+Spock
+Yatedo
+Disparus
+Généraux: A9.com
+AltaVista
+Ask.com
+Blekko
+Exalead
+Gigablast
+LeMoteur
+Panguso
+Autres: Astalavista
+Doona
+IceRocket
+Qwant Causes
+Technorati
+Catégorie
+Liste
+Portail d’Internet
+Portail de l’informatique
+Sciences de l’information et bibliothèques

@@ -1,0 +1,108 @@
+# Word embedding
+
+Source : fr.wikipedia.org, révision 235153616
+
+Si ce bandeau n'est plus pertinent, retirez-le. Cliquez ici pour en savoir plus.
+Les informations figurant dans cet article ou cette section doivent être reliées aux sources mentionnées dans les sections « Bibliographie », « Sources » ou « Liens externes » ( décembre 2015 ).
+Le word embedding (aussi appelé en français plongement lexical ou plongement sémantique ) est une méthode d'apprentissage d'une représentation de mots sous forme de vecteurs, utilisée notamment en traitement automatique des langues.
+Cette technique permet de représenter chaque mot d'un dictionnaire par un vecteur de nombres réels, autrement dit une liste de nombres. Les vecteurs des mots ont tous la même dimension et encodent le sens des mots d'un point de vue de similarité d'utilisation. Plus des mots peuvent être utilisées dans le même contexte (l'un à la place de l'autre dans une phrase) et plus leurs vecteurs sont proches. Par exemple, on pourrait s'attendre à ce que les mots « chien » et « chat » soient représentés par des vecteurs relativement proches. Cette technique est basée sur l'hypothèse (dite « de Harris » ou distributional hypothesis, ) qui veut que les mots apparaissant dans des contextes similaires ont des significations apparentées. La similarité entre des vecteurs peut être définie comme la distance dans l' espace vectoriel où sont définis ces vecteurs ou comme l'angle entre ces vecteurs.
+La technique des word embeddings diminue la dimension (la taille) de la représentation des mots en comparaison d'un modèle vectoriel par exemple, facilitant ainsi les tâches d' apprentissage impliquant ces mots, puisque moins soumis au fléau de la dimension.
+Introduction
+Pour utiliser les données en apprentissage machine, il est nécessaire de leur trouver une représentation mathématique, typiquement des vecteurs. Certaines données s'y prêtent directement, comme les images, qui engendrent des vecteurs riches en information, encodant toutes les nuances et les couleurs qui les composent. Les mots, quant à eux, sont des éléments d'information isolés, et certaines représentations rudimentaires se limitent à un simple identifiant par mot. Par exemple le mot « chat » sera encodé par un seul identifiant arbitraire, disons X87. C'est une représentation discrète, relativement pauvre, qui ne permet notamment pas de comparer deux mots entre eux. Les plongements lexicaux, eux, représentent un mot par un vecteur. Par exemple, un chat sera représenté par le vecteur [0,43 0,88 0,98 1,3]. Si l'on encode tous les mots d'un dictionnaire ainsi, il devient alors possible de comparer les vecteurs des mots entre eux, par exemple en mesurant l' angle entre les vecteurs. Une bonne représentation de mots permettra alors de trouver que le mot « chien » est plus près du mot « chat » qu'il ne l'est du mot « gratte-ciel ». Qui plus est, ces représentations permettent d'espérer que, dans l'espace vectoriel où le plongement est fait, on aura l'équation roi - homme + femme = reine ou encore l'équation Paris - France + Pologne = Varsovie.
+Les word embeddings sont également très utiles pour mitiger le fléau de la dimension, un problème récurrent en intelligence artificielle. Sans les plongements de mots, les identifiants uniques représentant les mots engendrent des données éparses, des points isolés dans un espace vaste et presque vide. Avec les plongements de mots, en revanche, l'espace devient beaucoup plus restreint et il est plus facile pour un ordinateur d'y établir des regroupements, d'y découvrir des régularités, en apprentissage machine.
+Historique et contexte
+De façon générale, la technique des word embeddings est possible grâce à l'hypothèse distributionnelle ( distributional hypothesis ), établie dans le domaine de la sémantique distributionnelle (en). L’idée est que des mots de sens proches auront tendance à apparaître dans des voisinages de mots similaires. Comme l'a écrit John Rupert Firth en 1957, « Vous connaîtrez un mot par ses fréquentations. ». En utilisant le voisinage d'un mot pour représenter ce dernier, on crée ainsi une représentation qui peut encoder sa sémantique (son sens). En d'autres termes, le contexte suffit pour représenter un mot, ce qui est fort différent de la linguistique traditionnelle chomskienne.
+D'un point de vue historique, l’encodage des mots selon certaines caractéristiques de leur sens a commencé dans les années 1950 et 1960. En particulier, le modèle vectoriel en recherche d’information permet de représenter un document complet par un objet mathématique qui vise à rendre compte de son sens. Avec ces représentations de documents, on peut notamment concevoir un moteur de recherche plein texte, qui compare la représentation d’une requête utilisateur avec les représentations de multiples documents. La représentation la plus proche de celle de la requête correspond alors au document le plus pertinent.
+On distingue deux approches pour encoder le contexte (le voisinage) d'un mot. Les approches à base de fréquences dénombrent les mots cooccurrents avec un mot donné, puis distillent cette information pour créer des vecteurs denses et de petite dimension. Un exemple est l' analyse sémantique latente. Les plongements lexicaux constituent une seconde approche, prédictive celle-là, par laquelle on cherche à prédire un mot donné à l'aide de son contexte ou vice-versa. C'est ce processus qui engendre les plongements lexicaux. [pas clair]. Une implémentation populaire du calcul des plongements de mots est fournie par le chercheur Tomas Mikolov dans son programme word2vec, dont la description date de 2013.
+Principe des word embeddings dans word2vec
+Principe général
+L'idée générale est de projeter un ensemble de mots d'un vocabulaire de taille dans un espace vectoriel continu où les vecteurs de ces mots ont une taille relativement petite. De plus, on veut trouver une représentation vectorielle de chaque mot de de façon que les mots aux représentations voisines apparaissent dans des contextes similaires.
+L'approche de Mikolov s'appuie sur des réseaux de neurones artificiels pour construire ces vecteurs. Ces modèles sont entraînés sur des corpus très volumineux. Le principe de base est qu'on tente de prédire un mot à partir de son contexte ou vice-versa. Un sous-produit de cet apprentissage constitue les plongements lexicaux. Il existe deux variantes de l'algorithme word2vec. Le modèle continuous bag-of-words (sac de mots continu) cherche à prédire un mot à partir de ses mots voisins, par exemple prédire attrape dans l'extrait le chat ____ la souris. Le modèle skip-gram cherche à prédire les mots du contexte à partir d'un mot central, par exemple prédire les quatre mots le, chat, la et souris à partir de attrape.
+Modèle CBOW. Illustration adaptée de l'article de Mikolov.
+Modèle skip-gram. Illustration adaptée de l'article de Mikolov.
+Dans les deux cas, on définit un réseau de neurones artificiels qui a une couche d'entrée, et une couche de sortie. Ces vecteurs sont binaires et de taille. Une couche cachée à dimensions est intercalée entre les deux. est un hyperparamètre d'apprentissage. L'entraînement du réseau produit une matrice de taille, connectée à gauche aux entrées et à droite à la couche cachée. Au terme de l'apprentissage, la matrice contient les plongements de tous les mots du vocabulaire.
+Les vecteurs et sont construits avec un encodage one-hot: ils possèdent un unique 1 dans leur i ème dimension et des zéros partout ailleurs. La dimension i non nulle correspond au mot i du vocabulaire. À la suite de la multiplication matricielle, la i ème ligne de encode donc le plongement du i ème mot. La propagation consiste à mettre à jour les différentes couches du réseau. La couche cachée est une application linéaire des entrées et de la couche. La couche de sortie est calculée grâce à la fonction softmax. La rétro-propagation utilise une fonction de perte, qui spécifie un score suivant la sortie en sachant l'entrée.
+Le modèle skip-gram (SG)
+réseau de neurones skip-gram
+Le modèle skip-gram apprend en considérant un mot tiré d'une phrase donnée. Autrement dit pour entraîner le réseau de neurones nous considérons une phrase, on en extrait un mot qui sera notre entrée du réseau. Le reste de la phrase sera notre sortie.
+La couche cachée est dans ce cas la somme pondérée de l'entrée par, seuls les éléments non nuls de apportent de l'information, on peut donc montrer que:.
+La couche de sortie peut être calculée sur la même idée, on a donc que l'entrée à la -ième valeur du -ième mot est:
+Nous pouvons donc appliquer la fonction fonction softmax. qui nous donne
+La fonction de perte est définie comme étant.
+The Continuous Bag-of-Words (CBOW)
+réseau de neurones Continuous Bag-of-words
+Le modèle Continuous Bag-of-words est l'image inverse du skip-gram modèle. À partir d'un contexte il apprend à reconnaître un mot, l'ensemble est une phrase du langage.
+Comme dans le modèle Skip-gram la couche cachée est la somme pondérée de l'entrée par, on peut donc montrer que:.
+La couche de sortie peut être calculée sur la même idée, on a donc que l'entrée à la -ième valeur du mot est:
+Nous pouvons donc appliquer la fonction fonction softmax qui nous donne
+La fonction de perte est définie comme étant.
+Applications
+Le plongement lexical a ouvert de nouvelles perspectives grâce à la réduction de dimensionnalité qu'il autorise. Un certain nombre d'applications ont ainsi pu voir le jour ou connaître une amélioration importante.
+Traduction
+Apport des word embedings
+Les premiers outils de traduction se basent sur des corpus parallèles afin d'apprendre les traductions mot à mot. Cette méthode étant très limitée (par exemple small peut être traduit par petit, petite, petites ou petits en fonction du contexte, ce qui n'est pas étudié dans le cas présent), la méthode a évolué en étudiant les bigrammes ou trigrammes afin de replacer chaque mot dans son contexte. La traduction est ainsi largement améliorée mais reste approximative car il n'y a aucune analyse sémantique des phrases.
+L'analyse sémantique est difficilement réalisable à partir des mots seuls. La traduction étant l'étude sémantique des similarités entre deux langages, cela rajoute encore une difficulté. Le plongement lexical permet une traduction automatique à partir des similarités sémantiques entre les langages.
+Méthode
+La traduction avec le plongement lexical se fait en plusieurs temps:
+word embedding sur chacun des deux langages (apprentissage de la sémantique de chaque langage)
+word embedding bilingue (apprentissage des similarités inter-langages)
+Le plongement lexical bilingue nécessite deux étapes:
+l'initialisation
+l’entraînement.
+Lors de l'initialisation, le coefficient d'alignement de chaque mot d'un langage avec les mots de l'autre langage est calculé, c'est-à-dire le nombre de fois où chaque mot x est aligné avec chaque mot y (et donc apparaît au même endroit dans les deux textes) par rapport au nombre de fois où le mot x apparaît dans toutes les sources.
+On crée ainsi une matrice d'alignement où chaque correspond au coefficient d'alignement du i ème mot du premier langage avec le j ème mot du deuxième langage.
+Enfin, pour l’entraînement, on calcule un vecteur objectif qui se base sur la matrice d'alignement précédemment calculée et sur les apprentissages de chaque langage. Ce vecteur servira de vecteur objectif lors de l’entraînement du plongement lexical bilingue.
+Analyse de sentiments
+Apport du plongement lexical
+Avec l'arrivée des réseaux sociaux, l'analyse automatique de sentiments ( opinion mining ) est devenue un domaine de recherche très étudié, le but étant de déduire si une phrase est plutôt positive, négative ou neutre. Cette analyse est notamment utilisée dans l'analyse de tweets.
+Avant l'arrivée du plongement lexical, l'analyse automatique de sentiments se basait sur une base d'apprentissage annotée entièrement à la main.
+Le plongement lexical apporte donc une véritable aide pour l'analyse de sentiments car il permet d'éviter une partie importante de travail manuel.
+Méthode
+Le plongement lexical ne peut pas être utilisé tel quel. Il comporte, en effet, une approche sémantique, or, avec cette approche, les mots bon et mauvais, par exemple, seront très proches alors que l'analyse de sentiment les voudrait opposés. Il faut donc ajouter dans la représentation de chaque mot un apprentissage spécifique aux sentiments.
+Pour cela, en plus du plongement lexical sémantique, s'ajoute un plongement lexical qui étudie les sentiments dans une phrase ainsi qu'un dernier qui va permettre de mêler ces deux plongements lexicaux.
+Le plongement lexical qui permet d'étudier les sentiments se base sur les mêmes éléments qu'un plongement lexical sémantique, c'est-à-dire le même réseau de neurones.
+Chaque séquence de mot va être étudiée à l'aide d'une fenêtre glissante, c'est-à-dire qu'on étudie n-gramme par n-gramme. La dernière couche du réseau de neurones, qui se base sur des probabilités conditionnelles, calcule la probabilité totale (pour la somme de tous les n-grammes de la séquence de mots) d'avoir une séquence de mot positive ou négative, cette probabilité donne directement la prédiction voulue.
+Le plongement lexical sémantique ne prend pas en compte les sentiments, tandis que le plongement lexical de sentiments ne prend pas en compte la sémantique. On peut donc les unifier en considérant une fonction de coût qui correspond à une combinaison linéaire des deux fonctions de coûts.
+Pour l'entraînement, la base d'apprentissage se base sur un corpus (ensemble de texte) distant-supervisés grâce à des émoticônes positives et négatives, c'est-à-dire un corpus n'étant pas étiqueté à la main mais grâce à une heuristique ayant un minimum de connaissance (ici la connaissance de l'heuristique est le sentiment en fonction de quelques émoticônes).
+Reconnaissance vocale
+Apport du plongement lexical
+Les principaux problèmes de la reconnaissance vocale sont: le coût, le temps de collecte et d'annotation des données et la mise à jour des données.
+Le plongement lexical permet de contrer l'ensemble de ces inconvénients.
+Méthode
+L'utilisation du plongement lexical se fait ici de deux manières: une première étape permet de reconnaître la phonétique de la phrase, une seconde permet d'apprendre à reconnaître de nouveaux mots.
+Entraînement du plongement lexical pour la reconnaissance vocale.
+Lors de la première étape, un flux de parole correspondant à une phrase exprimée par l'utilisateur est donné en entrée.
+Le plongement lexical est d'abord entraîné pour trouver le prochain mot d'une phrase à partir d'un corpus de textes. Afin de déterminer chaque mot, le début de la phrase déjà analysée et la phonétique partant du début jusqu'à la fin du mot à analyser est donné en entrée. Cela permet de calculer la probabilité avec une fonction softmax de chaque mot possible à partir de sa phonétique, afin de déterminer le mot le plus probable.
+Cette technique n'est, cependant, pas suffisante car les mots détectés doivent exclusivement faire partie des corpus utilisés lors de l’entraînement.
+Ce problème est réglé par l'ajout d'un deuxième plongement lexical qui ne travaille pas sur la sémantique mais sur les mots proches phonétiquement. Ce dernier se base sur les ensembles de lettres. Par exemple, le mot « hello » est décomposé comme suit: {h, e, l, o, [h, he, el, lo, o], [he, hel, ell, llo, lo],... }. Afin de l’entraîner, deux plongements lexicaux phonétiques et un acoustique sont utilisés (voir figure ci-contre). Le flux de parole correspondant à un mot est envoyé en entrée du plongement lexical acoustique, puis deux mots pouvant correspondre (le bon mot ainsi qu'un mauvais) sont envoyés aux deux autres. Un tel entraînement permet de comprendre d'autres mots et permet d'apprendre les mots proches phonétiquement car leurs vecteurs ainsi calculés sont très proches.
+Limitations
+Interprétabilité
+L'espace appris par les méthodes traditionnelles n'est pas interprétable, il est généralement impossible d'interpréter le sens de chacune des dimensions pour un humain. Néanmoins, certaines méthodes de la littérature permettent de construire des plongements interprétables. Les travaux de Murphy et al. sont pionniers en ce sens, avec leur approche Non negative sparse embedding (NNSE), ils proposent de factoriser la matrice de co-occurrences en introduisant des termes de régularisation pour forcer l'apprentissage d'un espace dans lequel les vecteurs sont creux. Par la suite, Faruqui et al. avec Spowv et Subarmanian et al. avec Spine ont proposé des approches qui reprennent cette idée. En revanche, Spine se base sur des architectures plus récentes, introduisant un auto-encodeur permettant d'obtenir de telles représentations creuses. Prouteau et al. proposent eux d'apprendre ces représentations via une approche basée graphe à la faible complexité, permettant un calcul très rapide de ces vecteurs dont l'interprétabilité est évaluée.
+Notes et références
+↑ article distributional hypothesis sur le wiki de ACL, la principale société savante en traitement automatique des langues
+↑ Harris, Z. (1954). Distributional structure. Word, 10(23): 146-162.
+↑ « Stanford CS224N: NLP with Deep Learning | Winter 2019 | Lecture 1 – Introduction and Word Vectors » (consulté le 12 février 2020 )
+↑ a b c et d (en) « Vector Representations of Words | TensorFlow », sur TensorFlow (consulté le 29 mars 2019 )
+↑ (en) Emerging Technology from the arXiv, « King - Man + Woman = Queen: The Marvelous Mathematics of Computational Linguistics », sur MIT Technology Review (consulté le 2 avril 2019 )
+↑ « ScienceDirect », sur www.sciencedirect.com (consulté le 29 mars 2019 )
+↑ Salton, Gerard., Introduction to modern information retrieval, McGraw-Hill, 1983 ( ISBN 0070544840 et 9780070544840, OCLC 8034654, lire en ligne )
+↑ (en-US) Germán Kruszewski, Georgiana Dinu et Marco Baroni, « Don’t count, predict! A systematic comparison of context-counting vs. context-predicting semantic vectors », ACL,‎ juin 2014, p. 238–247 ( DOI 10.3115/v1/P14-1023, lire en ligne, consulté le 1 er avril 2019 )
+↑ a b c d e et f Tomas Mikolov, Kai Chen, Greg Corrado et Jeffrey Dean, « Efficient Estimation of Word Representations in Vector Space », arXiv:1301.3781 [cs],‎ 16 janvier 2013 ( lire en ligne, consulté le 1 er avril 2019 )
+↑ (en) « Neural Networks and Deep Learning » (consulté le 3 avril 2019 )
+↑ « Word2Vec Tutorial - The Skip-Gram Model · Chris McCormick », sur mccormickml.com (consulté le 12 février 2020 )
+↑ Brian Murphy, Partha Talukdar et Tom Mitchell, « Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding », Proceedings of COLING 2012, The COLING 2012 Organizing Committee,‎ décembre 2012, p. 1933–1950 ( lire en ligne, consulté le 5 octobre 2022 )
+↑ Manaal Faruqui, Yulia Tsvetkov, Dani Yogatama, Chris Dyer et Noah Smith, « Sparse Overcomplete Word Vector Representations », arXiv:1506.02004 [cs],‎ 5 juin 2015 ( lire en ligne )
+↑ (en) Anant Subramanian, Danish Pruthi, Harsh Jhamtani, Taylor Berg-Kirkpatrick et Eduard Hovy, « SPINE: SParse Interpretable Neural Embeddings », Proceedings of the AAAI Conference on Artificial Intelligence, vol. 32, n o 1,‎ 26 avril 2018 ( ISSN 2374-3468, DOI 10.1609/aaai.v32i1.11935, lire en ligne )
+↑ (en) Thibault Prouteau, Victor Connes, Nicolas Dugué, Anthony Perez, Jean-Charles Lamirel, Nathalie Camelin et Sylvain Meignier, « SINr: Fast Computing of Sparse Interpretable Node Representations is not a Sin! », Springer International Publishing, Cham,‎ 2021, p. 325–337 ( ISBN 978-3-030-74251-5, DOI 10.1007/978-3-030-74251-5_26, lire en ligne )
+↑ Thibault Prouteau, Nicolas Dugué, Nathalie Camelin et Sylvain Meignier, « Are Embedding Spaces Interpretable? Results of an Intrusion Detection Evaluation on a Large French Corpus », LREC 2022, Marseille, France,‎ juin 2022 ( lire en ligne )
+Voir aussi
+Articles connexes
+Linguistique
+Bibliographie
+Bengio et al., A Neural Probabilistic Language Model, 2003.
+Mikolov et al., Distributed Representations of Words and Phrases and their Compositionality, 2013.
+Jerrold J. Katz, Semantic theory, 1973.
+Will Y. Zou, Richard Socher, Daniel Cer et Christopher D. Manning, Bilingual Word Embeddings for Phrase-Based Machine Translation, 2013.
+Duyu Tang, Furu Wei, Nan Yang, Ming Zhou, Ting Liu et Bing Qin, Learning Sentiment-Specific Word Embedding for Twitter Sentiment Classification, 2014.
+Samy Bengio et Georg Heigold, Word embedding for Speech Recognition, 2014.
+Portail de l'informatique théorique

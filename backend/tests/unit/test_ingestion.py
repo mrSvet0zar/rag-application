@@ -57,3 +57,46 @@ def test_html_to_text_extracts_title_and_strips_scripts():
 def test_html_to_text_empty_body():
     title, text = html_to_text("<html><head><title>x</title></head><body></body></html>")
     assert text == ""
+
+
+def test_html_to_text_keeps_sentences_with_inline_links_intact():
+    """Inline markup must not shred a sentence into one-word lines.
+
+    Extracting the document with a newline separator breaks at every tag
+    boundary; a link-heavy sentence then embeds as disconnected fragments.
+    """
+    html = (
+        "<html><body><p>La <a href='/x'>similarite cosinus</a> compare deux "
+        "<b>vecteurs</b> par leur angle.</p></body></html>"
+    )
+    _, text = html_to_text(html)
+
+    assert text == "La similarite cosinus compare deux vecteurs par leur angle."
+
+
+def test_html_to_text_separates_blocks_by_line():
+    html = "<html><body><h2>Titre</h2><p>Un.</p><ul><li>Deux</li><li>Trois</li></ul></body></html>"
+    _, text = html_to_text(html)
+
+    assert text.splitlines() == ["Titre", "Un.", "Deux", "Trois"]
+
+
+def test_html_to_text_drops_mathml():
+    """MathML ships a LaTeX twin, so keeping it duplicates every formula."""
+    html = (
+        "<html><body><p>Formule :</p>"
+        "<math><semantics><annotation>{\displaystyle x=1}</annotation></semantics></math>"
+        "<p>Suite.</p></body></html>"
+    )
+    _, text = html_to_text(html)
+
+    assert "displaystyle" not in text
+    assert text.splitlines() == ["Formule :", "Suite."]
+
+
+def test_html_to_text_does_not_duplicate_nested_blocks():
+    """A block wrapping other blocks must not emit its children twice."""
+    html = "<html><body><td><p>Cellule</p></td></body></html>"
+    _, text = html_to_text(html)
+
+    assert text.count("Cellule") == 1

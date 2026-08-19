@@ -6,3 +6,4 @@ __pycache__/
 .hf_cache/
 tests/
 sample_docs/
+eval/

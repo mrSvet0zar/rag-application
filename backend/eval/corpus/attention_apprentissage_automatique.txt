@@ -1,0 +1,130 @@
+# Attention (apprentissage automatique)
+
+Source : fr.wikipedia.org, révision 232445582
+
+Pour les articles homonymes, voir Attention (homonymie).
+L' attention, en apprentissage automatique, est une méthode consistant à déterminer l'importance relative de chaque élément au sein d'une séquence. Ainsi, par exemple en traitement automatique des langues, cette attention est représentée par des coefficients attribués à chaque mot d'une phrase en fonction de son importance dans la phrase. L'attention s'applique plus généralement à une séquence de vecteurs ( plongement lexical par exemple) de longueur arbitraire.
+Contrairement à des paramètres qui seraient déterminés lors de la phase d'apprentissage puis fixés lors de l'utilisation (par exemple dans un réseau de neurones à action directe ), les coefficients attribués par l'attention sont calculés en fonction de l'entrée et vont donc varier en fonction des valeurs d'entrée. Ces poids peuvent être calculés séquentiellement comme dans les réseaux de neurones récurrents (RNN), ou plus récemment en parallèle comme dans les transformeurs,.
+Le mécanisme d'attention des transformeurs a en particulier été conçu pour remédier aux faiblesses liées aux RNN. Dans un RNN, chaque mot hérite d'une partie de l'information du mot précédent, qui lui même hérite d'une partie de l'information du mot précédent. Ainsi, l'information récupérée d'un mot décroît exponentiellement avec le nombre de mots qui le sépare du mot actuel. Ce qui fait que ces réseaux n'ont qu'une mémoire à relativement court terme. À l'inverse, l'attention, telle qu'implémentée dans les transformeurs, permet de combiner directement l'information à différents endroits du texte.
+Applications
+L'attention pondère l'importance des différentes caractéristiques d'« entrée », de manière à ensuite pouvoir concentrer l'analyse sur les caractéristiques les plus pertinentes sur le moment (c'est-à-dire en fonction de la tâche à accomplir et de la demande), pour, in fine, aboutir à un traitement plus rapide, efficace (plus économe en ressource de traitement de l'information ) et précis de jeux de données complexes, y compris à grande échelle,. Le mécanisme d'attention, bioinspiré du fonctionnement des cerveaux animaux et humains, joue un rôle majeur dans les progrès récents des modèles d' apprentissage profond (par exemple en termes de traduction automatique fluide ou de description automatique d'image). Il est une innovation clé de l'architecture « Transformer » introduite par Google Brain en 2017,.
+L'attention permet par exemple au système d'IA de se concentrer sur des zones spécifiques d'une image pour générer des descriptions de plus en plus pertinentes et cohérentes en se focalisant sur des objets, personnes, détails importants ou sur les actions visibles dans l'image. Cela permet de transcrire avec plus de précision un signal audio en texte, en tenant mieux compte du contexte et de la prononciation. L'attention permet d'améliorer la compression, le filtrage ou la restauration de signaux audio ou vidéo, en se basant sur les caractéristiques les plus importantes du signal. Dans l'analyse de données médicales (radiographie, indicateurs physiologiques ou données génétiques), l'attention permet de mieux détecter des anomalies, diagnostiquer des maladies ou prédire des risques. Elle peut également extraire les informations a priori les plus importantes pour le demandeur, à partir d'un graphique, une piste-son, une vidéo, d'une phrase ou d'un texte.
+Des travaux ont cherché à rendre ces mécanismes d'attention eux-mêmes plus « intelligents » et adaptatifs, notamment dans le contexte de données à grande échelle et d'espaces d'entrée de grande dimension ( big data, en particulier quand les enjeux sont vitaux, par exemple pour le diagnostic ou le soin médical ou du véhicule autonome …), avec par exemple des systèmes dits d'« attention clairsemée » ( sparse attention ) et des systèmes d'« approximations de rang inférieur » ( low-rank attention approximation ), qui visent à alléger la complexité de calcul sans sacrifier les performances.
+Produit scalaire pondéré
+La méthode d'attention la plus fréquemment utilisée utilise le calcul d'un produit scalaire pondéré ( scaled dot-product attention ) défini comme opération sur deux séquences de vecteurs u = { u i } et v = { v j }.
+Mécanisme d'attention d'une phrase en français vers une phrase en anglais
+Les séquences u et v peuvent par exemple être des représentations d'une phrase dans deux langues différentes, dans lesquelles chaque mot (ou lexème ) est représenté par un vecteur de la séquence. L'opération d'attention consiste à calculer l'attention de u par rapport à v (les deux séquences ne jouant pas le même rôle).
+On choisit pour l'opération d'attention un hyperparamètre d k correspondant à la dimension interne au modèle d'attention. En premier lieu, les vecteurs des séquences d'entrée vont être transformés par des transformations linéaires en vecteurs de dimension d k.
+On obtient alors trois matrices Q, K, et V, chacune ayant d k colonnes. Q est obtenue à partir de la première séquence U, et K et V à partir de la seconde. Les matrices Q (pour query, c'est-à-dire "requête") et K (pour key, c'est-à-dire "clé") vont alors être multipliées entre elles, de sorte que le résultat soit une matrice représentant la proximité entre les concepts de la première séquence par rapport à la seconde. Par exemple, la ligne correspondant à un mot donné dans la séquence U (par exemple chat ) prendra dans chaque colonne une valeur différente pour chaque mot de la séquence V; la valeur la plus élevée de la ligne correspondant au mot (ou aux mots) s'y rapportant (comme cat ) dans la séquence.
+Enfin, on normalise ces coefficients ligne par ligne par une opération de softmax. Le résultat sera ensuite appliqués à la matrice V. Mathématiquement, l'opération de produit scalaire pondéré s'écrit alors
+Le résultat de l'attention associe donc à chaque élément de la séquence u une combinaison linéaire convexe des valeurs associées aux éléments de la séquence v, pondérées par la similarité entre ces mots.
+Outre l'hyperparamètre d k, les paramètres qui seront déterminés lors de l'apprentissage de la couche d'attention sont les coefficients W Q, W K, W V, des matrices réalisant la transformation linéaire des entrées vers les matrices Q, K, et V.
+Ces paramètres vont donc déterminer comment le bloc d'attention va représenter le calcul de la similarité (via Q et K ) et la représentation sémantique (via V ) pour identifier certaines relations spécifiques entre les éléments des séquences. Pour des suites de mots, cela pourrait être une proximité de sens, l'appartenance à une même catégorie grammaticale, une position dans la phrase, etc.)
+Attention à têtes multiples
+Afin d'apprendre plusieurs de ces relations simultanément, on peut regrouper des blocs d'attention en parallèle. Chaque tête est un bloc d'attention indépendant, muni de ses propres paramètres (mais tous de la même dimension interne d k ); on parle d'attention à têtes multiples ( multi-head attention). Les éléments en sortie de chaque tête sont concaténés puis réduits par une dernière transformation linéaire. En pratique, les opérations parallèles sur les têtes multiples peuvent être réalisés en un seul produit tensoriel.
+Auto-attention
+On a défini l'attention entre deux séquences de longueurs arbitraires (et indépendantes), mais rien n'empêche d'appliquer l'attention d'une séquence envers elle-même. On parle alors d'auto-attention ( self-attention ) ce qui permet de représenter les relations internes à la séquence, au lieu des correspondances entre éléments des deux séquences; l'attention appliquée à deux séquences distinctes étant alors qualifiée d'attention croisée ( cross-attention ) s'il fallait la distinguer de l'auto-attention.
+Références
+(en) Cet article est partiellement ou en totalité issu de l’article de Wikipédia en anglais intitulé « Attention (machine learning) » ( voir la liste des auteurs ).
+↑ R. N. Rathi et A. Mustafi, « The importance of Term Weighting in semantic understanding of text: A review of techniques », Multimedia Tools and Applications, vol. 82, n o 7,‎ 2023, p. 9761–9783 ( ISSN 1380-7501, PMID 35437420, PMCID 9007265, DOI 10.1007/s11042-022-12538-3, lire en ligne, consulté le 22 juin 2025 )
+↑ a et b Ashish Vaswani, Noam Shazeer, Niki Parmar et Jakob Uszkoreit, Attention Is All You Need, 2 août 2023 ( DOI 10.48550/arXiv.1706.03762, lire en ligne )
+↑ Aayush Mittal, « Attention: révolutionner l'efficacité des transformateurs », sur Unite.AI, 17 juillet 2024 (consulté le 16 novembre 2024 )
+↑ Jay Alammar, « Visualizing A Neural Machine Translation Model (Mechanics of Seq2seq Models With Attention) », sur jalammar.github.io (consulté le 27 juillet 2025 )
+↑ a b et c Pirmin Lemberger, « Le mécanisme d'attention en IA », sur groupeonepoint.com (consulté le 28 octobre 2023 ).
+↑ (en) Calvin Wankhede, « What is Google Gemini: The next-gen language model that can do it all », sur Android Authority, 4 juin 2023 (consulté le 28 octobre 2023 ).
+↑ a b c et d Marcin Frąckiewicz, « IA et mécanismes d'attention » [ archive du 1 er novembre 2023 ], sur TS2 SPACE, 24 juin 2023 (consulté le 28 octobre 2023 ).
+↑ Jay Alammar, « The Illustrated Transformer », sur jalammar.github.io (consulté le 27 juillet 2025 )
+v · m Apprentissage automatique et exploration de données
+Paradigmes
+Apprentissage supervisé
+Auto-supervisé
+Semi-supervisé
+Non supervisé
+Apprentissage par renforcement
+Transfert
+Incrémental
+Problèmes
+Classement
+Clustering
+Détection d'anomalies
+Optimisation en ligne
+Modèle génératif
+Régression
+Règle d'association
+Analyse factorielle
+Sélection de caractéristique
+Extraction de caractéristique
+Supervisé
+Classement
+Arbre de décision
+k -NN
+U-matrix
+CRF
+Régression logistique
+Régression
+Régression linéaire
+Régression de Poisson
+Modèle probit
+Analyse discriminante linéaire
+Machine à vecteurs de support
+Prédiction structurée
+Classification naïve bayésienne
+Réseau bayésien
+Modèle de Markov caché
+Réseau de neurones artificiels
+Rétropropagation à travers le temps
+Calcul par réservoir
+Rétropropagation du gradient
+Apprentissage profond
+Perceptron
+Perceptron multicouche
+Réseau neuronal convolutif
+Attention
+Réseau de neurones à impulsions
+Non supervisé et auto-supervisé
+Découverte de structures
+Regroupement hiérarchique
+K-moyennes
+Algorithme espérance-maximisation
+DBSCAN
+OPTICS
+Règle d'association
+Réduction de dimensions
+ACP
+ACP à noyaux
+Analyse en composantes indépendantes
+Analyse canonique des corrélations
+Analyse canonique à noyaux
+t-SNE
+Auto-encodeur
+IA générative et modèle génératif
+Classique
+de Wasserstein )
+Auto-encodeur variationnel
+Réseau de Hopfield
+Machine de Boltzmann restreinte
+Cartes de Kohonen
+Transformeur
+Métaheuristique d' optimisation
+NEAT
+HyperNEAT
+Essaims
+Forêts aléatoires
+Boosting
+Théorie
+Apprentissage PAC
+Complexité de Rademacher
+Dilemme biais-variance
+Hypothèse de la variété
+Pulvérisation
+Dimension de Vapnik-Chervonenkis
+Théorème de Cover
+Logiciels
+Keras
+Microsoft Cognitive Toolkit
+Scikit-learn
+TensorFlow
+Theano
+Weka
+PyTorch
+Portail de l’intelligence artificielle

@@ -1,0 +1,19 @@
+# Okapi BM25
+
+Source : fr.wikipedia.org, révision 232608659
+
+Cet article est une ébauche concernant l’ informatique.
+Okapi BM25 est une méthode de pondération utilisée en recherche d'information. Elle est une application du modèle probabiliste de pertinence, proposé en 1976 par Robertson et Jones.
+La méthode est plus simplement dénommée BM25, le terme « Okapi » faisant référence au nom du système de recherche de l'université de Londres où il a été implémenté initialement.
+Fonction d'ordonnancement
+BM25 est un modèle de sac de mots qui ordonne les documents en fonction de la fréquence des termes qui apparaissent dans chaque document, indépendamment des relations pouvant exister entre ces termes ou de leurs proximités relatives au sein du document. Il existe toute une famille de fonctions attribuant un score à chaque document pour une requête donnée. L'une des formes les plus connues de cette famille de fonctions est la suivante. Pour une requête Q, contenant les mots, le score BM25 d'un document D est:
+où est la fréquence du terme dans le document D, est la longueur du document D en nombre de mots, et avgdl est la longueur moyenne des documents dans la collection considérée. et b sont des paramètres libres pouvant être optimisés selon les cas d'usage mais qui, en l'absence de toute optimisation sont usuellement fixés à et. est la fréquence inverse de document pondérant le terme de la requête. En général, cela est calculé par:
+où N est le nombre de documents dans la collection et est le nombre de documents contenant.
+Voir aussi
+TF-IDF
+Modèle probabiliste
+Références
+↑ (en) Stephen E. Robertson et Karen Spärck Jones, « Relevance weighting of search terms », Journal of the American Society for Information Science, vol. 27, n o 3,‎ mai-juin 1976, p. 129–146 ( lire en ligne )
+↑ Christopher D. Manning, Prabhakar Raghavan, Hinrich Schütze. An Introduction to Information Retrieval, Cambridge University Press, 2009, p. 233.
+Sciences de l’information et bibliothèques
+Portail de l'informatique théorique
