@@ -9,11 +9,20 @@ already been received and spooled to disk.
 from __future__ import annotations
 
 import json
+import logging
+import time
+from uuid import uuid4
 
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from app.observability import request_id_var
+
 _KB = 1024
 _MB = 1024 * _KB
+
+# Probed every few seconds by the platform; logged at DEBUG so they do not
+# bury the requests a human cares about.
+_QUIET_PATHS = frozenset({"/api/health", "/api/ready"})
 
 
 def _human(size: int) -> str:
@@ -114,3 +123,68 @@ class MaxBodySizeMiddleware:
 
     def _message(self) -> str:
         return f"Requête trop volumineuse (limite : {_human(self.max_bytes)})."
+
+
+class RequestContextMiddleware:
+    """Tag every request with an id, and log how it went.
+
+    The id is taken from `X-Request-ID` when a proxy or client already set one,
+    so a trace survives across service boundaries, and echoed back on the
+    response — which is what makes a user's bug report ("request abc123 failed")
+    actionable.
+
+    ASGI-level rather than a FastAPI middleware so the access log covers
+    responses that never reach a route: 404s, validation errors, and the 413s
+    the body-size guard produces.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        request_id = self._incoming_id(scope) or uuid4().hex[:12]
+        token = request_id_var.set(request_id)
+        started = time.perf_counter()
+        status = 500  # if the app raises, nothing sets this
+
+        async def tagged_send(message: Message) -> None:
+            nonlocal status
+            if message["type"] == "http.response.start":
+                status = message["status"]
+                headers = list(message.get("headers", []))
+                headers.append((b"x-request-id", request_id.encode()))
+                message = {**message, "headers": headers}
+            await send(message)
+
+        try:
+            await self.app(scope, receive, tagged_send)
+        finally:
+            duration_ms = round((time.perf_counter() - started) * 1000, 2)
+            # Health checks fire constantly and would drown everything else.
+            level = logging.DEBUG if scope.get("path") in _QUIET_PATHS else logging.INFO
+            logging.getLogger("rag.access").log(
+                level,
+                "%s %s -> %s",
+                scope.get("method", "?"),
+                scope.get("path", "?"),
+                status,
+                extra={
+                    "http_method": scope.get("method"),
+                    "path": scope.get("path"),
+                    "status": status,
+                    "duration_ms": duration_ms,
+                },
+            )
+            request_id_var.reset(token)
+
+    @staticmethod
+    def _incoming_id(scope: Scope) -> str | None:
+        for name, value in scope.get("headers", []):
+            if name == b"x-request-id":
+                # Bounded: an unbounded header would end up in every log line.
+                return value.decode("latin-1")[:64] or None
+        return None

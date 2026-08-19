@@ -91,7 +91,9 @@ Notez l'URL de connexion interne, de la forme :
    > utile que pour s'en écarter. Changer `CHUNK_SIZE` ne re-découpe pas les
    > documents déjà indexés — il faut les ré-ingérer pour en profiter.
    > `CORS_ORIGINS` doit contenir l'URL exacte du frontend Vercel (voir étape 3).
-4. Déployez. Le healthcheck cible `/api/health`.
+4. Déployez. Le healthcheck cible `/api/ready`, qui vérifie réellement la
+   base — `/api/health` répond `ok` sans aucune I/O et ne prouve donc que
+   la vivacité du processus.
    Le build pré-télécharge le modèle : la **première build est longue** (~5–10 min).
 5. Récupérez l'URL publique du backend : `https://<backend>.up.railway.app`.
 
@@ -127,8 +129,11 @@ Vous pouvez en mettre plusieurs, séparées par des virgules.
 ## 5. Vérification post-déploiement
 
 ```bash
-# Backend en ligne + mode
+# Vivacité du processus
 curl https://<backend>.up.railway.app/api/health
+
+# Capacité à servir (teste la base)
+curl https://<backend>.up.railway.app/api/ready
 
 # Stats
 curl https://<backend>.up.railway.app/api/stats

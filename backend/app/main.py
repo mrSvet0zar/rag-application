@@ -26,12 +26,10 @@ from app.errors import (
     UrlFetchError,
     UrlNotAllowedError,
 )
-from app.middleware import MaxBodySizeMiddleware
+from app.middleware import MaxBodySizeMiddleware, RequestContextMiddleware
+from app.observability import configure_logging
 from app.services import Services, build_services
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
-)
 logger = logging.getLogger("rag")
 
 # Domain error -> HTTP status. Ordered: the first matching class wins, so put
@@ -59,6 +57,7 @@ def create_app(
 ) -> FastAPI:
     """Build the application. Pure wiring — no I/O until startup."""
     settings = settings or get_settings()
+    configure_logging(settings.log_format)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -80,6 +79,10 @@ def create_app(
     # Added before CORS so it ends up *inside* it: oversized requests are
     # rejected before any parsing, but the 413 still carries CORS headers.
     app.add_middleware(MaxBodySizeMiddleware, max_bytes=settings.max_upload_bytes)
+
+    # Added last, so it wraps everything: even a request rejected by the body
+    # guard gets an id and an access log line.
+    app.add_middleware(RequestContextMiddleware)
 
     app.add_middleware(
         CORSMiddleware,

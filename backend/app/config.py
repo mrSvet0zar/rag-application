@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     debug: bool = True
+    # "json" in production so logs are queryable; "text" is easier to read
+    # over a shoulder during local development.
+    log_format: str = "json"
     # Ceiling on any request body (uploads and fetched pages alike). Chosen
     # to stay well under the container's memory budget, which already holds
     # two ML models.

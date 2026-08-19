@@ -41,7 +41,8 @@ Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonc
 - 📥 **Ingestion multi-formats** — `.txt`, `.md`, `.pdf`, `.docx`, `.html`, et **import depuis une URL** (avec garde **anti-SSRF**).
 - 💬 **Conversations persistées** (documents, chunks, conversations, messages en base).
 - 🌗 **Mode clair / sombre** persistant (respecte la préférence système, sans flash au chargement).
-- 🛡️ **Robustesse** — schéma auto-appliqué au démarrage, retry de connexion, dégradation gracieuse si le LLM est indisponible, mode démo.
+- 🛡️ **Robustesse** — migrations Alembic au démarrage (sous verrou), retry de connexion, dégradation gracieuse si le LLM est indisponible, corps de requête bornés, mode démo.
+- 🔭 **Observabilité** — logs JSON structurés, `X-Request-ID` propagé et renvoyé, découpage des latences par étage (récupération / génération / persistance), sondes *liveness* et *readiness* distinctes.
 - ⚙️ **Prêt pour la prod** — Docker, CI GitHub Actions, déployé sur Railway + Vercel.
 
 ## 🏗️ Architecture
@@ -125,6 +126,7 @@ npm install && npm run dev
 | `POST`   | `/api/documents/import-url`  | Importe une page web (SSRF-guarded)      |
 | `GET`    | `/api/documents`             | Liste des documents                      |
 | `DELETE` | `/api/documents/{id}`        | Supprime un document et ses chunks       |
+| `GET`    | `/api/health` · `/api/ready` | Vivacité · capacité à servir (teste la DB) |
 | `POST`   | `/api/chat`                  | Question (RAG, réponse complète)         |
 | `POST`   | `/api/chat/stream`           | Question en **streaming** (SSE)          |
 | `GET`    | `/api/conversations/{id}`    | Historique d'une conversation            |

@@ -7,7 +7,9 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-healthcheckPath = "/api/health"
+# Readiness, not liveness: a container whose database is unreachable should
+# not be given traffic, even though its process is perfectly alive.
+healthcheckPath = "/api/ready"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
