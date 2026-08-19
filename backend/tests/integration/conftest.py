@@ -70,6 +70,8 @@ def test_settings() -> Settings:
         chunk_size=400,
         chunk_overlap=50,
         min_relevance_score=0.0,
+        # Off unless a test opts in, so unrelated tests are never throttled.
+        rate_limit_enabled=False,
     )
 
 
@@ -133,6 +135,13 @@ async def harness(test_settings: Settings, request: pytest.FixtureRequest):
     if body_limit is not None:
         test_settings = test_settings.model_copy(
             update={"max_upload_bytes": body_limit.args[0]}
+        )
+
+    # Rate-limit tests would otherwise have to fire the full production quota.
+    quota = request.node.get_closest_marker("rate_limit")
+    if quota is not None:
+        test_settings = test_settings.model_copy(
+            update={"rate_limit_enabled": True, "rate_limit_requests": quota.args[0]}
         )
 
     embedder = FakeEmbedder()

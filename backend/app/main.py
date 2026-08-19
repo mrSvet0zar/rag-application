@@ -26,14 +26,22 @@ from app.errors import (
     UrlFetchError,
     UrlNotAllowedError,
 )
-from app.middleware import MaxBodySizeMiddleware, RequestContextMiddleware
+from app.middleware import (
+    MaxBodySizeMiddleware,
+    RateLimitMiddleware,
+    RequestContextMiddleware,
+)
 from app.observability import configure_logging
+from app.rate_limit import RateLimiter
 from app.services import Services, build_services
 
 logger = logging.getLogger("rag")
 
 # Domain error -> HTTP status. Ordered: the first matching class wins, so put
 # subclasses before their parents if that ever applies.
+# Endpoints whose cost is an LLM call or a model inference, not a query.
+COSTLY_PREFIXES = ("/api/chat", "/api/documents/upload", "/api/documents/import-url")
+
 _ERROR_STATUS: tuple[tuple[type[AppError], int], ...] = (
     (NotFoundError, 404),
     (PayloadTooLargeError, 413),
@@ -80,8 +88,18 @@ def create_app(
     # rejected before any parsing, but the 413 still carries CORS headers.
     app.add_middleware(MaxBodySizeMiddleware, max_bytes=settings.max_upload_bytes)
 
+    if settings.rate_limit_enabled:
+        app.add_middleware(
+            RateLimitMiddleware,
+            limiter=RateLimiter(
+                settings.rate_limit_requests, settings.rate_limit_window_seconds
+            ),
+            prefixes=COSTLY_PREFIXES,
+            trust_proxy_headers=settings.trust_proxy_headers,
+        )
+
     # Added last, so it wraps everything: even a request rejected by the body
-    # guard gets an id and an access log line.
+    # guard or the rate limiter gets an id and an access log line.
     app.add_middleware(RequestContextMiddleware)
 
     app.add_middleware(

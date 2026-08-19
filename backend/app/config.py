@@ -41,6 +41,17 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 10 * 1024 * 1024
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
+    # --- Rate limiting ---
+    # Applied only to the endpoints that cost money: a question calls a paid
+    # LLM, an upload runs an embedding model. Reads are left alone.
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 20
+    rate_limit_window_seconds: int = 60
+    # True behind a TLS-terminating platform (Railway), where X-Forwarded-For
+    # is set by something trusted. False when exposed directly, since a client
+    # could otherwise forge a fresh identity per request.
+    trust_proxy_headers: bool = True
+
     # --- RAG ---
     # 512/100 chosen by measurement, not by habit: see docs/EVALUATION.md.
     # It beats 1024/200 on hit@k and doc_hit@k while halving retrieval

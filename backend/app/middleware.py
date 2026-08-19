@@ -16,6 +16,7 @@ from uuid import uuid4
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.observability import request_id_var
+from app.rate_limit import RateLimiter
 
 _KB = 1024
 _MB = 1024 * _KB
@@ -188,3 +189,78 @@ class RequestContextMiddleware:
                 # Bounded: an unbounded header would end up in every log line.
                 return value.decode("latin-1")[:64] or None
         return None
+
+
+class RateLimitMiddleware:
+    """Throttle the endpoints that cost money, per client.
+
+    Only the costly prefixes are limited: answering a question calls a paid LLM
+    and ingesting a document runs an embedding model, while listing documents
+    costs a query. Limiting reads would only degrade the experience without
+    protecting anything.
+
+    Identifying the client is the delicate part behind a proxy. `scope["client"]`
+    is the proxy itself, so every caller would share one bucket; the real
+    address is in `X-Forwarded-For`, which a client can forge unless something
+    trusted rewrites it. Hence `trust_proxy_headers`: on when a platform like
+    Railway terminates TLS in front, off when the app is exposed directly.
+    """
+
+    def __init__(
+        self,
+        app: ASGIApp,
+        limiter: RateLimiter,
+        prefixes: tuple[str, ...],
+        trust_proxy_headers: bool = True,
+    ) -> None:
+        self.app = app
+        self.limiter = limiter
+        self.prefixes = prefixes
+        self.trust_proxy_headers = trust_proxy_headers
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or not self._is_limited(scope.get("path", "")):
+            await self.app(scope, receive, send)
+            return
+
+        client = self._client_key(scope)
+        allowed, retry_after = self.limiter.allow(client)
+        if allowed:
+            await self.app(scope, receive, send)
+            return
+
+        logging.getLogger("rag.ratelimit").warning(
+            "rate limit hit",
+            extra={
+                "event": "ratelimit.rejected",
+                "path": scope.get("path"),
+                "retry_after": retry_after,
+            },
+        )
+        payload = json.dumps(
+            {"detail": f"Trop de requêtes. Réessayez dans {retry_after} s."}
+        ).encode()
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 429,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(payload)).encode()),
+                    (b"retry-after", str(retry_after).encode()),
+                ],
+            }
+        )
+        await send({"type": "http.response.body", "body": payload})
+
+    def _is_limited(self, path: str) -> bool:
+        return path.startswith(self.prefixes)
+
+    def _client_key(self, scope: Scope) -> str:
+        if self.trust_proxy_headers:
+            for name, value in scope.get("headers", []):
+                if name == b"x-forwarded-for":
+                    # Leftmost entry is the original client; the rest are proxies.
+                    return value.decode("latin-1").split(",")[0].strip()[:64]
+        client = scope.get("client")
+        return client[0] if client else "unknown"

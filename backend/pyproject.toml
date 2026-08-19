@@ -72,6 +72,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 markers = [
     "rerank: wire a reranker into the app under test",
     "max_body: shrink the request body limit, e.g. @pytest.mark.max_body(2048)",
+    "rate_limit: set the request quota, e.g. @pytest.mark.rate_limit(2)",
 ]
 
 # ------------------------------------------------------------ coverage ----

@@ -42,6 +42,7 @@ Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonc
 - 💬 **Conversations persistées** (documents, chunks, conversations, messages en base).
 - 🌗 **Mode clair / sombre** persistant (respecte la préférence système, sans flash au chargement).
 - 🛡️ **Robustesse** — migrations Alembic au démarrage (sous verrou), retry de connexion, dégradation gracieuse si le LLM est indisponible, corps de requête bornés, mode démo.
+- 🚦 **Rate limiting** — seau à jetons par client sur les seuls endpoints coûteux (un appel LLM est facturé, pas une lecture).
 - 🔭 **Observabilité** — logs JSON structurés, `X-Request-ID` propagé et renvoyé, découpage des latences par étage (récupération / génération / persistance), sondes *liveness* et *readiness* distinctes.
 - ⚙️ **Prêt pour la prod** — Docker, CI GitHub Actions, déployé sur Railway + Vercel.
 
@@ -189,6 +190,8 @@ Variables principales (`backend/.env`, voir [`.env.example`](backend/.env.exampl
 | `RERANK_ENABLED`      | `true`              | Reranking cross-encoder (2ᵉ modèle, ~500 Mo RAM) |
 | `CHUNK_SIZE` / `CHUNK_OVERLAP` | `512` / `100` | Découpage — **choisi par mesure** |
 | `HYBRID_ENABLED`      | `true`              | Recherche lexicale fusionnée au vectoriel (RRF) |
+| `RATE_LIMIT_REQUESTS` | `20` / min          | Quota sur les endpoints coûteux (chat, ingestion) |
+| `LOG_FORMAT`          | `json`              | `text` pour des logs lisibles en local      |
 | `MIN_RELEVANCE_SCORE` | `0.25`              | Seuil de similarité (sans rerank)           |
 | `TOP_K_RETRIEVAL`     | `5`                 | Nombre de chunks fournis au LLM             |
 
