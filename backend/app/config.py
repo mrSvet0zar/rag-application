@@ -39,8 +39,11 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     # --- RAG ---
-    chunk_size: int = 1024
-    chunk_overlap: int = 200
+    # 512/100 chosen by measurement, not by habit: see docs/EVALUATION.md.
+    # It beats 1024/200 on hit@k and doc_hit@k while halving retrieval
+    # latency, because the cross-encoder scores passages half as long.
+    chunk_size: int = 512
+    chunk_overlap: int = 100
     min_relevance_score: float = 0.25
     top_k_retrieval: int = 5
 

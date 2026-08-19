@@ -139,15 +139,15 @@ métriques déterministes et latences. Méthode, résultats et limites assumées
 
 | Configuration | hit@5 | recall@5 | MRR | nDCG@5 | p50 |
 |---|---|---|---|---|---|
-| Vectoriel seul | 0.419 | 0.342 | 0.309 | 0.286 | 22 ms |
-| Vectoriel + reranking | 0.581 | 0.454 | 0.524 | 0.443 | 577 ms |
-| Hybride seul | 0.645 | 0.517 | 0.346 | 0.372 | 44 ms |
-| **Hybride + reranking** | **0.774** | **0.664** | **0.664** | **0.614** | 1151 ms |
+| Vectoriel seul | 0.387 | 0.357 | 0.290 | 0.296 | 27 ms |
+| Vectoriel + reranking | 0.613 | 0.568 | 0.478 | 0.477 | 293 ms |
+| Hybride seul | 0.484 | 0.455 | 0.324 | 0.345 | 64 ms |
+| **Hybride + reranking** | **0.806** | **0.735** | **0.652** | **0.635** | 574 ms |
 
-Les deux étages sont complémentaires : **l'hybride trouve** (à lui seul il bat
-vectoriel+reranking sur `hit@5` pour 13× moins de latence), **le reranking
-ordonne** (+ 0.32 de MRR). Ensemble : `hit@5` +85 %, MRR +115 %. Les 12 questions
-à terme exact passent désormais toutes (`hit@5` = 1.000).
+`hit@5` **+108 %**, MRR **+125 %** sur la recherche vectorielle seule. Les
+questions à terme exact atteignent `doc_hit@5` = **1.000**. La taille de chunk
+(512/100) a elle aussi été **choisie par mesure**, pas par habitude : elle bat
+1024/200 en qualité *et* divise la latence par deux.
 
 ```bash
 cd backend && python -m eval.runner --compare
@@ -185,6 +185,8 @@ Variables principales (`backend/.env`, voir [`.env.example`](backend/.env.exampl
 | `ANTHROPIC_API_KEY`   | *(vide)*            | Clé Claude. Vide = mode démo.               |
 | `CHAT_MODEL`          | `claude-sonnet-5`   | Modèle de génération                        |
 | `RERANK_ENABLED`      | `true`              | Reranking cross-encoder (2ᵉ modèle, ~500 Mo RAM) |
+| `CHUNK_SIZE` / `CHUNK_OVERLAP` | `512` / `100` | Découpage — **choisi par mesure** |
+| `HYBRID_ENABLED`      | `true`              | Recherche lexicale fusionnée au vectoriel (RRF) |
 | `MIN_RELEVANCE_SCORE` | `0.25`              | Seuil de similarité (sans rerank)           |
 | `TOP_K_RETRIEVAL`     | `5`                 | Nombre de chunks fournis au LLM             |
 

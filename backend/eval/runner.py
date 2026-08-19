@@ -15,7 +15,8 @@ Usage (from `backend/`):
     python -m eval.runner                          # current settings
     python -m eval.runner --no-rerank              # vector search alone
     python -m eval.runner --chunk-size 512 --chunk-overlap 100
-    python -m eval.runner --compare                # baseline vs rerank, side by side
+    python -m eval.runner --compare                # dense/hybrid x rerank on/off
+    python -m eval.runner --sweep                  # compare chunking strategies
 
 Each configuration is indexed into its own database (`rag_eval_c1024_o200`…),
 so switching configurations never mixes two indexes and re-running one is
@@ -258,6 +259,12 @@ def _row(label: str, summary: dict[str, float]) -> str:
     return f"{label:<22}{cells} {summary['p50_ms']:>9.0f} {summary['p95_ms']:>9.0f}"
 
 
+def sweep_header(k_label: str) -> None:
+    header = " ".join(f"{name:>11}" for name in METRIC_NAMES)
+    print(f"{'':<22}{header} {'p50 (ms)':>9} {'p95 (ms)':>9}  {k_label}")
+    print("-" * (22 + 12 * len(METRIC_NAMES) + 32))
+
+
 def report(title: str, outcomes: list[Outcome], k: int) -> None:
     header = " ".join(f"{name.replace('@k', f'@{k}'):>11}" for name in METRIC_NAMES)
     print(f"\n{title}")
@@ -287,6 +294,17 @@ async def _main() -> int:
     parser.add_argument("--no-rerank", action="store_true", help="skip the cross-encoder")
     parser.add_argument("--no-hybrid", action="store_true", help="dense retrieval only")
     parser.add_argument(
+        "--sweep",
+        action="store_true",
+        help="compare chunking strategies at fixed k and fixed context budget",
+    )
+    parser.add_argument(
+        "--budget-chars",
+        type=int,
+        default=5120,
+        help="context budget for the sweep (default: 5 x 1024)",
+    )
+    parser.add_argument(
         "--compare",
         action="store_true",
         help="run dense/hybrid x with/without reranking, side by side",
@@ -294,6 +312,9 @@ async def _main() -> int:
     args = parser.parse_args()
 
     settings = get_settings()
+    if args.sweep:
+        return await _sweep(settings, args.k, args.budget_chars)
+
     chunk_size = args.chunk_size or settings.chunk_size
     chunk_overlap = args.chunk_overlap or settings.chunk_overlap
 
@@ -322,6 +343,54 @@ async def _main() -> int:
             outcomes,
             variant.k,
         )
+    return 0
+
+
+# Overlap is kept at ~20% of the chunk size so the comparison varies one thing.
+SWEEP_CONFIGS: tuple[tuple[int, int], ...] = (
+    (256, 50),
+    (512, 100),
+    (1024, 200),
+    (2048, 400),
+)
+
+
+async def _sweep(settings: Settings, k: int, budget_chars: int) -> int:
+    """Compare chunking strategies, holding retrieval fixed at its best setting.
+
+    Reported twice, because a single view would mislead:
+
+    * **At constant k** — the usual comparison, but unfair on context: five
+      256-character chunks give the LLM a quarter of the text that five
+      1024-character chunks do.
+    * **At constant context budget** — k is scaled so every configuration hands
+      the generator roughly the same number of characters, which is the
+      comparison that matches what the LLM actually receives.
+
+    Only `hit@k`, `doc_hit@k` and `mrr` are strictly comparable across chunk
+    sizes: `recall@k` and `precision@k` are relative to the number of relevant
+    chunks, and that count itself changes with the chunking.
+    """
+    print(f"corpus : {CORPUS_DIR}  |  hybride + reranking")
+    print()
+
+    print(f"=== à k constant (k={k}) ===")
+    sweep_header("")
+    for chunk_size, overlap in SWEEP_CONFIGS:
+        variant = Variant(f"{chunk_size}/{overlap}", True, True, chunk_size, overlap, k)
+        outcomes = await evaluate(variant, settings)
+        print(_row(f"  {variant.name}", aggregate(outcomes)))
+
+    print()
+    print(f"=== à budget de contexte constant (~{budget_chars} caractères) ===")
+    sweep_header("k")
+    for chunk_size, overlap in SWEEP_CONFIGS:
+        scaled = max(1, round(budget_chars / chunk_size))
+        variant = Variant(
+            f"{chunk_size}/{overlap}", True, True, chunk_size, overlap, scaled
+        )
+        outcomes = await evaluate(variant, settings)
+        print(_row(f"  {variant.name}", aggregate(outcomes)) + f" {scaled:>9}")
     return 0
 
 

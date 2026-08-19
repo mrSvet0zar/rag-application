@@ -75,21 +75,26 @@ Trois choses apprises en la construisant :
 - Une question du golden set était fausse (réponse présente uniquement en
   bibliographie) : corrigée, incident documenté.
 
-### A4. A/B testing des stratégies de chunking
+### A4. A/B testing des stratégies de chunking ✅
 
-Quasi gratuit une fois A1 en place : on relance le harness en faisant varier
-`chunk_size`, `chunk_overlap`, les séparateurs. Extensible aux poids de fusion,
-au seuil de rerank et à `top_k`.
+**Fait.** `python -m eval.runner --sweep` compare 256/512/1024/2048, à retrieval
+constant, dans deux vues : à k constant et à budget de contexte constant (cinq
+chunks de 256 caractères ne donnent pas au LLM le même texte que cinq de 1024).
 
-### A5. Livrable
+**512/100 retenu** et adopté comme défaut : meilleur `hit@k` et `doc_hit@k` dans
+les deux vues, et **moitié moins de latence** que 1024/200. Résultats détaillés
+dans [EVALUATION.md](EVALUATION.md).
 
-Tableau de résultats dans le README — c'est l'artefact qui prouve la démarche :
+Enseignement principal : le découpage **interagit** avec le reranking. Passer à
+512 dégrade l'hybride seul (0.645 → 0.484) mais améliore l'ensemble avec
+reranking (0.774 → 0.806). Choisir un découpage sans tenir compte de l'étage
+suivant aurait mené à la mauvaise conclusion.
 
-| Configuration | recall@5 | nDCG@5 | faithfulness | p95 |
-|---|---|---|---|---|
-| Vectoriel seul | | | | |
-| Vectoriel + rerank | | | | |
-| Hybride + rerank | | | | |
+### A5. Livrable ✅
+
+Tableaux de résultats publiés dans [EVALUATION.md](EVALUATION.md) et résumés
+dans le README, avec la méthode, les réglages découverts en mesurant, l'incident
+de golden set et les limites assumées.
 
 ---
 
@@ -175,6 +180,6 @@ markdown maison sont les zones les plus fragiles.
 1. ~~**B1** (migrations)~~ ✅
 2. ~~**B2** (limite d'upload)~~ ✅
 3. ~~**A1 → A2** (harness + baseline)~~ ✅
-4. ~~**A3**~~ ✅ → **A4 → A5** (A/B chunking, tableau de résultats).
+4. ~~**A3 → A4 → A5**~~ ✅ (hybride, A/B chunking, tableau de résultats).
 5. **B3 → B6** (asynchrone, rate limit, readiness, observabilité).
 6. **B7 → B9** (durcissement, API, tests frontend).

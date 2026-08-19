@@ -82,11 +82,14 @@ Notez l'URL de connexion interne, de la forme :
    PGVECTOR_DIMENSION=384
    MIN_RELEVANCE_SCORE=0.25
    TOP_K_RETRIEVAL=5
-   CHUNK_SIZE=1024
-   CHUNK_OVERLAP=200
+   CHUNK_SIZE=512
+   CHUNK_OVERLAP=100
    CORS_ORIGINS=https://<votre-app>.vercel.app
    ```
    > `PORT` est injecté automatiquement par Railway — ne pas le définir.
+   > Ces valeurs reprennent les défauts de l'application ; les surcharger n'est
+   > utile que pour s'en écarter. Changer `CHUNK_SIZE` ne re-découpe pas les
+   > documents déjà indexés — il faut les ré-ingérer pour en profiter.
    > `CORS_ORIGINS` doit contenir l'URL exacte du frontend Vercel (voir étape 3).
 4. Déployez. Le healthcheck cible `/api/health`.
    Le build pré-télécharge le modèle : la **première build est longue** (~5–10 min).

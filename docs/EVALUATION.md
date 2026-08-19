@@ -71,26 +71,24 @@ par un LLM (fidélité, pertinence de la réponse), qui restent hors CI.
 
 ## Résultats
 
-Configuration : `chunk_size=1024`, `chunk_overlap=200`, k=5, embeddings
-`paraphrase-multilingual-MiniLM-L12-v2` (384d), reranking
-`mmarco-mMiniLMv2-L12-H384-v1`, fusion RRF (k=60). Latences mesurées après
-préchauffage des modèles.
+Configuration retenue : `chunk_size=512`, `chunk_overlap=100` (voir le sweep
+plus bas), k=5, embeddings `paraphrase-multilingual-MiniLM-L12-v2` (384d),
+reranking `mmarco-mMiniLMv2-L12-H384-v1`, fusion RRF (k=60). Latences mesurées
+après préchauffage des modèles.
 
 | Configuration | hit@5 | doc_hit@5 | recall@5 | precision@5 | MRR | nDCG@5 | p50 | p95 |
 |---|---|---|---|---|---|---|---|---|
-| Vectoriel seul | 0.419 | 0.710 | 0.342 | 0.090 | 0.309 | 0.286 | 22 ms | 25 ms |
-| Vectoriel + reranking | 0.581 | 0.774 | 0.454 | 0.129 | 0.524 | 0.443 | 577 ms | 701 ms |
-| Hybride seul | 0.645 | 0.806 | 0.517 | 0.135 | 0.346 | 0.372 | 44 ms | 67 ms |
-| **Hybride + reranking** | **0.774** | **0.903** | **0.664** | **0.181** | **0.664** | **0.614** | 1151 ms | 1366 ms |
+| Vectoriel seul | 0.387 | 0.742 | 0.357 | 0.084 | 0.290 | 0.296 | 27 ms | 31 ms |
+| Vectoriel + reranking | 0.613 | 0.903 | 0.568 | 0.135 | 0.478 | 0.477 | 293 ms | 359 ms |
+| Hybride seul | 0.484 | 0.806 | 0.455 | 0.110 | 0.324 | 0.345 | 64 ms | 91 ms |
+| **Hybride + reranking** | **0.806** | **0.935** | **0.735** | **0.174** | **0.652** | **0.635** | 574 ms | 719 ms |
 
-Par type de question :
+Par type de question, dans la configuration retenue :
 
-| Configuration | Type | hit@5 | doc_hit@5 | MRR |
+| Type | hit@5 | doc_hit@5 | MRR | (vectoriel seul, hit@5) |
 |---|---|---|---|---|
-| Vectoriel seul | lexical | 0.500 | 0.833 | 0.403 |
-| Vectoriel seul | semantic | 0.368 | 0.632 | 0.250 |
-| Hybride + reranking | **lexical** | **1.000** | **1.000** | **0.917** |
-| Hybride + reranking | semantic | 0.632 | 0.842 | 0.504 |
+| lexical (12) | 0.917 | **1.000** | 0.875 | 0.500 |
+| semantic (19) | 0.737 | 0.895 | 0.511 | 0.316 |
 
 Reproduire :
 
@@ -102,47 +100,98 @@ cd backend && python -m eval.runner --compare
 
 ## Lecture des résultats
 
-**Les deux étages font des choses différentes, et c'est mesurable.**
+**Les deux étages font des choses différentes.** L'hybride **trouve** : à
+découpage large (1024) il battait à lui seul le vectoriel + reranking sur
+`hit@5` pour 13 fois moins de latence. Le reranking **ordonne** : peu de gain en
+`hit@5`, beaucoup en MRR, parce qu'il remonte le bon passage en tête — ce qui
+compte pour un LLM qui lit mieux le haut de son contexte. C'est leur combinaison
+qui paie : `hit@5` +108 %, MRR +125 %, nDCG@5 +115 % sur le vectoriel seul.
 
-- **L'hybride trouve** : à lui seul il fait mieux que le vectoriel + reranking
-  sur `hit@5` (0.645 contre 0.581) **pour 13 fois moins de latence** (44 ms
-  contre 577 ms). Mais son MRR est bien plus faible (0.346 contre 0.524) : il
-  ramène les bons passages sans savoir les ordonner.
-- **Le reranking ordonne** : il gagne peu en `hit@5` mais beaucoup en MRR, parce
-  qu'il remonte le bon passage en tête — ce qui compte pour un LLM qui lit mieux
-  le haut de son contexte.
-
-Les deux sont donc complémentaires, et c'est leur combinaison qui paie :
-`hit@5` +85 %, MRR +115 %, nDCG@5 +115 % par rapport au vectoriel seul.
-
-**Le point aveugle des termes exacts est fermé.** Les 12 questions lexicales
-passent toutes (`hit@5` = 1.000, `doc_hit@5` = 1.000), contre 6 sur 12 pour le
+**Le point aveugle des termes exacts est fermé.** Les questions lexicales
+atteignent `doc_hit@5` = 1.000 et `hit@5` = 0.917, contre 0.500 pour le
 vectoriel seul. C'était l'hypothèse de départ du chantier hybride ; elle est
 vérifiée.
 
-**L'hybride aide aussi les questions sémantiques** (0.368 → 0.632), ce qui
-n'allait pas de soi : même reformulée, une question française partage souvent
-assez de vocabulaire avec sa réponse pour que le lexical contribue.
+**L'hybride aide aussi les questions sémantiques** (0.316 → 0.737), ce qui
+n'allait pas de soi : même reformulée, une question française partage assez de
+vocabulaire avec sa réponse pour que le lexical contribue.
 
-**Ce qui reste à traiter.** Les 7 échecs restants sont tous sémantiques, et
-l'écart persistant entre `hit@5` (0.774) et `doc_hit@5` (0.903) dit que le bon
-article est trouvé dans 13 % des cas sans le passage qui répond — un problème de
-granularité de découpage, donc l'objet de l'A/B testing du chunking.
-
-### Deux réglages découverts en mesurant
+### Réglages découverts en mesurant
 
 **Le budget du reranker doit être séparé du pool par moteur.** La fusion de deux
 classements de 20 produit jusqu'à 40 candidats ; les tronquer à 20 avant le
-cross-encoder jetait l'essentiel de l'apport lexical avant tout jugement. En
-passant le plafond à 40 : `hit@5` 0.710 → 0.774, mais la latence double
-(594 → 1151 ms), le cross-encoder notant deux fois plus de passages. Compromis
-assumé et réglable (`RERANK_MAX_CANDIDATES`).
+cross-encoder jetait l'essentiel de l'apport lexical avant tout jugement. Le
+plafond porté à 40 : `hit@5` 0.710 → 0.774 (à 1024/200), au prix du double de
+latence. Compromis assumé et réglable (`RERANK_MAX_CANDIDATES`).
 
 **Le OU lexical n'est pas un détail.** `websearch_to_tsquery` et
 `plainto_tsquery` combinent les termes en **ET** : sur une question en langage
 naturel, aucun chunk ne contient tous les mots de contenu, et la recherche
 lexicale renvoie **zéro résultat**. Les lexèmes sont donc combinés en OU, ce qui
 en refait un problème de classement plutôt qu'un filtre.
+
+---
+
+## A/B testing du découpage
+
+Le diagnostic de la baseline pointait le découpage : le bon *article* était
+souvent trouvé sans le passage qui répond. Quatre configurations comparées, à
+retrieval constant (hybride + reranking).
+
+```bash
+cd backend && python -m eval.runner --sweep
+```
+
+**À k constant (k=5)**
+
+| chunk / overlap | hit@5 | doc_hit@5 | MRR | nDCG@5 | p50 |
+|---|---|---|---|---|---|
+| 256 / 50 | 0.742 | 0.871 | 0.605 | 0.567 | 371 ms |
+| **512 / 100** | **0.806** | **0.935** | 0.652 | 0.635 | 624 ms |
+| 1024 / 200 | 0.774 | 0.903 | 0.664 | 0.614 | 1177 ms |
+| 2048 / 400 | 0.806 | 0.839 | **0.748** | **0.704** | 1990 ms |
+
+**À budget de contexte constant** (~5120 caractères, k ajusté en conséquence)
+
+| chunk / overlap | k | hit@k | doc_hit@k | MRR | nDCG@k | p50 |
+|---|---|---|---|---|---|---|
+| 256 / 50 | 20 | 0.742 | 0.871 | 0.605 | 0.562 | 347 ms |
+| **512 / 100** | 10 | **0.839** | **0.935** | 0.657 | 0.640 | 622 ms |
+| 1024 / 200 | 5 | 0.774 | 0.903 | 0.664 | 0.614 | 1183 ms |
+| 2048 / 400 | 2 | 0.774 | 0.839 | 0.742 | 0.700 | 2055 ms |
+
+> ⚠️ **Toutes les métriques ne sont pas comparables entre découpages.**
+> `recall@k` et `precision@k` sont relatifs au nombre de chunks pertinents, et
+> ce nombre change avec le découpage. Seuls `hit@k`, `doc_hit@k` et `MRR` se
+> comparent directement. C'est aussi pourquoi la seconde vue existe : à k
+> constant, cinq chunks de 256 caractères donnent au LLM quatre fois moins de
+> texte que cinq chunks de 1024 — la comparaison serait faussée.
+
+**512/100 est retenu.** Il est le meilleur sur les deux métriques comparables
+dans les deux vues, et **divise la latence par deux** face à 1024/200 : le
+cross-encoder note toujours 40 passages, mais deux fois plus courts.
+
+**Le découpage interagit avec le reranking**, ce qu'aucune des deux mesures
+seules n'aurait montré. En passant de 1024 à 512 :
+
+| | 1024/200 | 512/100 |
+|---|---|---|
+| Hybride **seul** | 0.645 | 0.484 |
+| Hybride **+ reranking** | 0.774 | **0.806** |
+
+Des chunks courts dégradent la récupération brute — chacun porte moins de
+contexte, donc les signaux dense et lexical sont plus fragmentés — mais donnent
+au cross-encoder des passages plus précis à juger. Choisir un découpage sans
+tenir compte de l'étage suivant aurait conduit à la mauvaise conclusion.
+
+**2048/400 a le meilleur MRR et nDCG** mais le pire `doc_hit@5` (0.839) et une
+latence de 2 s. De gros chunks contiennent plus, donc un passage trouvé est plus
+souvent classé premier ; mais ils ratent plus souvent le bon article, et
+saturent le contexte du LLM avec du texte non pertinent.
+
+> 📌 **Conséquence opérationnelle** : changer le découpage ne re-découpe pas les
+> documents déjà indexés. Une base existante conserve son ancien découpage
+> jusqu'à ré-ingestion, et cohabite donc avec le nouveau.
 
 ---
 

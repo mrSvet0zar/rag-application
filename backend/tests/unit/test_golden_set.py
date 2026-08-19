@@ -14,15 +14,18 @@ from pathlib import Path
 import pytest
 
 from app.chunking import TextChunker
+from app.config import Settings
 
 EVAL_DIR = Path(__file__).resolve().parents[2] / "eval"
 CORPUS_DIR = EVAL_DIR / "corpus"
 GOLDEN_SET = EVAL_DIR / "golden_set.json"
 
-# Snippets must fit inside the overlap between two consecutive chunks;
-# otherwise one could straddle a boundary and belong to no chunk at all.
-CHUNK_SIZE = 1024
-CHUNK_OVERLAP = 200
+# Read from the real defaults rather than restated here: a snippet must fit
+# inside the overlap between two consecutive chunks, so tightening the overlap
+# has to fail this guard rather than silently invalidate the golden set.
+_DEFAULTS = Settings(anthropic_api_key="")
+CHUNK_SIZE = _DEFAULTS.chunk_size
+CHUNK_OVERLAP = _DEFAULTS.chunk_overlap
 
 
 def _questions() -> list[dict]:
