@@ -36,7 +36,12 @@ class RetrievedChunk(BaseModel):
     text: str
     document_id: int
     filename: str | None = None
-    similarity_score: float  # cosine similarity from vector search
+    # Each score is absent when the stage that produces it did not see this
+    # chunk: a passage found only by the lexical search has no cosine
+    # similarity, and vice versa. Reporting 0.0 instead of null would claim a
+    # measurement that was never made.
+    similarity_score: float | None = None  # cosine similarity, if vector-matched
+    lexical_score: float | None = None  # full-text rank, if lexically matched
     rerank_score: float | None = None  # cross-encoder relevance, if reranked
 
 

@@ -61,15 +61,21 @@ class FakeEmbedder:
 class RecordingVectorStore:
     """Returns canned rows and records how it was queried."""
 
-    def __init__(self, rows: list[dict]) -> None:
+    def __init__(self, rows: list[dict], lexical_rows: list[dict] | None = None) -> None:
         self._rows = rows
+        self._lexical_rows = lexical_rows if lexical_rows is not None else []
         self.calls: list[dict] = []
+        self.lexical_calls: list[dict] = []
 
     async def search(
         self, query_embedding: list[float], top_k: int, min_score: float
     ) -> list[dict]:
         self.calls.append({"top_k": top_k, "min_score": min_score})
         return list(self._rows)
+
+    async def search_lexical(self, query: str, top_k: int) -> list[dict]:
+        self.lexical_calls.append({"query": query, "top_k": top_k})
+        return list(self._lexical_rows)
 
 
 class ReversingReranker:

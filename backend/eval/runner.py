@@ -62,6 +62,7 @@ class Variant:
 
     name: str
     rerank: bool
+    hybrid: bool
     chunk_size: int
     chunk_overlap: int
     k: int
@@ -175,6 +176,7 @@ async def evaluate(variant: Variant, settings: Settings) -> list[Outcome]:
             "database_url": _with_database(settings.database_url, variant.index_name),
             "chunk_size": variant.chunk_size,
             "chunk_overlap": variant.chunk_overlap,
+            "hybrid_enabled": variant.hybrid,
         }
     )
 
@@ -282,11 +284,12 @@ async def _main() -> int:
     parser.add_argument("--k", type=int, default=5)
     parser.add_argument("--chunk-size", type=int)
     parser.add_argument("--chunk-overlap", type=int)
-    parser.add_argument("--no-rerank", action="store_true", help="vector search only")
+    parser.add_argument("--no-rerank", action="store_true", help="skip the cross-encoder")
+    parser.add_argument("--no-hybrid", action="store_true", help="dense retrieval only")
     parser.add_argument(
         "--compare",
         action="store_true",
-        help="run with and without reranking and show both",
+        help="run dense/hybrid x with/without reranking, side by side",
     )
     args = parser.parse_args()
 
@@ -294,16 +297,22 @@ async def _main() -> int:
     chunk_size = args.chunk_size or settings.chunk_size
     chunk_overlap = args.chunk_overlap or settings.chunk_overlap
 
-    variants = []
     if args.compare:
+        # The four combinations that matter, so each stage's contribution is
+        # visible on its own rather than only in aggregate.
         variants = [
-            Variant("vectoriel seul", False, chunk_size, chunk_overlap, args.k),
-            Variant("vectoriel + rerank", True, chunk_size, chunk_overlap, args.k),
+            Variant("vectoriel seul", False, False, chunk_size, chunk_overlap, args.k),
+            Variant("vectoriel + rerank", True, False, chunk_size, chunk_overlap, args.k),
+            Variant("hybride seul", False, True, chunk_size, chunk_overlap, args.k),
+            Variant("hybride + rerank", True, True, chunk_size, chunk_overlap, args.k),
         ]
     else:
         rerank = settings.rerank_enabled and not args.no_rerank
-        label = "vectoriel + rerank" if rerank else "vectoriel seul"
-        variants = [Variant(label, rerank, chunk_size, chunk_overlap, args.k)]
+        hybrid = settings.hybrid_enabled and not args.no_hybrid
+        label = ("hybride" if hybrid else "vectoriel") + (
+            " + rerank" if rerank else " seul"
+        )
+        variants = [Variant(label, rerank, hybrid, chunk_size, chunk_overlap, args.k)]
 
     print(f"corpus : {CORPUS_DIR}  |  chunk_size={chunk_size} overlap={chunk_overlap}")
     for variant in variants:

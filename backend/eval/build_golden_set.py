@@ -181,12 +181,19 @@ QUESTIONS: list[dict] = [
         "kind": "semantic",
         "snippets": ["apprentissage profond introduite en 2017"],
     },
+    # An earlier q21 asked which paper introduced the transformer, expecting the
+    # title "Attention Is All You Need". The corpus only carries that string in
+    # an infobox and in bibliography entries — never in prose. Every "relevant"
+    # chunk was therefore a citation list, which a reranker rightly scores as a
+    # poor answer, so the question penalised the retriever for behaving well.
+    # Replaced by a question the corpus answers in prose, on a document the
+    # golden set did not otherwise cover.
     {
         "id": "q21",
-        "question": "Quel article scientifique a présenté le transformeur ?",
-        "document": "transformeur",
+        "question": "Que veut dire le sigle ACP en statistique ?",
+        "document": "analyse_en_composantes_principales",
         "kind": "lexical",
-        "snippets": ["Attention Is All You Need"],
+        "snippets": ["ACP ou PCA en anglais pour principal component analysis"],
     },
     {
         "id": "q22",

@@ -44,6 +44,17 @@ class Settings(BaseSettings):
     min_relevance_score: float = 0.25
     top_k_retrieval: int = 5
 
+    # --- Hybrid retrieval (lexical + vector) ---
+    # Vector search is blind to exact terms (acronyms, proper nouns, foreign
+    # titles); a lexical pass covers exactly that. The two rankings are merged
+    # with Reciprocal Rank Fusion, which combines *ranks* and so needs no
+    # normalisation between two incomparable score scales.
+    hybrid_enabled: bool = True
+    lexical_candidates: int = 20
+    # RRF damping constant. 60 is the value from the original paper and is the
+    # conventional default; higher flattens the contribution of top ranks.
+    rrf_k: int = 60
+
     # --- Reranking (cross-encoder) ---
     # Retrieve `rerank_candidates` chunks by vector similarity, then re-score
     # them with a cross-encoder and keep the best `k`. Set rerank_enabled=False
@@ -51,6 +62,11 @@ class Settings(BaseSettings):
     rerank_enabled: bool = True
     rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
     rerank_candidates: int = 20
+    # How many candidates the cross-encoder is allowed to score. Distinct from
+    # `rerank_candidates`, which is per retriever: fusing two rankings of 20
+    # yields up to 40, and truncating that back to 20 discards most of what the
+    # lexical pass contributed before the reranker ever sees it.
+    rerank_max_candidates: int = 40
     # Drop chunks the cross-encoder scores below this (keeps at least the top 1),
     # so obviously irrelevant passages aren't fed to the LLM or shown as sources.
     rerank_min_score: float = 0.05

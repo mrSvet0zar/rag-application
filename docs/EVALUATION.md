@@ -69,16 +69,19 @@ par un LLM (fidélité, pertinence de la réponse), qui restent hors CI.
 
 ---
 
-## Résultats de référence
+## Résultats
 
 Configuration : `chunk_size=1024`, `chunk_overlap=200`, k=5, embeddings
 `paraphrase-multilingual-MiniLM-L12-v2` (384d), reranking
-`mmarco-mMiniLMv2-L12-H384-v1`. Latences mesurées après préchauffage des modèles.
+`mmarco-mMiniLMv2-L12-H384-v1`, fusion RRF (k=60). Latences mesurées après
+préchauffage des modèles.
 
 | Configuration | hit@5 | doc_hit@5 | recall@5 | precision@5 | MRR | nDCG@5 | p50 | p95 |
 |---|---|---|---|---|---|---|---|---|
 | Vectoriel seul | 0.419 | 0.710 | 0.342 | 0.090 | 0.309 | 0.286 | 22 ms | 25 ms |
-| **Vectoriel + reranking** | **0.548** | **0.774** | **0.422** | **0.123** | **0.492** | **0.411** | 560 ms | 704 ms |
+| Vectoriel + reranking | 0.581 | 0.774 | 0.454 | 0.129 | 0.524 | 0.443 | 577 ms | 701 ms |
+| Hybride seul | 0.645 | 0.806 | 0.517 | 0.135 | 0.346 | 0.372 | 44 ms | 67 ms |
+| **Hybride + reranking** | **0.774** | **0.903** | **0.664** | **0.181** | **0.664** | **0.614** | 1151 ms | 1366 ms |
 
 Par type de question :
 
@@ -86,8 +89,8 @@ Par type de question :
 |---|---|---|---|---|
 | Vectoriel seul | lexical | 0.500 | 0.833 | 0.403 |
 | Vectoriel seul | semantic | 0.368 | 0.632 | 0.250 |
-| Vectoriel + reranking | lexical | 0.750 | 0.917 | 0.708 |
-| Vectoriel + reranking | semantic | 0.421 | 0.684 | 0.355 |
+| Hybride + reranking | **lexical** | **1.000** | **1.000** | **0.917** |
+| Hybride + reranking | semantic | 0.632 | 0.842 | 0.504 |
 
 Reproduire :
 
@@ -99,28 +102,68 @@ cd backend && python -m eval.runner --compare
 
 ## Lecture des résultats
 
-**Le reranking apporte un gain net et chiffré.** hit@5 +31 %, MRR +59 %,
-nDCG@5 +44 % en relatif. Le gain sur le MRR est plus fort que sur le hit@5 :
-le cross-encoder ne trouve pas seulement plus de bons passages, il les **remonte
-en tête**, ce qui compte pour un LLM qui lit mieux le haut de son contexte.
+**Les deux étages font des choses différentes, et c'est mesurable.**
 
-**Il coûte cher.** 22 ms → 560 ms en médiane, soit ×25. C'est le compromis à
-assumer : sur ce corpus il est rentable, mais la décision n'est pas gratuite et
-elle est désormais explicite (`RERANK_ENABLED`).
+- **L'hybride trouve** : à lui seul il fait mieux que le vectoriel + reranking
+  sur `hit@5` (0.645 contre 0.581) **pour 13 fois moins de latence** (44 ms
+  contre 577 ms). Mais son MRR est bien plus faible (0.346 contre 0.524) : il
+  ramène les bons passages sans savoir les ordonner.
+- **Le reranking ordonne** : il gagne peu en `hit@5` mais beaucoup en MRR, parce
+  qu'il remonte le bon passage en tête — ce qui compte pour un LLM qui lit mieux
+  le haut de son contexte.
 
-**L'écart entre `hit@5` (0.55) et `doc_hit@5` (0.77) est le résultat le plus
-utile.** Dans ~22 % des cas, le bon *article* est récupéré mais pas le passage
-qui contient la réponse. Ce n'est donc pas un problème de compréhension du sujet
-mais de **granularité du découpage** — ce qui désigne directement l'A/B testing
-du chunking comme piste, plutôt qu'un changement de modèle d'embeddings.
+Les deux sont donc complémentaires, et c'est leur combinaison qui paie :
+`hit@5` +85 %, MRR +115 %, nDCG@5 +115 % par rapport au vectoriel seul.
 
-**Les questions à terme exact restent le point faible du vectoriel.** Exemple
-concret : « Quel article scientifique a présenté le transformeur ? », dont la
-réponse est le titre anglais *Attention Is All You Need*. La recherche
-vectorielle classe le bon chunk **au 37ᵉ rang** et remonte à la place des
-passages génériques sur l'IA. Aucun réglage de seuil ne rattrape cela — c'est
-structurellement ce qu'une recherche lexicale résout, et c'est la justification
-chiffrée du chantier hybride.
+**Le point aveugle des termes exacts est fermé.** Les 12 questions lexicales
+passent toutes (`hit@5` = 1.000, `doc_hit@5` = 1.000), contre 6 sur 12 pour le
+vectoriel seul. C'était l'hypothèse de départ du chantier hybride ; elle est
+vérifiée.
+
+**L'hybride aide aussi les questions sémantiques** (0.368 → 0.632), ce qui
+n'allait pas de soi : même reformulée, une question française partage souvent
+assez de vocabulaire avec sa réponse pour que le lexical contribue.
+
+**Ce qui reste à traiter.** Les 7 échecs restants sont tous sémantiques, et
+l'écart persistant entre `hit@5` (0.774) et `doc_hit@5` (0.903) dit que le bon
+article est trouvé dans 13 % des cas sans le passage qui répond — un problème de
+granularité de découpage, donc l'objet de l'A/B testing du chunking.
+
+### Deux réglages découverts en mesurant
+
+**Le budget du reranker doit être séparé du pool par moteur.** La fusion de deux
+classements de 20 produit jusqu'à 40 candidats ; les tronquer à 20 avant le
+cross-encoder jetait l'essentiel de l'apport lexical avant tout jugement. En
+passant le plafond à 40 : `hit@5` 0.710 → 0.774, mais la latence double
+(594 → 1151 ms), le cross-encoder notant deux fois plus de passages. Compromis
+assumé et réglable (`RERANK_MAX_CANDIDATES`).
+
+**Le OU lexical n'est pas un détail.** `websearch_to_tsquery` et
+`plainto_tsquery` combinent les termes en **ET** : sur une question en langage
+naturel, aucun chunk ne contient tous les mots de contenu, et la recherche
+lexicale renvoie **zéro résultat**. Les lexèmes sont donc combinés en OU, ce qui
+en refait un problème de classement plutôt qu'un filtre.
+
+---
+
+## Un incident de méthode, et sa correction
+
+La première version du golden set demandait quel article a présenté le
+transformeur, en attendant le titre *Attention Is All You Need*. La question
+échouait dans **les quatre** configurations, y compris avec le lexical, ce qui
+était suspect.
+
+Diagnostic : dans le corpus, cette chaîne n'apparaît **que** dans une infobox et
+dans des listes de références bibliographiques — jamais dans de la prose. Tous
+les chunks marqués « pertinents » étaient donc des blocs de citations, qu'un
+cross-encoder classe à juste titre comme de mauvaises réponses. La question
+pénalisait le moteur pour s'être bien comporté.
+
+C'est une limite intrinsèque d'une vérité terrain définie par sous-chaîne : elle
+ne distingue pas un passage qui **répond** d'un passage qui **mentionne**. La
+question a été remplacée par une autre, réellement ancrée dans de la prose. Le
+garde-fou est de vérifier qu'un échec systématique vient bien du moteur, et non
+de l'annotation.
 
 ---
 
@@ -133,6 +176,10 @@ chiffrée du chantier hybride.
   qu'un à trois chunks pertinents, donc `precision@5` ne peut mécaniquement pas
   dépasser 0.2 à 0.6. Elle sert à comparer des configurations entre elles, pas à
   être lue dans l'absolu.
+- **Une vérité terrain par sous-chaîne ne distingue pas répondre de
+  mentionner** (voir l'incident ci-dessus). Les questions dont la réponse
+  n'existe que dans une bibliographie ou une infobox sont à écarter à
+  l'écriture du golden set.
 - **La pertinence est stricte et au niveau du chunk.** Un chunk du bon article
   qui reformule la réponse sans contenir l'extrait attendu compte comme un
   échec. C'est délibéré — pour répondre il faut le passage, pas le voisinage —
@@ -141,3 +188,12 @@ chiffrée du chantier hybride.
 - **La génération n'est pas évaluée ici.** Ce document ne mesure que la
   récupération, dont tout le reste dépend. Les métriques de fidélité
   (*faithfulness*) jugées par LLM viendront séparément, hors CI.
+- **Le classement lexical n'est pas BM25.** `ts_rank_cd` n'intègre pas de
+  fréquence inverse de document : un terme rare n'est pas privilégié sur un
+  terme courant. Du vrai BM25 demanderait une extension (ParadeDB,
+  `pg_search`) et alourdirait le déploiement.
+- **La recherche lexicale est sensible aux accents.** `to_tsvector('french')`
+  applique la racinisation française mais ne retire pas les accents ; une
+  requête tapée sans accent ne matchera pas. Y remédier suppose de marquer
+  `unaccent` comme IMMUTABLE, ce qu'il n'est pas — mentir là-dessus peut
+  corrompre l'index si le dictionnaire change.

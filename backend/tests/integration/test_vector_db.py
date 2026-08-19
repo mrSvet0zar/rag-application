@@ -268,3 +268,64 @@ async def test_connect_gives_up_after_its_budget(test_settings: Settings):
     )
     with pytest.raises((OSError, asyncpg.PostgresError)):
         await Database(unreachable).connect(max_wait_seconds=0.2)
+
+
+# ---------- lexical search ----------
+async def test_lexical_search_finds_an_exact_term(db: Database):
+    """The case vector search is blind to: a foreign title inside French prose."""
+    await _index(
+        db,
+        "transformeur.md",
+        [
+            "Le transformeur est décrit dans Attention Is All You Need.",
+            "Les réseaux récurrents traitent les séquences pas à pas.",
+        ],
+    )
+
+    results = await db.search_lexical("Attention Is All You Need", top_k=5)
+
+    assert results[0]["text"].startswith("Le transformeur est décrit")
+    assert results[0]["lexical_score"] > 0
+
+
+async def test_lexical_search_ors_the_query_terms(db: Database):
+    """ANDing a natural-language question would match nothing at all: no chunk
+    contains every content word of a real question."""
+    await _index(db, "a.md", ["Le transformeur est une architecture profonde."])
+
+    results = await db.search_lexical(
+        "Quel article scientifique a présenté le transformeur ?", top_k=5
+    )
+
+    assert len(results) == 1
+
+
+async def test_lexical_search_applies_french_stemming(db: Database):
+    """Indexed with the french dictionary, so inflections must match."""
+    await _index(db, "a.md", ["Les vecteurs normalisés facilitent la recherche."])
+
+    assert await db.search_lexical("vecteur normalisé", top_k=5)
+
+
+async def test_lexical_search_returns_nothing_for_a_query_without_lexemes(
+    db: Database,
+):
+    """A query of stopwords parses to an empty tsquery; the guard must hold."""
+    await _index(db, "a.md", ["Un contenu quelconque."])
+
+    assert await db.search_lexical("le la les de des", top_k=5) == []
+
+
+async def test_lexical_search_respects_top_k(db: Database):
+    await _index(db, "a.md", [f"pgvector chunk numéro {i}" for i in range(6)])
+
+    assert len(await db.search_lexical("pgvector", top_k=3)) == 3
+
+
+async def test_lexical_search_joins_the_source_filename(db: Database):
+    await _index(db, "guide.md", ["indexation lexicale du contenu"])
+
+    [hit] = await db.search_lexical("indexation lexicale", top_k=1)
+
+    assert hit["filename"] == "guide.md"
+    assert set(hit) >= {"id", "document_id", "text", "filename", "lexical_score"}

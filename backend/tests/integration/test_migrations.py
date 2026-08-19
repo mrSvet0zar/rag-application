@@ -10,8 +10,9 @@ from __future__ import annotations
 import asyncpg
 import pytest
 
+from alembic.script import ScriptDirectory
 from app.config import Settings
-from app.migrations import run_migrations
+from app.migrations import _alembic_config, run_migrations
 from tests.integration.conftest import _maintenance_url
 
 EXPECTED_TABLES = {"documents", "chunks", "conversations", "messages"}
@@ -67,9 +68,11 @@ async def test_migrates_an_empty_database_to_the_full_schema(blank_database: str
     await run_migrations(blank_database)
 
     assert await _tables(blank_database) >= EXPECTED_TABLES
+    # Compared against Alembic's own head rather than a hard-coded revision, so
+    # adding a migration does not require editing this test.
+    head = ScriptDirectory.from_config(_alembic_config(blank_database)).get_current_head()
     assert (
-        await _scalar(blank_database, "SELECT version_num FROM alembic_version")
-        == "0001_baseline"
+        await _scalar(blank_database, "SELECT version_num FROM alembic_version") == head
     )
 
 
@@ -133,3 +136,46 @@ async def test_migrates_a_database_that_already_has_the_legacy_schema(
         await _scalar(blank_database, "SELECT filename FROM documents")
         == "pre-existing.md"
     )
+
+
+async def test_creates_the_lexical_search_column_and_gin_index(blank_database: str):
+    """Hybrid retrieval depends on the generated tsvector and its index."""
+    await run_migrations(blank_database)
+
+    generated = await _scalar(
+        blank_database,
+        "SELECT is_generated FROM information_schema.columns "
+        "WHERE table_name = 'chunks' AND column_name = 'search_vector'",
+    )
+    assert generated == "ALWAYS", "the column must be maintained by PostgreSQL"
+
+    index = await _scalar(
+        blank_database,
+        "SELECT indexdef FROM pg_indexes WHERE indexname = 'idx_chunks_search_vector'",
+    )
+    assert "gin" in index.lower()
+
+
+async def test_the_search_vector_is_backfilled_for_existing_rows(blank_database: str):
+    """A generated column must cover rows written after it exists, and the
+    migration must have populated the ones written before."""
+    await run_migrations(blank_database)
+
+    conn = await asyncpg.connect(blank_database)
+    try:
+        document_id = await conn.fetchval(
+            "INSERT INTO documents (filename) VALUES ('doc') RETURNING id"
+        )
+        await conn.execute(
+            "INSERT INTO chunks (document_id, chunk_index, text) VALUES ($1, 0, $2)",
+            document_id,
+            "Le transformeur est une architecture d'apprentissage profond.",
+        )
+        matches = await conn.fetchval(
+            "SELECT count(*) FROM chunks "
+            "WHERE search_vector @@ to_tsquery('french', 'transformeur')"
+        )
+    finally:
+        await conn.close()
+
+    assert matches == 1

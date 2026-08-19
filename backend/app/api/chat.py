@@ -22,14 +22,19 @@ router = APIRouter(tags=["chat"])
 
 def _to_source(chunk: dict) -> RetrievedChunk:
     """Map a retrieved chunk row to its API representation."""
-    rerank = chunk.get("rerank_score")
+
+    def score(name: str) -> float | None:
+        value = chunk.get(name)
+        return round(float(value), 4) if value is not None else None
+
     return RetrievedChunk(
         id=chunk["id"],
         text=chunk["text"],
         document_id=chunk["document_id"],
         filename=chunk.get("filename"),
-        similarity_score=round(float(chunk["similarity"]), 4),
-        rerank_score=round(float(rerank), 4) if rerank is not None else None,
+        similarity_score=score("similarity"),
+        lexical_score=score("lexical_score"),
+        rerank_score=score("rerank_score"),
     )
 
 

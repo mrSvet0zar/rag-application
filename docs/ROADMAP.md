@@ -58,21 +58,22 @@ passage — c'est un problème de découpage (A4) ; et les questions à terme
 exact restent mal servies (le titre *Attention Is All You Need* sort au 37ᵉ
 rang), ce qui chiffre l'intérêt de l'hybride (A3).
 
-### A3. Recherche hybride (lexical + vectoriel)
+### A3. Recherche hybride (lexical + vectoriel) ✅
 
-La recherche vectorielle seule échoue sur les termes exacts : références,
-acronymes, noms propres, jargon rare. Le lexical couvre exactement ce trou.
+**Faite.** Colonne `tsvector` générée + index GIN (migration `0002_lexical`),
+recherche full-text dans `Database.search_lexical`, fusion **RRF** dans
+`app/fusion.py`, câblée dans `Retriever`. Réglable par `HYBRID_ENABLED`.
 
-- **Pas d'Elasticsearch** : PostgreSQL fait du full-text nativement
-  (`tsvector` + index GIN + `ts_rank_cd`), fusionnable avec pgvector dans **une
-  seule requête**.
-- Fusion par **RRF** (Reciprocal Rank Fusion) plutôt que somme pondérée : évite
-  d'avoir à normaliser deux échelles de scores incomparables.
-- Corpus francophone → configuration `french` + `unaccent`, pas le défaut anglais.
-- **Honnêteté de vocabulaire** : `ts_rank_cd` n'est pas BM25 au sens strict. On
-  parle de « recherche lexicale full-text », ou on passe par ParadeDB/`pg_search`
-  pour du vrai BM25 (au prix d'un déploiement plus lourd).
-- Nécessite une colonne `tsvector` sur `chunks` → **dépend de B1 (migrations)**.
+Résultats dans [EVALUATION.md](EVALUATION.md) : `hit@5` 0.419 → **0.774**,
+MRR 0.309 → **0.664**. Les 12 questions à terme exact passent toutes.
+
+Trois choses apprises en la construisant :
+- `websearch_to_tsquery` combine les termes en **ET** → zéro résultat sur une
+  question en langage naturel ; il faut combiner les lexèmes en **OU**.
+- Le budget du cross-encoder doit être **distinct** du pool par moteur, sinon la
+  troncature jette l'apport lexical avant de le juger (`RERANK_MAX_CANDIDATES`).
+- Une question du golden set était fausse (réponse présente uniquement en
+  bibliographie) : corrigée, incident documenté.
 
 ### A4. A/B testing des stratégies de chunking
 
@@ -174,6 +175,6 @@ markdown maison sont les zones les plus fragiles.
 1. ~~**B1** (migrations)~~ ✅
 2. ~~**B2** (limite d'upload)~~ ✅
 3. ~~**A1 → A2** (harness + baseline)~~ ✅
-4. **A3 → A4 → A5** (hybride, A/B chunking, tableau de résultats).
+4. ~~**A3**~~ ✅ → **A4 → A5** (A/B chunking, tableau de résultats).
 5. **B3 → B6** (asynchrone, rate limit, readiness, observabilité).
 6. **B7 → B9** (durcissement, API, tests frontend).

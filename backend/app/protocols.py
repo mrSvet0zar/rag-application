@@ -30,11 +30,17 @@ class Reranker(Protocol):
 
 
 class VectorStore(Protocol):
-    """Similarity search over stored chunks."""
+    """Similarity search over stored chunks, dense and lexical.
+
+    Both live behind one interface because they are two views of the same
+    store — in this implementation, two queries against the same table.
+    """
 
     async def search(
         self, query_embedding: list[float], top_k: int, min_score: float
     ) -> list[dict]: ...
+
+    async def search_lexical(self, query: str, top_k: int) -> list[dict]: ...
 
 
 class Generator(Protocol):

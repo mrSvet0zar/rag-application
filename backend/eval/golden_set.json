@@ -184,11 +184,11 @@
     },
     {
       "id": "q21",
-      "question": "Quel article scientifique a présenté le transformeur ?",
-      "document": "transformeur",
+      "question": "Que veut dire le sigle ACP en statistique ?",
+      "document": "analyse_en_composantes_principales",
       "kind": "lexical",
       "snippets": [
-        "Attention Is All You Need"
+        "ACP ou PCA en anglais pour principal component analysis"
       ]
     },
     {

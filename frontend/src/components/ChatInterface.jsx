@@ -192,16 +192,31 @@ function Sources({ sources }) {
                 {s.rerank_score != null ? (
                   <span
                     className="whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
-                    title={`Reranking ${(s.rerank_score * 100).toFixed(0)}% · cosinus ${(s.similarity_score * 100).toFixed(0)}%`}
+                    title={
+                      `Reranking ${(s.rerank_score * 100).toFixed(0)}%` +
+                      // Absent when the passage came from the lexical pass only.
+                      (s.similarity_score != null
+                        ? ` · cosinus ${(s.similarity_score * 100).toFixed(0)}%`
+                        : ' · trouvé par la recherche lexicale')
+                    }
                   >
                     ⭐ {(s.rerank_score * 100).toFixed(0)}%
                   </span>
-                ) : (
+                ) : s.similarity_score != null ? (
                   <span
                     className="whitespace-nowrap rounded bg-brand-50 px-1.5 py-0.5 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                     title="Similarité cosinus"
                   >
                     {(s.similarity_score * 100).toFixed(0)}%
+                  </span>
+                ) : (
+                  // Found by the lexical pass only, so there is no cosine score
+                  // to show — reporting 0 % would be a measurement we never made.
+                  <span
+                    className="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                    title="Trouvé par la recherche lexicale"
+                  >
+                    🔤 lexical
                   </span>
                 )}
               </div>

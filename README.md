@@ -35,7 +35,7 @@ Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonc
 
 ## ✨ Fonctionnalités
 
-- 🔍 **RAG à deux étages** — recherche vectorielle (pgvector, index HNSW) puis **reranking par cross-encoder** multilingue : remonte les passages pertinents que la similarité seule enterre.
+- 🔍 **Recherche hybride + reranking** — recherche vectorielle (pgvector, HNSW) **et** lexicale full-text, fusionnées par *Reciprocal Rank Fusion*, puis re-classées par un cross-encoder multilingue. Le vectoriel comprend la paraphrase, le lexical rattrape les sigles et noms propres qu'il rate.
 - 🧠 **Génération Claude** avec **citation des sources** (`[source: fichier]`) et **streaming SSE** token par token.
 - 🌍 **Embeddings 100 % locaux** (`sentence-transformers`, multilingue FR/EN, 384 dims) — gratuits, sans clé, sans coût.
 - 📥 **Ingestion multi-formats** — `.txt`, `.md`, `.pdf`, `.docx`, `.html`, et **import depuis une URL** (avec garde **anti-SSRF**).
@@ -68,14 +68,17 @@ flowchart LR
 ```mermaid
 flowchart TD
     Q["❓ Question"] --> E["Embedding local<br/>384d multilingue"]
+    Q --> LX["Recherche lexicale<br/>tsvector · GIN · ts_rank_cd"]
     E --> VS["Recherche vectorielle<br/>pgvector · HNSW · cosinus"]
-    VS -->|"pool de ~20 candidats"| RR["🎯 Reranking cross-encoder<br/>re-note chaque paire (question, passage)"]
+    VS -->|"20 candidats"| F["🔀 Fusion RRF<br/>combine les rangs, pas les scores"]
+    LX -->|"20 candidats"| F
+    F -->|"jusqu'à 40"| RR["🎯 Reranking cross-encoder<br/>re-note chaque paire (question, passage)"]
     RR -->|"top-k pertinents"| P["📝 Prompt + contexte"]
     P --> C["🧠 Claude — streaming SSE"]
     C --> A["💬 Réponse + sources citées"]
 ```
 
-**Pourquoi le reranking ?** Un bi-encodeur (embeddings) encode la question et les passages *séparément* — rapide mais grossier. Le cross-encoder lit la paire *ensemble* → bien plus précis. En pratique, un passage à **0.19** de similarité cosinus (sous le seuil !) peut être **re-classé n°1** par le cross-encoder.
+**Pourquoi ces trois étages ?** Un bi-encodeur (embeddings) encode la question et les passages *séparément* — rapide, mais aveugle aux termes exacts : le sigle *ACP* ou un titre anglais dans un texte français lui échappent. La recherche lexicale couvre exactement ce trou, et **RRF** fusionne les deux classements sans avoir à normaliser deux échelles de scores incomparables. Le cross-encoder, lui, lit la paire (question, passage) *ensemble* et corrige l'ordre. [Chiffres à l'appui](docs/EVALUATION.md).
 
 ## 🧱 Stack
 
@@ -84,6 +87,7 @@ flowchart TD
 | Frontend     | React 18 + Vite + Tailwind CSS + React Query                           |
 | Backend      | FastAPI (async) + asyncpg                                              |
 | Embeddings   | `sentence-transformers` (local, multilingue, 384 dims)                 |
+| Recherche    | Hybride : pgvector (HNSW, cosinus) + full-text PostgreSQL, fusion RRF   |
 | Reranking    | Cross-encoder `mmarco-mMiniLMv2` (multilingue)                         |
 | LLM          | Anthropic **Claude** (`claude-sonnet-5`)                               |
 | Vector store | PostgreSQL 16 + **pgvector** (index HNSW, similarité cosinus)          |
@@ -136,7 +140,14 @@ métriques déterministes et latences. Méthode, résultats et limites assumées
 | Configuration | hit@5 | recall@5 | MRR | nDCG@5 | p50 |
 |---|---|---|---|---|---|
 | Vectoriel seul | 0.419 | 0.342 | 0.309 | 0.286 | 22 ms |
-| **Vectoriel + reranking** | **0.548** | **0.422** | **0.492** | **0.411** | 560 ms |
+| Vectoriel + reranking | 0.581 | 0.454 | 0.524 | 0.443 | 577 ms |
+| Hybride seul | 0.645 | 0.517 | 0.346 | 0.372 | 44 ms |
+| **Hybride + reranking** | **0.774** | **0.664** | **0.664** | **0.614** | 1151 ms |
+
+Les deux étages sont complémentaires : **l'hybride trouve** (à lui seul il bat
+vectoriel+reranking sur `hit@5` pour 13× moins de latence), **le reranking
+ordonne** (+ 0.32 de MRR). Ensemble : `hit@5` +85 %, MRR +115 %. Les 12 questions
+à terme exact passent désormais toutes (`hit@5` = 1.000).
 
 ```bash
 cd backend && python -m eval.runner --compare

@@ -173,6 +173,49 @@ class Database:
             )
         return len(records)
 
+    # Must match the configuration used by the generated `search_vector`
+    # column (see migration 0002): a query parsed with a different dictionary
+    # would produce lexemes the index never stored.
+    FTS_CONFIG = "french"
+
+    async def search_lexical(self, query: str, top_k: int = 20) -> list[dict]:
+        """Full-text search over chunks, best first.
+
+        The query text is reduced to its lexemes and combined with OR rather
+        than AND. `websearch_to_tsquery` and `plainto_tsquery` both AND their
+        terms, which for a natural-language question means every content word
+        must appear in the same chunk — in practice that returns nothing at all.
+        ORing keeps it a ranking problem instead of a filter.
+
+        Note this is `ts_rank_cd`, not BM25: PostgreSQL's ranking has no inverse
+        document frequency, so a rare term is not rewarded over a common one.
+        It is still enough to surface exact matches that the embedding misses.
+        """
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(
+                f"""WITH parsed AS (
+                       SELECT to_tsquery('{self.FTS_CONFIG}', (
+                           SELECT string_agg(quote_literal(lexeme), ' | ')
+                           FROM unnest(to_tsvector('{self.FTS_CONFIG}', $1))
+                       )) AS tsq
+                   )
+                   SELECT c.id,
+                          c.document_id,
+                          c.text,
+                          d.filename,
+                          ts_rank_cd(c.search_vector, parsed.tsq) AS lexical_score
+                   FROM chunks c
+                   JOIN documents d ON d.id = c.document_id,
+                        parsed
+                   WHERE parsed.tsq IS NOT NULL
+                     AND c.search_vector @@ parsed.tsq
+                   ORDER BY lexical_score DESC
+                   LIMIT $2""",
+                query,
+                top_k,
+            )
+            return [dict(r) for r in rows]
+
     async def search(
         self, query_embedding: list[float], top_k: int = 5, min_score: float = 0.25
     ) -> list[dict]:
