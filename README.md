@@ -168,6 +168,9 @@ pytest                      # 206 tests (unitaires + intégration), gate de couv
 pytest tests/unit           # sans base de données
 ruff check . && ruff format --check .
 mypy
+
+cd ../frontend
+npm test                    # 24 tests (client SSE, échappement XSS, thème)
 ```
 
 Les tests d'intégration tournent sur une **vraie** base pgvector (créée à la volée,

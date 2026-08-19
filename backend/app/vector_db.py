@@ -157,10 +157,20 @@ class Database:
             )
             return dict(row) if row else None
 
-    async def list_documents(self) -> list[dict]:
+    async def list_documents(self, limit: int = 50, offset: int = 0) -> list[dict]:
+        """Newest first, bounded. An unbounded list is a query that works right
+        up until the day it does not."""
         async with self.pool.acquire() as conn:
-            rows = await conn.fetch("SELECT * FROM documents ORDER BY uploaded_at DESC")
+            rows = await conn.fetch(
+                "SELECT * FROM documents ORDER BY uploaded_at DESC " "LIMIT $1 OFFSET $2",
+                limit,
+                offset,
+            )
             return [dict(r) for r in rows]
+
+    async def count_documents(self) -> int:
+        async with self.pool.acquire() as conn:
+            return int(await conn.fetchval("SELECT COUNT(*) FROM documents") or 0)
 
     async def delete_document(self, document_id: int) -> int:
         """Delete a document; chunks cascade. Returns chunks removed."""
@@ -306,20 +316,35 @@ class Database:
             )
             return message_id
 
-    async def get_conversation(self, conversation_id: UUID) -> dict | None:
+    async def get_conversation(
+        self, conversation_id: UUID, message_limit: int = 200
+    ) -> dict | None:
+        """A conversation with its most recent messages, oldest first.
+
+        Bounded: nothing stops a conversation from growing indefinitely, and
+        loading all of it to render a chat window is a latency cliff waiting to
+        happen.
+        """
         async with self.pool.acquire() as conn:
             convo = await conn.fetchrow(
                 "SELECT * FROM conversations WHERE id = $1", conversation_id
             )
             if not convo:
                 return None
+            # Newest N in SQL, then flipped: taking the *oldest* N would show
+            # the start of a long conversation instead of what just happened.
             messages = await conn.fetch(
                 """SELECT id, role, content, created_at
                    FROM messages WHERE conversation_id = $1
-                   ORDER BY created_at ASC""",
+                   ORDER BY created_at DESC
+                   LIMIT $2""",
                 conversation_id,
+                message_limit,
             )
-            return {**dict(convo), "messages": [dict(m) for m in messages]}
+            return {
+                **dict(convo),
+                "messages": [dict(m) for m in reversed(messages)],
+            }
 
     # ---------- Stats ----------
     async def get_stats(self) -> dict:

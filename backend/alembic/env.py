@@ -24,7 +24,11 @@ from app.config import get_settings
 
 config = context.config
 
-if config.config_file_name is not None:
+# Only configure logging for the standalone `alembic` CLI. When the application
+# runs migrations itself it hands the URL over through `config.attributes`, and
+# fileConfig would reset the root logger — silently replacing the app's JSON
+# formatter with alembic.ini's plain one for the rest of the process.
+if config.config_file_name is not None and not config.attributes.get("database_url"):
     fileConfig(config.config_file_name)
 
 

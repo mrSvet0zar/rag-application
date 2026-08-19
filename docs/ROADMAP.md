@@ -153,43 +153,89 @@ Ce qu'il a fallu traiter, et qui n'existait pas en synchrone :
 > vraie file (ARQ/Celery + Redis) deviendrait justifié avec plusieurs répliques,
 > des reprises automatiques ou des ingestions de plusieurs minutes.
 
-### B4. Pas de rate limiting 🟠
+### B4. Rate limiting ✅
 
-Endpoints publics déclenchant des appels LLM facturés : n'importe qui peut vider
-le crédit Anthropic. → Limitation par IP (slowapi/Redis) sur `/chat*` et l'ingestion.
+**Fait.** Seau à jetons par client, appliqué aux **seuls** endpoints coûteux
+(chat, upload, import d'URL) : une question déclenche un appel LLM facturé, une
+lecture non. Un seau plutôt qu'une fenêtre fixe, qui laisserait dépenser un
+quota complet à la fin d'une fenêtre puis à nouveau au début de la suivante.
 
-### B5. Healthcheck superficiel 🟠
+L'identification du client est le point délicat : derrière un proxy,
+`scope["client"]` est le proxy (tout le monde partagerait un seau) tandis que
+`X-Forwarded-For` est forgeable si rien de confiance ne le réécrit — d'où
+`TRUST_PROXY_HEADERS`, qui en fait une décision de déploiement explicite.
 
-`/health` renvoie `ok` sans vérifier la base : le healthcheck Railway reste vert
-alors que l'application est incapable de répondre.
-→ Séparer *liveness* (`/health`) et *readiness* (`/ready`, avec ping DB).
+> Limite assumée : les seaux sont en mémoire du processus. Avec plusieurs
+> répliques, chacune applique la limite séparément.
 
-### B6. Observabilité 🟠
+### B5. Liveness et readiness séparées ✅
 
-Logs non structurés, pas d'identifiant de corrélation, aucune métrique.
-Impossible de relier un incident utilisateur à une trace.
-→ Logs JSON + `request_id` (middleware), métriques de latence par étape
-(embed / search / rerank / LLM) et coût en tokens, Sentry.
+**Fait.** `/api/health` ne fait aucune I/O (une base lente ne doit pas faire
+tuer un processus sain) ; `/api/ready` fait un aller-retour SQL et répond
+**503** sinon, pour qu'on retire l'instance du trafic au lieu d'échouer devant
+l'utilisateur. Le healthcheck Railway et celui du Dockerfile pointent dessus.
 
-### B7. Durcissement de l'image 🟢
+### B6. Observabilité ✅
 
-Le conteneur tourne en **root** et ne déclare pas de `HEALTHCHECK`.
-→ Utilisateur non privilégié, `HEALTHCHECK`, build multi-stage.
+**Fait.** Logs **JSON** (tout ce qui est passé en `extra` devient une clé de
+premier niveau, donc requêtable), identifiant de requête repris de
+`X-Request-ID` s'il existe et renvoyé dans la réponse, porté par un `contextvar`
+qui suit les `await`. Le middleware est ASGI et le plus externe : les 404, les
+erreurs de validation et les 413 sont donc tracés eux aussi — précisément les
+réponses dont on vous parle.
 
-### B8. Détails d'API 🟢
+Découpage des latences **par étage** sur les deux endpoints de chat
+(récupération / génération / persistance, plus le *time to first token* en
+streaming). « Deux secondes » n'est pas actionnable ; « dont 1,8 dans le
+cross-encoder » l'est.
 
-- Pas de pagination sur `GET /documents` ni de borne sur l'historique de
-  conversation.
-- CORS : `allow_methods=["*"]` combiné à `allow_credentials=True`.
-- Pas de versionnement d'API (`/api/v1`).
+Détail attrapé en vérifiant : `env.py` d'Alembic appelait `fileConfig()`, ce qui
+réinitialisait le logging du processus et remplaçait silencieusement le
+formateur JSON par celui d'`alembic.ini`. Isolé au seul usage CLI.
 
-### B9. Tests frontend 🟢
+### B7. Durcissement de l'image ✅
 
-Le frontend n'a que du lint/format — **aucun test**. Le parsing SSE et le rendu
-markdown maison sont les zones les plus fragiles.
-→ Vitest + Testing Library sur le client SSE, le hook de thème, le rendu des sources.
+**Fait.** Le conteneur tourne sous un utilisateur non privilégié (uid 10001) et
+déclare un `HEALTHCHECK` pointant sur `/api/ready`, avec un `start-period`
+couvrant les migrations et le chargement des modèles. Vérifié : image
+construite, conteneur `healthy` en 5 s, `id` retourne bien `appuser`.
 
----
+> Le multi-stage a été **écarté sciemment** : l'essentiel de l'image est PyTorch
+> et deux modèles pré-téléchargés, qui doivent de toute façon s'y trouver, et
+> les wheels n'exigent aucun compilateur. La complexité n'achèterait presque
+> rien.
+
+### B8. Détails d'API ✅
+
+**Fait.** Pagination bornée et plafonnée sur `GET /api/documents`
+(`limit` ≤ 200), historique de conversation limité aux messages les plus
+**récents** (et non aux plus anciens — sinon on afficherait le début d'une
+longue conversation), et CORS resserré : méthodes et en-têtes énumérés plutôt
+que `*`, ce qui est à la fois plus large que nécessaire et refusé par certains
+navigateurs quand les credentials sont autorisés.
+
+> **Versionnement d'URL (`/api/v1`) : considéré et écarté.** Il n'a de valeur
+> qu'avec des consommateurs externes à ne pas casser ; ici le frontend est le
+> seul client et se déploie avec l'API. L'introduire imposerait un déploiement
+> coordonné (Railway et Vercel déploient indépendamment, donc une fenêtre de
+> désaccord) pour un bénéfice nul aujourd'hui. À faire le jour où un tiers
+> consomme l'API.
+
+### B9. Tests frontend ✅
+
+**Fait.** Vitest + Testing Library, 24 tests, exécutés en CI. Ciblés sur ce qui
+est réellement fragile plutôt que sur du rendu trivial :
+
+- **Le client SSE**, écrit à la main : une frontière de lecture réseau peut
+  tomber au milieu d'une trame, au milieu de plusieurs trames, ou **au milieu
+  d'un caractère UTF-8** — les trois sont couverts.
+- **L'échappement**, qui est ici une propriété de sécurité : le texte de
+  l'assistant passe par `dangerouslySetInnerHTML`. Un `<img onerror>` dans une
+  réponse ou dans un extrait de source doit rester du texte.
+- **Le thème** : préférence système, choix stocké prioritaire, valeur stockée
+  aberrante ignorée.
+- **Les badges de source** : rerank, repli sur le cosinus, et libellé « lexical »
+  quand aucun score de similarité n'existe — plutôt qu'un 0 % inventé.
 
 ## Ordre recommandé
 
@@ -198,4 +244,4 @@ markdown maison sont les zones les plus fragiles.
 3. ~~**A1 → A2** (harness + baseline)~~ ✅
 4. ~~**A3 → A4 → A5**~~ ✅ (hybride, A/B chunking, tableau de résultats).
 5. ~~**B3 → B6**~~ ✅ (asynchrone, rate limit, readiness, observabilité).
-6. **B7 → B9** (durcissement, API, tests frontend).
+6. ~~**B7 → B9**~~ ✅ (durcissement, API, tests frontend).

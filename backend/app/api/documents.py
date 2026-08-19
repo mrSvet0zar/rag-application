@@ -7,7 +7,7 @@ import logging
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import APIRouter, BackgroundTasks, File, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, File, Query, UploadFile, status
 
 from app.deps import DbDep, IngestorDep, SettingsDep
 from app.errors import (
@@ -130,8 +130,14 @@ async def get_document(doc_id: int, db: DbDep) -> DocumentResponse:
 
 
 @router.get("", response_model=list[DocumentResponse])
-async def list_documents(db: DbDep) -> list[DocumentResponse]:
-    return [DocumentResponse(**d) for d in await db.list_documents()]
+async def list_documents(
+    db: DbDep,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+) -> list[DocumentResponse]:
+    """Newest first. Bounded by default, and capped, so no caller can ask the
+    database for everything at once."""
+    return [DocumentResponse(**d) for d in await db.list_documents(limit, offset)]
 
 
 @router.delete("/{doc_id}")

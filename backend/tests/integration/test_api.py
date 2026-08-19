@@ -393,3 +393,39 @@ async def test_unknown_conversation_is_404(harness: Harness):
 
 async def test_malformed_conversation_id_is_422(harness: Harness):
     assert (await harness.client.get("/api/conversations/not-a-uuid")).status_code == 422
+
+
+# ---------- pagination & bounds ----------
+async def test_document_listing_is_paginated(harness: Harness):
+    for index in range(5):
+        await upload(harness, f"doc{index}.md", f"contenu numéro {index}".encode())
+
+    first = (await harness.client.get("/api/documents?limit=2")).json()
+    second = (await harness.client.get("/api/documents?limit=2&offset=2")).json()
+
+    assert len(first) == 2
+    assert len(second) == 2
+    assert {d["id"] for d in first}.isdisjoint({d["id"] for d in second})
+
+
+async def test_document_listing_rejects_an_unbounded_limit(harness: Harness):
+    """The cap is the point: no caller gets to ask for the whole table."""
+    assert (await harness.client.get("/api/documents?limit=100000")).status_code == 422
+    assert (await harness.client.get("/api/documents?limit=0")).status_code == 422
+
+
+async def test_conversation_history_is_bounded_to_the_most_recent(harness: Harness):
+    """A long conversation must not become a latency cliff — and the window
+    kept has to be the recent end, not the beginning."""
+    first = await harness.client.post("/api/chat", json={"question": "q0", "k": 1})
+    conversation_id = first.json()["conversation_id"]
+    for index in range(1, 4):
+        await harness.client.post(
+            "/api/chat",
+            json={"question": f"q{index}", "conversation_id": conversation_id, "k": 1},
+        )
+
+    convo = (await harness.client.get(f"/api/conversations/{conversation_id}")).json()
+    questions = [m["content"] for m in convo["messages"] if m["role"] == "user"]
+
+    assert questions == ["q0", "q1", "q2", "q3"], "ordre chronologique conservé"

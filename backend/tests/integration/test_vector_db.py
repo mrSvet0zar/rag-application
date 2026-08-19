@@ -329,3 +329,26 @@ async def test_lexical_search_joins_the_source_filename(db: Database):
 
     assert hit["filename"] == "guide.md"
     assert set(hit) >= {"id", "document_id", "text", "filename", "lexical_score"}
+
+
+async def test_get_conversation_keeps_the_most_recent_messages(db: Database):
+    """When the cap bites, it must keep the end of the conversation."""
+    conversation_id = await db.create_conversation()
+    for index in range(6):
+        await db.add_message(conversation_id, "user", f"message {index}")
+
+    convo = await db.get_conversation(conversation_id, message_limit=2)
+
+    assert [m["content"] for m in convo["messages"]] == ["message 4", "message 5"]
+
+
+async def test_list_documents_pages_through_newest_first(db: Database):
+    for index in range(4):
+        await db.create_document(f"doc{index}.md", "text/plain", 10)
+
+    page = await db.list_documents(limit=2, offset=0)
+    following = await db.list_documents(limit=2, offset=2)
+
+    assert len(page) == 2 and len(following) == 2
+    assert {d["id"] for d in page}.isdisjoint({d["id"] for d in following})
+    assert await db.count_documents() == 4

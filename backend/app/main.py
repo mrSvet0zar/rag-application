@@ -115,8 +115,12 @@ def create_app(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        # Enumerated rather than "*": with credentials allowed, a wildcard is
+        # both broader than anything this API needs and rejected outright by
+        # some browsers.
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "X-Request-ID"],
+        expose_headers=["X-Request-ID"],
     )
 
     @app.exception_handler(AppError)
