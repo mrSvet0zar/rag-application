@@ -10,18 +10,15 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from pathlib import Path
 from uuid import UUID
 
 import asyncpg
 from pgvector.asyncpg import register_vector
 
 from app.config import Settings
+from app.migrations import run_migrations
 
 logger = logging.getLogger(__name__)
-
-# init_db.sql lives at the backend root (one level above this app/ package).
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "init_db.sql"
 
 
 class Database:
@@ -85,14 +82,13 @@ class Database:
                 delay = min(delay * 2, 8.0)
 
     async def _bootstrap(self) -> None:
-        """One connection attempt: ensure schema, then build the pool.
+        """One connection attempt: migrate the schema, then build the pool.
 
-        register_vector (run on every pooled connection) needs the `vector`
-        type to already exist, so the extension must be created before the pool
-        is built. init_db.sql is idempotent, so this is safe on every startup
-        and removes the need to apply it manually in prod.
+        Order matters: `register_vector` runs on every pooled connection and
+        needs the `vector` type to already exist, so migrations (which create
+        the extension) must complete before the pool is created.
         """
-        await self._ensure_schema()
+        await run_migrations(self.settings.database_url)
         self._pool = await asyncpg.create_pool(
             self.settings.database_url,
             min_size=self.settings.db_pool_min_size,
@@ -100,21 +96,6 @@ class Database:
             init=self._init_connection,
         )
         logger.info("Database pool created.")
-
-    async def _ensure_schema(self) -> None:
-        """Apply init_db.sql once via a plain (non-pgvector) connection."""
-        if not SCHEMA_PATH.exists():
-            logger.warning(
-                "Schema file not found at %s; skipping bootstrap.", SCHEMA_PATH
-            )
-            return
-        sql = SCHEMA_PATH.read_text(encoding="utf-8")
-        conn = await asyncpg.connect(self.settings.database_url)
-        try:
-            await conn.execute(sql)
-            logger.info("Schema ensured (init_db.sql applied).")
-        finally:
-            await conn.close()
 
     @staticmethod
     async def _init_connection(conn: asyncpg.Connection) -> None:

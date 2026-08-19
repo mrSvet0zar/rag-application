@@ -156,12 +156,28 @@ async def test_import_url_rejects_a_non_http_scheme(harness: Harness):
 
 
 class _FakeResponse:
+    """Mimics the streamed response the endpoint consumes.
+
+    The body is served in small pieces so the test exercises the same
+    incremental read path as a real download.
+    """
+
     def __init__(self, html: str) -> None:
-        self.text = html
-        self.content = html.encode()
+        self._body = html.encode()
+        self.encoding = "utf-8"
 
     def raise_for_status(self) -> None:  # pragma: no cover - nothing to do
         pass
+
+    async def aiter_bytes(self):
+        for start in range(0, len(self._body), 16):
+            yield self._body[start : start + 16]
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *_exc):
+        return False
 
 
 def _patch_fetch(monkeypatch: pytest.MonkeyPatch, html: str) -> None:
@@ -179,7 +195,9 @@ def _patch_fetch(monkeypatch: pytest.MonkeyPatch, html: str) -> None:
         async def __aexit__(self, *_exc):
             return False
 
-        async def get(self, _url, **_kwargs):
+        def stream(self, _method, _url, **_kwargs):
+            # Not async: httpx.stream returns an async context manager, it is
+            # not awaited itself.
             return _FakeResponse(html)
 
     monkeypatch.setattr(documents_module.httpx, "AsyncClient", _FakeClient)

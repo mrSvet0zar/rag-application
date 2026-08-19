@@ -96,7 +96,7 @@ async def _truncate(db: Database) -> None:
 async def db(test_settings: Settings):
     """A connected Database on a clean schema (tables emptied)."""
     database = Database(test_settings)
-    await database.connect()  # also applies init_db.sql
+    await database.connect()  # also runs Alembic migrations
     await _truncate(database)
     try:
         yield database
@@ -127,6 +127,13 @@ async def harness(test_settings: Settings, request: pytest.FixtureRequest):
     from tests.doubles import ReversingReranker
 
     reranker = ReversingReranker() if request.node.get_closest_marker("rerank") else None
+
+    # Body-size tests would otherwise have to ship 10 MB of payload.
+    body_limit = request.node.get_closest_marker("max_body")
+    if body_limit is not None:
+        test_settings = test_settings.model_copy(
+            update={"max_upload_bytes": body_limit.args[0]}
+        )
 
     embedder = FakeEmbedder()
     generator = StubGenerator()

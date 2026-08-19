@@ -46,10 +46,17 @@ simple est de déployer **l'image officielle pgvector** comme service :
 > **sous-dossier** et règle le problème. (En local ça ne se produit pas : le
 > *named volume* de docker-compose démarre réellement vide.)
 
-> ✅ **Pas de SQL à exécuter à la main** : au premier démarrage, le backend
-> applique automatiquement `init_db.sql` (extension pgvector + tables + index
-> HNSW). C'est idempotent — il vérifie à chaque démarrage sans rien casser.
-> Il vous suffit donc de fournir la base ; le schéma se crée tout seul.
+> ✅ **Pas de SQL à exécuter à la main** : au démarrage, le backend applique
+> les migrations **Alembic** (`alembic upgrade head`), qui créent l'extension
+> pgvector, les tables et les index. L'opération est protégée par un verrou
+> consultatif PostgreSQL, donc plusieurs instances qui démarrent en même temps
+> ne peuvent pas migrer simultanément. Il vous suffit de fournir la base.
+>
+> Pour faire évoluer le schéma, ajoutez une révision dans
+> `backend/alembic/versions/` : elle sera appliquée au déploiement suivant.
+> Sur une base créée **avant** l'introduction d'Alembic, la révision de
+> référence est idempotente : elle s'applique sans toucher aux données
+> existantes et se contente d'estampiller la base (testé).
 
 > 💡 Alternatives managées avec pgvector inclus : **Neon** ou **Supabase**
 > (créez la base, récupérez l'URL de connexion — le schéma s'appliquera au

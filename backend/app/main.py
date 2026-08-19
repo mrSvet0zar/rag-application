@@ -21,10 +21,12 @@ from app.errors import (
     AppError,
     IngestionFailedError,
     NotFoundError,
+    PayloadTooLargeError,
     UnreadableDocumentError,
     UrlFetchError,
     UrlNotAllowedError,
 )
+from app.middleware import MaxBodySizeMiddleware
 from app.services import Services, build_services
 
 logging.basicConfig(
@@ -36,6 +38,7 @@ logger = logging.getLogger("rag")
 # subclasses before their parents if that ever applies.
 _ERROR_STATUS: tuple[tuple[type[AppError], int], ...] = (
     (NotFoundError, 404),
+    (PayloadTooLargeError, 413),
     (UnreadableDocumentError, 400),
     (UrlNotAllowedError, 400),
     (UrlFetchError, 400),
@@ -73,6 +76,10 @@ def create_app(
             await services.db.disconnect()
 
     app = FastAPI(title="RAG Application API", version="1.0.0", lifespan=lifespan)
+
+    # Added before CORS so it ends up *inside* it: oversized requests are
+    # rejected before any parsing, but the 413 still carries CORS headers.
+    app.add_middleware(MaxBodySizeMiddleware, max_bytes=settings.max_upload_bytes)
 
     app.add_middleware(
         CORSMiddleware,

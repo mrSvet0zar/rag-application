@@ -1,7 +1,8 @@
 """Document ingestion helpers: text extraction (DOCX/HTML) and URL safety.
 
-These are deliberately pure/synchronous so they're easy to unit-test. Network
-I/O (fetching a URL) lives in main.py; here we only validate and parse.
+Parsing and validation here are pure and synchronous, so they are cheap to
+unit-test. The one async helper, `read_capped`, deliberately takes a byte
+stream rather than an HTTP response so it can be exercised without a network.
 """
 
 from __future__ import annotations
@@ -9,7 +10,10 @@ from __future__ import annotations
 import io
 import ipaddress
 import socket
+from collections.abc import AsyncIterator
 from urllib.parse import urlparse
+
+from app.errors import PayloadTooLargeError
 
 # Tags whose text is boilerplate, not content.
 _STRIP_TAGS = [
@@ -124,3 +128,21 @@ def extract_text(filename: str, content: bytes) -> str:
         return content.decode("utf-8")
     except UnicodeDecodeError:
         return content.decode("latin-1")
+
+
+async def read_capped(stream: AsyncIterator[bytes], limit: int, what: str) -> bytes:
+    """Accumulate `stream`, aborting as soon as it exceeds `limit` bytes.
+
+    Buffering the whole body first and checking its length afterwards would
+    spend the memory before noticing — which is the entire problem this guards
+    against.
+    """
+    buffer = bytearray()
+    async for piece in stream:
+        buffer.extend(piece)
+        if len(buffer) > limit:
+            megabytes = limit / (1024 * 1024)
+            raise PayloadTooLargeError(
+                f"{what} trop volumineux (limite : {megabytes:.0f} Mo)."
+            )
+    return bytes(buffer)

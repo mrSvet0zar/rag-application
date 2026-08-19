@@ -12,8 +12,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # init_db.sql runs automatically the first time the volume is created.
-      - ./backend/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+      # No schema seeding here: the backend owns the schema and applies
+      # Alembic migrations at startup (see backend/alembic/).
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rag_user -d rag_db"]
       interval: 5s

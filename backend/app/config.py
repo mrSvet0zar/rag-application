@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     debug: bool = True
+    # Ceiling on any request body (uploads and fetched pages alike). Chosen
+    # to stay well under the container's memory budget, which already holds
+    # two ML models.
+    max_upload_bytes: int = 10 * 1024 * 1024
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     # --- RAG ---

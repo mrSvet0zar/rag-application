@@ -20,6 +20,10 @@ class IngestionFailedError(AppError):
     """Chunking/embedding/storage failed after the document row was created."""
 
 
+class PayloadTooLargeError(AppError):
+    """The request body exceeds the configured size limit."""
+
+
 class NotFoundError(AppError):
     """A referenced resource does not exist."""
 

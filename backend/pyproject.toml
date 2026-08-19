@@ -69,7 +69,10 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
-markers = ["rerank: wire a reranker into the app under test"]
+markers = [
+    "rerank: wire a reranker into the app under test",
+    "max_body: shrink the request body limit, e.g. @pytest.mark.max_body(2048)",
+]
 
 # ------------------------------------------------------------ coverage ----
 [tool.coverage.run]

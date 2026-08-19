@@ -9,22 +9,24 @@ from urllib.parse import urlparse
 import httpx
 from fastapi import APIRouter, File, UploadFile
 
-from app.deps import DbDep, IngestorDep
+from app.deps import DbDep, IngestorDep, SettingsDep
 from app.errors import (
     NotFoundError,
     UnreadableDocumentError,
     UrlFetchError,
     UrlNotAllowedError,
 )
-from app.ingestion import extract_text, html_to_text, validate_public_url
+from app.ingestion import (
+    extract_text,
+    html_to_text,
+    read_capped,
+    validate_public_url,
+)
 from app.schemas import DocumentResponse, UrlImportRequest
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/documents", tags=["documents"])
-
-# Cap on how much of a fetched web page we'll read (bytes).
-MAX_URL_BYTES = 5 * 1024 * 1024
 
 
 @router.post("/upload", response_model=DocumentResponse)
@@ -55,7 +57,9 @@ async def upload_document(
 
 
 @router.post("/import-url", response_model=DocumentResponse)
-async def import_url(req: UrlImportRequest, ingestor: IngestorDep) -> DocumentResponse:
+async def import_url(
+    req: UrlImportRequest, ingestor: IngestorDep, settings: SettingsDep
+) -> DocumentResponse:
     """Fetch a web page, extract its readable text, and index it."""
     url = str(req.url)
 
@@ -66,19 +70,24 @@ async def import_url(req: UrlImportRequest, ingestor: IngestorDep) -> DocumentRe
     except ValueError as exc:
         raise UrlNotAllowedError(f"URL refusée : {exc}") from exc
 
+    limit = settings.max_upload_bytes
     try:
-        async with httpx.AsyncClient(
-            timeout=20.0, follow_redirects=True, max_redirects=5
-        ) as client:
-            resp = await client.get(url, headers={"User-Agent": "RAG-App/1.0"})
+        # Streamed, not `client.get`: a plain get buffers the entire body first,
+        # so checking its size afterwards would happen only once the memory had
+        # already been spent. Here we stop mid-download.
+        async with (
+            httpx.AsyncClient(
+                timeout=20.0, follow_redirects=True, max_redirects=5
+            ) as client,
+            client.stream("GET", url, headers={"User-Agent": "RAG-App/1.0"}) as resp,
+        ):
             resp.raise_for_status()
+            raw = await read_capped(resp.aiter_bytes(), limit, "Page")
+            encoding = resp.encoding or "utf-8"
     except httpx.HTTPError as exc:
         raise UrlFetchError(f"Récupération impossible : {exc}") from exc
 
-    if len(resp.content) > MAX_URL_BYTES:
-        raise UnreadableDocumentError("Page trop volumineuse (> 5 Mo).")
-
-    title, text = html_to_text(resp.text)
+    title, text = html_to_text(raw.decode(encoding, errors="replace"))
     if not text.strip():
         raise UnreadableDocumentError("Aucun texte extractible de cette page.")
 
@@ -87,7 +96,7 @@ async def import_url(req: UrlImportRequest, ingestor: IngestorDep) -> DocumentRe
     document = await ingestor.ingest(
         filename=filename,
         content_type="text/html",
-        size_bytes=len(resp.content),
+        size_bytes=len(raw),
         text=text,
     )
     return DocumentResponse(**document)

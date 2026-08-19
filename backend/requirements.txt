@@ -11,6 +11,7 @@ python-dotenv==1.0.1
 # --- Database (async) ---
 asyncpg==0.30.0
 pgvector==0.3.6
+alembic==1.14.0            # schema migrations (pulls SQLAlchemy, used only as the migration driver)
 
 # --- LLM (Claude) ---
 anthropic==0.42.0
