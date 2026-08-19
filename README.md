@@ -2,7 +2,7 @@
 
 # 🤖 RAG Chatbot — Questions-réponses sur vos documents
 
-**Uploadez vos documents, posez des questions, obtenez des réponses ancrées dans vos sources** — avec citations, streaming en temps réel et reranking par cross-encoder.
+**Uploadez vos documents, posez des questions, obtenez des réponses ancrées dans vos sources** — recherche hybride, reranking, citations et streaming. Chaque choix de récupération est **mesuré**, pas supposé.
 
 [![CI](https://github.com/mrSvet0zar/rag-application/actions/workflows/ci.yml/badge.svg)](https://github.com/mrSvet0zar/rag-application/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
@@ -12,13 +12,15 @@
 ![Claude](https://img.shields.io/badge/LLM-Claude-D97757)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-### [🚀 Démo live](https://rag-application-flax.vercel.app) &nbsp;·&nbsp; [Fonctionnalités](#-fonctionnalités) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Démarrage](#-démarrage-rapide)
+### [🚀 Démo live](https://rag-application-flax.vercel.app) &nbsp;·&nbsp; [Fonctionnalités](#-fonctionnalités) &nbsp;·&nbsp; [Architecture](#-architecture) &nbsp;·&nbsp; [Évaluation](#-évaluation-de-la-recherche) &nbsp;·&nbsp; [Démarrage](#-démarrage-rapide)
 
 </div>
 
 ---
 
-Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonctionnel. Il démontre la maîtrise d'une chaîne RAG complète : chunking, embeddings vectoriels, recherche sémantique, **reranking**, et génération par LLM avec citation des sources.
+Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonctionnel : chunking, embeddings vectoriels, recherche hybride, **reranking** et génération par LLM avec citation des sources.
+
+Ce qui le distingue d'une démo RAG : la qualité de la récupération y est **mesurée sur un jeu de référence** plutôt qu'affirmée, et chaque paramètre — taille de chunk comprise — a été retenu parce qu'il gagne sur ces mesures. Le raisonnement, les compromis assumés et les limites sont écrits dans [docs/EVALUATION.md](docs/EVALUATION.md) et [docs/ROADMAP.md](docs/ROADMAP.md).
 
 > 💡 **Sans clé API ?** L'app tourne quand même : la recherche vectorielle fonctionne et une réponse est construite localement (*mode démo*). Ajoutez une clé Anthropic pour activer les réponses de Claude.
 
@@ -45,7 +47,9 @@ Un chatbot **Retrieval-Augmented Generation** de bout en bout, déployé et fonc
 - 🛡️ **Robustesse** — migrations Alembic au démarrage (sous verrou), retry de connexion, dégradation gracieuse si le LLM est indisponible, corps de requête bornés, mode démo.
 - 🚦 **Rate limiting** — seau à jetons par client sur les seuls endpoints coûteux (un appel LLM est facturé, pas une lecture).
 - 🔭 **Observabilité** — logs JSON structurés, `X-Request-ID` propagé et renvoyé, découpage des latences par étage (récupération / génération / persistance), sondes *liveness* et *readiness* distinctes.
-- ⚙️ **Prêt pour la prod** — Docker, CI GitHub Actions, déployé sur Railway + Vercel.
+- 📏 **Récupération mesurée** — corpus épinglé (1312 chunks), 31 questions annotées, métriques déterministes ; `hit@5` **+108 %** entre la recherche vectorielle nue et la configuration retenue.
+- 🔒 **Surface d'attaque bornée** — garde anti-SSRF sur l'import d'URL, corps de requête plafonnés (contrôlés au niveau ASGI, avant tout parsing), listes paginées, historique borné, CORS énuméré, conteneur non privilégié.
+- ⚙️ **Prêt pour la prod** — image Docker durcie (utilisateur non root, `HEALTHCHECK`), migrations versionnées, CI complète, déployé sur Railway + Vercel.
 
 ## 🏗️ Architecture
 
@@ -56,13 +60,17 @@ flowchart LR
 
     subgraph Traitement
         EMB["🔡 Embeddings locaux<br/>sentence-transformers"]
+        LEX["🔤 Recherche lexicale<br/>full-text PostgreSQL"]
         RR["🎯 Reranking<br/>cross-encoder"]
         LLM["🧠 Claude API"]
     end
 
     BE --> EMB
+    BE --> LEX
     BE --> RR
     BE --> LLM
+    BE -.->|"202, puis en tâche de fond"| ING["📥 Ingestion<br/>chunks + embeddings"]
+    ING --> DB
     BE <--> DB[("🐘 PostgreSQL + pgvector<br/>documents · chunks · conversations")]
 ```
 
@@ -126,7 +134,7 @@ npm install && npm run dev
 | -------- | ---------------------------- | ---------------------------------------- |
 | `POST`   | `/api/documents/upload`      | Upload (txt/md/pdf/docx/html) → **202**, indexé en tâche de fond |
 | `POST`   | `/api/documents/import-url`  | Importe une page web (SSRF-guarded) → **202** |
-| `GET`    | `/api/documents`             | Liste des documents (avec leur statut)   |
+| `GET`    | `/api/documents`             | Liste paginée (`limit` ≤ 200, `offset`)  |
 | `GET`    | `/api/documents/{id}`        | Un document — ce qu'on sonde pendant l'indexation |
 | `DELETE` | `/api/documents/{id}`        | Supprime un document et ses chunks       |
 | `GET`    | `/api/health` · `/api/ready` | Vivacité · capacité à servir (teste la DB) |
@@ -164,13 +172,13 @@ cd backend && python -m eval.runner --compare
 cd backend
 pip install -r requirements-dev.txt
 
-pytest                      # 206 tests (unitaires + intégration), gate de couverture à 80 %
+pytest                      # 268 tests (unitaires + intégration), couverture 90 % (gate à 80 %)
 pytest tests/unit           # sans base de données
 ruff check . && ruff format --check .
 mypy
 
 cd ../frontend
-npm test                    # 24 tests (client SSE, échappement XSS, thème)
+npm test                    # 24 tests (client SSE, échappement XSS, thème, badges)
 ```
 
 Les tests d'intégration tournent sur une **vraie** base pgvector (créée à la volée,
@@ -234,8 +242,8 @@ rag-application/
 │       └── integration/        # vraie PostgreSQL + API de bout en bout
 └── frontend/
     └── src/
-        ├── services/api.js
-        ├── hooks/useTheme.js
+        ├── services/api.js     # client REST + client SSE (+ tests)
+        ├── hooks/useTheme.js   # thème persistant (+ tests)
         └── components/{Navbar,DocumentPanel,ChatInterface}.jsx
 ```
 
