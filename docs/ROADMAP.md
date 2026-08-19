@@ -28,7 +28,7 @@ recommandé est en fin de document.
 L'évaluation vient donc *avant* les optimisations, pour que chacune devienne une
 expérience chiffrée plutôt qu'une intuition.
 
-### A1. Harness d'évaluation + jeu de référence
+### A1. Harness d'évaluation + jeu de référence ✅
 
 - **Golden set** versionné (`backend/eval/golden_set.json`) : ~30-50 questions
   annotées avec les chunks attendus. C'est ~40 % de l'effort du chantier, et la
@@ -45,10 +45,18 @@ expérience chiffrée plutôt qu'une intuition.
 > ⚠️ Ne jamais mettre les métriques LLM-as-judge en gate CI : coût par push,
 > résultats instables, dépendance réseau.
 
-### A2. Baseline
+### A2. Baseline ✅
 
-Faire tourner le harness sur la configuration actuelle (vectoriel + rerank) et
-figer les chiffres. Sans point de départ, aucune amélioration n'est démontrable.
+**Faite.** Résultats et méthode dans [EVALUATION.md](EVALUATION.md).
+Vectoriel seul : hit@5 0.419, MRR 0.309, p50 22 ms. Avec reranking :
+hit@5 0.548, MRR 0.492, p50 560 ms — soit +31 % de hit@5 et +59 % de MRR
+pour ×25 de latence.
+
+Deux constats orientent la suite : l'écart entre `hit@5` (0.55) et
+`doc_hit@5` (0.77) montre que le bon article est souvent trouvé sans le bon
+passage — c'est un problème de découpage (A4) ; et les questions à terme
+exact restent mal servies (le titre *Attention Is All You Need* sort au 37ᵉ
+rang), ce qui chiffre l'intérêt de l'hybride (A3).
 
 ### A3. Recherche hybride (lexical + vectoriel)
 
@@ -165,7 +173,7 @@ markdown maison sont les zones les plus fragiles.
 
 1. ~~**B1** (migrations)~~ ✅
 2. ~~**B2** (limite d'upload)~~ ✅
-3. **A1 → A2** (harness + baseline) — rend mesurable tout ce qui suit.
+3. ~~**A1 → A2** (harness + baseline)~~ ✅
 4. **A3 → A4 → A5** (hybride, A/B chunking, tableau de résultats).
 5. **B3 → B6** (asynchrone, rate limit, readiness, observabilité).
 6. **B7 → B9** (durcissement, API, tests frontend).

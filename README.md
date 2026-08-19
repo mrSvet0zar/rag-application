@@ -126,13 +126,29 @@ npm install && npm run dev
 | `GET`    | `/api/conversations/{id}`    | Historique d'une conversation            |
 | `GET`    | `/api/stats`                 | Statistiques globales                    |
 
+## 📏 Évaluation de la recherche
+
+La qualité de la récupération est **mesurée**, pas supposée : 27 articles épinglés
+à une révision (1312 chunks), 31 questions annotées par extraits verbatim,
+métriques déterministes et latences. Méthode, résultats et limites assumées :
+**[docs/EVALUATION.md](docs/EVALUATION.md)**.
+
+| Configuration | hit@5 | recall@5 | MRR | nDCG@5 | p50 |
+|---|---|---|---|---|---|
+| Vectoriel seul | 0.419 | 0.342 | 0.309 | 0.286 | 22 ms |
+| **Vectoriel + reranking** | **0.548** | **0.422** | **0.492** | **0.411** | 560 ms |
+
+```bash
+cd backend && python -m eval.runner --compare
+```
+
 ## 🧪 Qualité
 
 ```bash
 cd backend
 pip install -r requirements-dev.txt
 
-pytest                      # 80 tests (unitaires + intégration), gate de couverture à 80 %
+pytest                      # 206 tests (unitaires + intégration), gate de couverture à 80 %
 pytest tests/unit           # sans base de données
 ruff check . && ruff format --check .
 mypy
@@ -187,6 +203,8 @@ rag-application/
 │   │   ├── ingestion.py        # extraction docx/html/pdf + garde anti-SSRF
 │   │   ├── errors.py           # erreurs métier
 │   │   └── vector_db.py        # accès DB async + recherche vectorielle
+│   ├── eval/                # corpus épinglé, golden set, métriques, runner
+│   ├── alembic/             # migrations de schéma
 │   └── tests/
 │       ├── doubles.py          # faux embedder/reranker/générateur
 │       ├── unit/               # logique pure, sans I/O
